@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> </head>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
+</head>
 <body>
 
     <header>
@@ -20,7 +21,7 @@
             <ul>
                 <li><a href="#features">Funkcje</a></li>
                 <li><a href="#register">Rejestracja</a></li>
-                <li><a href="#" class="nav-cta">Pobierz Rozszerzenie</a></li>
+                <li><a href="https://chrome.google.com/webstore/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" class="nav-cta" target="_blank" rel="noopener noreferrer">Pobierz Rozszerzenie</a></li>
             </ul>
         </nav>
     </header>
@@ -30,7 +31,7 @@
             <div class="container hero-content">
                 <h1>Przenieś swoje KDP na wyższy poziom.</h1>
                 <p>KDP Wingman to niezbędne narzędzie, które przyspieszy Twoją pracę. Stworzone przez polskiego autora dla polskich autorów, którzy marzą o wolności finansowej i pracy z dowolnego miejsca na świecie.</p>
-                <a href="#register" class="cta-button">Zatrudnij swojego Wingmana</a>
+                <a href="https://chrome.google.com/webstore/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" class="cta-button" target="_blank" rel="noopener noreferrer">Zatrudnij swojego Wingmana</a>
             </div>
         </section>
 
@@ -166,13 +167,12 @@
         const registerForm = document.querySelector('.register-form');
     
         registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Zatrzymujemy domyślną akcję formularza
+            e.preventDefault(); 
     
             const email = registerForm.querySelector('input[type="email"]').value;
             const password = registerForm.querySelector('input[type="password"]').value;
             const passwordConfirm = registerForm.querySelectorAll('input[type="password"]')[1].value;
     
-            // Prosta walidacja po stronie klienta
             if (password !== passwordConfirm) {
                 alert('Błąd: Hasła nie są takie same!');
                 return;
@@ -190,13 +190,11 @@
                 const data = await response.json();
     
                 if (!response.ok) {
-                    // Jeśli serwer zwrócił błąd (np. email zajęty)
                     throw new Error(data.message || 'Wystąpił nieznany błąd.');
                 }
     
-                // Sukces
                 alert('Konto utworzone! Sprawdź skrzynkę e-mail i kliknij link aktywacyjny, aby dokończyć rejestrację.');
-                registerForm.reset(); // Czyścimy formularz
+                registerForm.reset(); 
     
             } catch (error) {
                 console.error('Błąd rejestracji:', error);
@@ -204,7 +202,6 @@
             }
         });
     </script>
-
 
 </body>
 </html>
