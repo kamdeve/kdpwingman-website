@@ -129,6 +129,8 @@ nav a:hover {
 }
 
 .cta-button {
+    display: inline-block; /* <-- DODANA LINIA */
+    cursor: pointer; /* <-- DODANA LINIA */
     background: var(--primary-color);
     color: var(--background-white);
     padding: 15px 35px;
