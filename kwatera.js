@@ -13,15 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                // KROK 2: Przetwarzamy surowe dane
-                const cleanData = processKDPData(rawData);
+                // Przetwarzamy dane z arkusza "Combined Sales"
+                const cleanData = processKDPData(workbook);
 
-                // Na razie wyświetlamy przetworzone dane w konsoli
-                console.log("Dane po przetworzeniu:");
+                // Wyświetlamy przetworzone dane w konsoli
+                console.log("Dane po przetworzeniu z 'Combined Sales':");
                 console.log(cleanData);
             };
 
@@ -34,53 +31,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-
 /**
- * Funkcja do przetwarzania surowych danych z raportu KDP.
- * @param {Array<Array<string>>} data - Surowe dane z pliku Excela.
+ * ZAKTUALIZOWANA funkcja do przetwarzania danych z raportu KDP.
+ * @param {Object} workbook - Cały skoroszyt (plik Excela) odczytany przez SheetJS.
  * @returns {Array<Object>} - Tablica czystych obiektów z danymi o sprzedaży.
  */
-function processKDPData(data) {
+function processKDPData(workbook) {
+    // ZMIANA 1: Szukamy arkusza o konkretnej nazwie "Combined Sales"
+    const sheetName = "Combined Sales";
+    const worksheet = workbook.Sheets[sheetName];
+
+    if (!worksheet) {
+        console.error(`Nie znaleziono arkusza o nazwie "${sheetName}" w raporcie.`);
+        return [];
+    }
+
+    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
     let headerRowIndex = -1;
     let headers = [];
     const processedData = [];
 
-    // 1. Znajdź wiersz nagłówka (szukamy słowa "Date" lub "Data")
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].includes('Date') || data[i].includes('Data')) {
+    // ZMIANA 2: Szukamy wiersza nagłówkowego zawierającego "Royalty Date"
+    for (let i = 0; i < rawData.length; i++) {
+        if (rawData[i].includes('Royalty Date')) {
             headerRowIndex = i;
-            headers = data[i];
+            headers = rawData[i];
             break;
         }
     }
 
-    // Jeśli nie znaleziono nagłówka, zwróć pustą tablicę
     if (headerRowIndex === -1) {
-        console.error("Nie znaleziono wiersza nagłówkowego w raporcie.");
+        console.error("Nie znaleziono wiersza nagłówkowego w arkuszu 'Combined Sales'.");
         return [];
     }
     
-    // Ustal indeksy kluczowych kolumn
-    const dateIndex = headers.indexOf('Date') !== -1 ? headers.indexOf('Date') : headers.indexOf('Data');
+    // ZMIANA 3: Używamy nowych, dokładnych nazw nagłówków do znalezienia indeksów
+    const dateIndex = headers.indexOf('Royalty Date');
     const titleIndex = headers.indexOf('Title');
     const royaltyIndex = headers.indexOf('Royalty');
     const currencyIndex = headers.indexOf('Currency');
     const marketplaceIndex = headers.indexOf('Marketplace');
 
-    // 2. Przejdź przez wiersze z danymi (zaczynając od wiersza po nagłówku)
-    for (let i = headerRowIndex + 1; i < data.length; i++) {
-        const row = data[i];
+    for (let i = headerRowIndex + 1; i < rawData.length; i++) {
+        const row = rawData[i];
         
-        // Pomiń puste wiersze lub wiersze podsumowania
-        if (row.length === 0 || row[dateIndex] === null || row[dateIndex] === undefined) {
+        if (row.length === 0 || !row[dateIndex] || !row[royaltyIndex]) {
             continue;
         }
 
-        // 3. Stwórz czysty obiekt dla każdego wiersza
+        // ZMIANA 4: Upewniamy się, że tantiemy są poprawnie konwertowane na liczbę
+        const royaltyValue = parseFloat(String(row[royaltyIndex]).replace(',', '.'));
+
         const saleRecord = {
             data: row[dateIndex],
             tytul: row[titleIndex],
-            tantiema: row[royaltyIndex],
+            tantiema: royaltyValue,
             waluta: row[currencyIndex],
             rynek: row[marketplaceIndex]
         };
