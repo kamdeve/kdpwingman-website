@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Płatność udana! - KDP Wingman</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; margin: 0; }
+        .box { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; max-width: 500px; }
+        h1 { color: #00C851; margin-bottom: 20px; }
+        p { font-size: 1.1rem; line-height: 1.6; }
+        .btn { display: inline-block; margin-top: 30px; padding: 15px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🎉 Płatność przyjęta!</h1>
+        <p id="message">Weryfikujemy transakcję...</p>
+        <a href="group-buy.html" class="btn">Wróć do zrzutki</a>
+    </div>
+
+    <script>
+        const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
+
+        // Pobierz ID sesji z paska adresu
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        const msg = document.getElementById('message');
+
+        if (sessionId) {
+            // Wyślij ID do backendu, żeby zaksięgować wpłatę
+            fetch(`${API_URL}/api/payment-success`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sessionId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    msg.innerHTML = `Twoje konto zostało doładowane o <strong>${data.amount} zł</strong>.<br>Możesz teraz kliknąć "Dołącz" na stronie głównej!`;
+                } else {
+                    msg.innerText = "Coś poszło nie tak. Skontaktuj się z nami.";
+                    msg.style.color = "#ff4444";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                msg.innerText = "Błąd połączenia. Sprawdź swoje konto.";
+            });
+        } else {
+            msg.innerText = "Błąd: Brak identyfikatora płatności.";
+        }
+    </script>
+</body>
+</html>

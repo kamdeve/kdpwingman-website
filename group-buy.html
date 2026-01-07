@@ -138,10 +138,32 @@
             }
 
             if (statusData.wallet_balance < 40) {
-                showMessage(`⚠️ Masz za mało środków (${statusData.wallet_balance} zł). Wymagane 40 zł.`, "#ffbb33");
-                btn.innerText = "Doładuj konto";
+                showMessage(`⚠️ Masz za mało środków (${statusData.wallet_balance} zł).`, "#ffbb33");
+                btn.innerText = "Zapłać 40 zł (Stripe)";
                 btn.disabled = false;
-                // Tutaj w przyszłości wejdzie przycisk Stripe
+                
+                // Nowa funkcja po kliknięciu: IDŹ DO PŁATNOŚCI
+                btn.onclick = async () => {
+                    btn.innerText = "Łączenie z bankiem...";
+                    btn.disabled = true;
+                    try {
+                        const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email })
+                        });
+                        const payData = await payRes.json();
+                        if(payData.url) {
+                            window.location.href = payData.url; // Przekierowanie do Stripe!
+                        } else {
+                            alert("Błąd płatności");
+                            btn.disabled = false;
+                        }
+                    } catch(err) {
+                        alert("Błąd: " + err.message);
+                        btn.disabled = false;
+                    }
+                };
                 return;
             }
 
