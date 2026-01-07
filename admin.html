@@ -8,6 +8,12 @@
         body { font-family: 'Segoe UI', sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         h1 { color: #2c3e50; text-align: center; }
+        
+        /* Styl okna logowania */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .login-input { padding: 10px; font-size: 16px; width: 200px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        
         .header-stats { display: flex; justify-content: space-around; margin: 30px 0; background: #f8f9fa; padding: 20px; border-radius: 8px; }
         .stat-box { text-align: center; }
         .stat-value { font-size: 2rem; font-weight: bold; color: #007bff; }
@@ -22,32 +28,44 @@
         
         .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
         .btn:hover { background: #0056b3; }
-        .btn-action { background: #6c757d; font-size: 0.8rem; padding: 5px 10px; margin-left: 10px; }
         
-        .password-box { font-family: monospace; background: #eee; padding: 2px 6px; border-radius: 4px; display: none; }
+        /* Ukrywanie panelu głównego przed zalogowaniem */
+        #main-content { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>🔐 Panel Administratora</h2>
+            <p>Podaj klucz dostępu:</p>
+            <input type="password" id="admin-pass" class="login-input" placeholder="Hasło...">
+            <br>
+            <button class="btn" onclick="tryLogin()">Zaloguj</button>
+            <p id="login-msg" style="color: red; margin-top: 10px; font-size: 14px;"></p>
+        </div>
+    </div>
+
+    <div id="main-content" class="container">
         <h1>👑 Panel Zarządzania Zrzutką</h1>
         
         <div style="text-align: center; margin-bottom: 20px;">
-            <button class="btn" onclick="loadParticipants()">🔄 Odśwież Listę Wpłat</button>
+            <button class="btn" onclick="loadParticipants()">🔄 Odśwież Listę</button>
+            <button class="btn" style="background: #6c757d; margin-left: 10px;" onclick="copyEmails()">📋 Kopiuj E-maile</button>
         </div>
 
         <div class="header-stats">
             <div class="stat-box">
                 <div class="stat-value" id="month-display">--</div>
-                <div class="stat-label">Aktualny Miesiąc</div>
+                <div class="stat-label">Miesiąc</div>
             </div>
             <div class="stat-box">
                 <div class="stat-value" id="count-display">0</div>
-                <div class="stat-label">Opłaconych Osób</div>
+                <div class="stat-label">Opłaconych</div>
             </div>
             <div class="stat-box">
                 <div class="stat-value" id="money-display">0 zł</div>
-                <div class="stat-label">Zebrana Kwota</div>
+                <div class="stat-label">Skarbonka</div>
             </div>
         </div>
 
@@ -55,86 +73,103 @@
             <thead>
                 <tr>
                     <th>Email Uczestnika</th>
-                    <th>Wpłata</th>
-                    <th>Data Dołączenia</th>
-                    <th>Akcje</th>
+                    <th>Kwota</th>
+                    <th>Data Wpłaty</th>
+                    <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="tbody">
-                <tr><td colspan="4" style="text-align:center; padding: 20px;">Kliknij "Odśwież", aby pobrać dane...</td></tr>
-            </tbody>
+            <tbody id="tbody"></tbody>
         </table>
     </div>
 
     <script>
-        // UWAGA: Upewnij się, że ten adres jest poprawny (V2 Backend)
         const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
-        const SECRET = "super_tajne_haslo_admina"; 
+        let SECRET_KEY = ""; // Teraz jest puste! Uzupełnimy po wpisaniu hasła.
 
-        async function loadParticipants() {
-            const tbody = document.getElementById('tbody');
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Ładowanie danych...</td></tr>';
+        // Funkcja logowania
+        function tryLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (!pass) return;
+
+            // Zapisujemy to co wpisał użytkownik jako klucz
+            SECRET_KEY = pass;
+            
+            // Próbujemy pobrać dane. Jeśli hasło złe, backend odrzuci.
+            loadParticipants(true);
+        }
+
+        async function loadParticipants(isLoginAttempt = false) {
+            const msg = document.getElementById('login-msg');
+            if(isLoginAttempt) msg.innerText = "Sprawdzanie...";
 
             try {
-                const res = await fetch(`${API_URL}/api/admin/participants?secret=${SECRET}`);
+                const res = await fetch(`${API_URL}/api/admin/participants?secret=${SECRET_KEY}`);
                 const data = await res.json();
 
                 if (!res.ok) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Błąd: ${data.error || "Brak dostępu"}</td></tr>`;
+                    if(isLoginAttempt) {
+                        msg.innerText = "❌ Błędne hasło!";
+                    } else {
+                        alert("Błąd autoryzacji. Odśwież stronę.");
+                    }
                     return;
                 }
 
-                // Aktualizacja statystyk
+                // SUKCES - Pokaż panel, ukryj logowanie
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+
+                // Wypełnij dane
                 document.getElementById('month-display').innerText = data.month;
                 document.getElementById('count-display').innerText = data.count;
                 
-                // Oblicz sumę (prosta matematyka w JS)
                 let totalMoney = 0;
                 if(data.participants.length > 0) {
                     totalMoney = data.participants.reduce((acc, curr) => acc + parseFloat(curr.amount_paid), 0);
                 }
                 document.getElementById('money-display').innerText = totalMoney.toFixed(2) + " zł";
 
-                // Generowanie tabeli
+                const tbody = document.getElementById('tbody');
                 tbody.innerHTML = '';
+                
                 if (data.participants.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Jeszcze nikt nie wpłacił w tym miesiącu.</td></tr>';
-                    return;
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Brak wpłat w tym miesiącu.</td></tr>';
+                } else {
+                    data.participants.forEach(p => {
+                        const row = `<tr>
+                            <td><strong>${p.email}</strong></td>
+                            <td>${p.amount_paid} zł</td>
+                            <td>${new Date(p.joined_at).toLocaleString('pl-PL')}</td>
+                            <td><span class="status-paid">✅ Opłacono</span></td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
                 }
 
-                data.participants.forEach(p => {
-                    const row = `<tr>
-                        <td><strong>${p.email}</strong> <br><span class="status-paid">Opłacono</span></td>
-                        <td>${p.amount_paid} zł</td>
-                        <td>${new Date(p.joined_at).toLocaleString('pl-PL')}</td>
-                        <td>
-                            <button class="btn btn-action" onclick="generatePass(this)">🔑 Generuj Hasło</button>
-                            <span class="password-box"></span>
-                        </td>
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
-
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Błąd połączenia: ${err.message}</td></tr>`;
+                if(isLoginAttempt) msg.innerText = "Błąd połączenia z serwerem.";
+                console.error(err);
             }
         }
 
-        // Mała funkcja pomocnicza dla admina
-        function generatePass(btn) {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            let pass = "";
-            for (let i = 0; i < 8; i++) {
-                pass += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            const span = btn.nextElementSibling;
-            span.innerText = pass;
-            span.style.display = "inline-block";
-            btn.innerText = "Skopiuj";
+        // Funkcja dla Ciebie - kopiuje wszystkie maile do schowka (żebyś mógł wkleić do Outlooka/Gmaila)
+        function copyEmails() {
+            const rows = document.querySelectorAll('#tbody tr td strong');
+            if(rows.length === 0) return alert("Brak maili do skopiowania");
             
-            // Kopiowanie do schowka
-            navigator.clipboard.writeText(pass);
+            let emails = [];
+            rows.forEach(el => emails.push(el.innerText));
+            
+            navigator.clipboard.writeText(emails.join(', '));
+            alert("Skopiowano " + emails.length + " maili do schowka!");
         }
+        
+        // Obsługa Entera w polu hasła
+        document.getElementById('admin-pass').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                tryLogin();
+            }
+        });
     </script>
 </body>
 </html>
