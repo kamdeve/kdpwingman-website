@@ -43,10 +43,21 @@
                         icon.innerHTML = "🎉";
                         icon.classList.remove('loader');
                         title.innerText = "Sukces! Jesteś na liście!";
+                        
+                        // TUTAJ JEST ZMIANA - NOWY TEKST W RAMCE
                         msg.innerHTML = `
                             Twój depozyt (40 zł) został pobrany.<br>
-                            Twoje saldo portfela: <strong>${data.new_balance} zł</strong>.<br><br>
-                            Możesz zamknąć tę stronę. Login i hasło otrzymasz na e-mail 5-go dnia miesiąca.
+                            Aktualne saldo portfela: <strong>${data.new_balance} zł</strong>.
+                            
+                            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 0.95rem; line-height: 1.5; border-left: 4px solid #00C851; text-align: left;">
+                                <strong>💰 Co z resztą pieniędzy?</strong><br>
+                                Spokojnie! Gdy zamkniemy grupę i poznamy finalną cenę, 
+                                różnica <u>automatycznie wróci</u> na Twój wirtualny portfel. 
+                                Będziesz mógł ją wykorzystać w przyszłym miesiącu lub wypłacić.
+                            </div>
+
+                            Możesz bezpiecznie zamknąć tę stronę.<br>
+                            Login i hasło otrzymasz na e-mail <strong>5-go dnia miesiąca</strong>.
                         `;
                     } else {
                         icon.innerHTML = "💰";
