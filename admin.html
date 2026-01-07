@@ -3,150 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admina - KDP Wingman</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Panel Zrzutki - KDP Wingman</title>
     <style>
-        .admin-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        .admin-box { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 900px; /* Zwiększamy szerokość dla tabeli */ }
-        .hidden { display: none !important; }
-        .user-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 14px; }
-        .user-table th, .user-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .user-table th { background-color: #f2f2f2; }
-        /* Nowe style dla siatki ze statystykami */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 1.5rem; margin: 20px 0; }
-        .stats-grid div { background-color: #f8f9fa; padding: 20px; border-radius: 6px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .header-stats { display: flex; justify-content: space-around; margin: 30px 0; background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .stat-box { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #007bff; }
+        .stat-label { color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #f1f3f5; font-weight: 600; color: #495057; }
+        tr:hover { background-color: #f8f9fa; }
+        
+        .status-paid { color: #28a745; font-weight: bold; background: #d4edda; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; }
+        
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .btn:hover { background: #0056b3; }
+        .btn-action { background: #6c757d; font-size: 0.8rem; padding: 5px 10px; margin-left: 10px; }
+        
+        .password-box { font-family: monospace; background: #eee; padding: 2px 6px; border-radius: 4px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <div class="admin-box">
-            <div id="admin-login-view">
-                <h2>Panel Administratora</h2>
-                <p>Zaloguj się, aby zobaczyć statystyki.</p>
-                <form id="admin-login-form" class="register-form">
-                    <input type="email" id="admin-email" placeholder="E-mail admina" required>
-                    <input type="password" id="admin-password" placeholder="Hasło" required>
-                    <button type="submit">Zaloguj się</button>
-                    <p id="admin-login-error" style="color: red; font-size: 14px; margin-top: 10px;"></p>
-                </form>
-            </div>
+    <div class="container">
+        <h1>👑 Panel Zarządzania Zrzutką</h1>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button class="btn" onclick="loadParticipants()">🔄 Odśwież Listę Wpłat</button>
+        </div>
 
-            <div id="admin-stats-view" class="hidden">
-                <h2>Statystyki Aplikacji</h2>
-                <div id="stats-content" class="stats-grid"></div>
-                <div id="user-list-container"></div>
-                <button id="logout-button" class="btn btn-outline" style="margin-top: 20px;">Wyloguj</button>
+        <div class="header-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="month-display">--</div>
+                <div class="stat-label">Aktualny Miesiąc</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="count-display">0</div>
+                <div class="stat-label">Opłaconych Osób</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="money-display">0 zł</div>
+                <div class="stat-label">Zebrana Kwota</div>
             </div>
         </div>
+
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>Email Uczestnika</th>
+                    <th>Wpłata</th>
+                    <th>Data Dołączenia</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <tr><td colspan="4" style="text-align:center; padding: 20px;">Kliknij "Odśwież", aby pobrać dane...</td></tr>
+            </tbody>
+        </table>
     </div>
 
-<script>
-    const loginView = document.getElementById('admin-login-view');
-    const statsView = document.getElementById('admin-stats-view');
-    const loginForm = document.getElementById('admin-login-form');
-    const statsContent = document.getElementById('stats-content');
-    const userListContainer = document.getElementById('user-list-container');
-    const loginError = document.getElementById('admin-login-error');
-    const logoutButton = document.getElementById('logout-button');
+    <script>
+        // UWAGA: Upewnij się, że ten adres jest poprawny (V2 Backend)
+        const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
+        const SECRET = "super_tajne_haslo_admina"; 
 
-    const API_URL = 'https://kdpwingman-backend-production.up.railway.app';
-    let authToken = localStorage.getItem('admin_token');
+        async function loadParticipants() {
+            const tbody = document.getElementById('tbody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Ładowanie danych...</td></tr>';
 
-    // Funkcja do pobierania statystyk i listy użytkowników
-    async function fetchStatsAndUsers() {
-        if (!authToken) { showLoginView(); return; }
+            try {
+                const res = await fetch(`${API_URL}/api/admin/participants?secret=${SECRET}`);
+                const data = await res.json();
 
-        try {
-            // Pobieranie ogólnych statystyk (teraz z nową daną)
-            const statsResponse = await fetch(`${API_URL}/api/admin/stats`, { headers: { 'Authorization': `Bearer ${authToken}` } });
-            if (!statsResponse.ok) throw new Error('Błąd pobierania statystyk.');
-            const statsData = await statsResponse.json();
+                if (!res.ok) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Błąd: ${data.error || "Brak dostępu"}</td></tr>`;
+                    return;
+                }
+
+                // Aktualizacja statystyk
+                document.getElementById('month-display').innerText = data.month;
+                document.getElementById('count-display').innerText = data.count;
+                
+                // Oblicz sumę (prosta matematyka w JS)
+                let totalMoney = 0;
+                if(data.participants.length > 0) {
+                    totalMoney = data.participants.reduce((acc, curr) => acc + parseFloat(curr.amount_paid), 0);
+                }
+                document.getElementById('money-display').innerText = totalMoney.toFixed(2) + " zł";
+
+                // Generowanie tabeli
+                tbody.innerHTML = '';
+                if (data.participants.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Jeszcze nikt nie wpłacił w tym miesiącu.</td></tr>';
+                    return;
+                }
+
+                data.participants.forEach(p => {
+                    const row = `<tr>
+                        <td><strong>${p.email}</strong> <br><span class="status-paid">Opłacono</span></td>
+                        <td>${p.amount_paid} zł</td>
+                        <td>${new Date(p.joined_at).toLocaleString('pl-PL')}</td>
+                        <td>
+                            <button class="btn btn-action" onclick="generatePass(this)">🔑 Generuj Hasło</button>
+                            <span class="password-box"></span>
+                        </td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Błąd połączenia: ${err.message}</td></tr>`;
+            }
+        }
+
+        // Mała funkcja pomocnicza dla admina
+        function generatePass(btn) {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let pass = "";
+            for (let i = 0; i < 8; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            const span = btn.nextElementSibling;
+            span.innerText = pass;
+            span.style.display = "inline-block";
+            btn.innerText = "Skopiuj";
             
-            // Wyświetlanie obu statystyk
-            statsContent.innerHTML = `
-                <div>Wszyscy zweryfikowani:<br><strong>${statsData.verifiedUsers}</strong></div>
-                <div>Aktywni (7 dni):<br><strong>${statsData.activeLast7Days}</strong></div>
-            `;
-
-            // Pobieranie listy użytkowników
-            const usersResponse = await fetch(`${API_URL}/api/admin/users`, { headers: { 'Authorization': `Bearer ${authToken}` } });
-            if (!usersResponse.ok) throw new Error('Błąd pobierania listy użytkowników.');
-            const usersData = await usersResponse.json();
-            displayUserTable(usersData);
-
-            showStatsView();
-
-        } catch (error) {
-            console.error(error);
-            handleAuthError(error.message);
+            // Kopiowanie do schowka
+            navigator.clipboard.writeText(pass);
         }
-    }
-    
-    // Funkcja do renderowania tabeli użytkowników (teraz z nową kolumną)
-    function displayUserTable(users) {
-        let tableHTML = '<table class="user-table"><thead><tr><th>ID</th><th>Email</th><th>Rola</th><th>Zweryfikowany</th><th>Data Rejestracji</th><th>Ostatnie Logowanie</th></tr></thead><tbody>';
-        users.forEach(user => {
-            const registrationDate = new Date(user.created_at).toLocaleString('pl-PL');
-            // Sprawdzamy, czy data ostatniego logowania istnieje, i formatujemy ją
-            const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleString('pl-PL') : 'Brak';
-
-            tableHTML += `
-                <tr>
-                    <td>${user.id}</td>
-                    <td>${user.email}</td>
-                    <td>${user.role}</td>
-                    <td>${user.is_verified ? 'Tak' : 'Nie'}</td>
-                    <td>${registrationDate}</td>
-                    <td>${lastLoginDate}</td>
-                </tr>
-            `;
-        });
-        tableHTML += '</tbody></table>';
-        userListContainer.innerHTML = tableHTML;
-    }
-
-    // Funkcja do logowania
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        loginError.textContent = '';
-        const email = document.getElementById('admin-email').value;
-        const password = document.getElementById('admin-password').value;
-
-        try {
-            const response = await fetch(`${API_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message);
-
-            authToken = data.token;
-            localStorage.setItem('admin_token', authToken);
-            fetchStatsAndUsers();
-        } catch (error) {
-            loginError.textContent = error.message;
-        }
-    });
-    
-    function handleAuthError(message) {
-        localStorage.removeItem('admin_token');
-        showLoginView();
-        loginError.textContent = message;
-    }
-
-    // Pozostałe funkcje (wylogowanie, przełączanie widoków)
-    logoutButton.addEventListener('click', () => { authToken = null; localStorage.removeItem('admin_token'); showLoginView(); });
-    function showLoginView() { loginView.classList.remove('hidden'); statsView.classList.add('hidden'); }
-    function showStatsView() { loginView.classList.add('hidden'); statsView.classList.remove('hidden'); }
-
-    // Sprawdź przy starcie, czy użytkownik jest już zalogowany jako admin
-    if (authToken) {
-        fetchStatsAndUsers();
-    } else {
-        showLoginView();
-    }
-</script>
+    </script>
 </body>
 </html>
