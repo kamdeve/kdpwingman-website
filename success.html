@@ -10,25 +10,27 @@
         h1 { color: #00C851; margin-bottom: 20px; }
         p { font-size: 1.1rem; line-height: 1.6; }
         .btn { display: inline-block; margin-top: 30px; padding: 15px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        .loader { font-size: 2rem; animation: spin 1s infinite linear; display: inline-block; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="box">
-        <h1>🎉 Płatność przyjęta!</h1>
-        <p id="message">Weryfikujemy transakcję...</p>
-        <a href="group-buy.html" class="btn">Wróć do zrzutki</a>
+        <div id="icon" class="loader">⏳</div>
+        <h1 id="title">Przetwarzanie...</h1>
+        <p id="message">Trwa księgowanie wpłaty i zapisywanie na listę.</p>
+        <a href="group-buy.html" class="btn">Wróć na stronę główną</a>
     </div>
 
     <script>
         const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
-
-        // Pobierz ID sesji z paska adresu
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session_id');
+        const title = document.getElementById('title');
         const msg = document.getElementById('message');
+        const icon = document.getElementById('icon');
 
         if (sessionId) {
-            // Wyślij ID do backendu, żeby zaksięgować wpłatę
             fetch(`${API_URL}/api/payment-success`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -37,18 +39,31 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    msg.innerHTML = `Twoje konto zostało doładowane o <strong>${data.amount} zł</strong>.<br>Możesz teraz kliknąć "Dołącz" na stronie głównej!`;
+                    if (data.joined) {
+                        icon.innerHTML = "🎉";
+                        icon.classList.remove('loader');
+                        title.innerText = "Sukces! Jesteś na liście!";
+                        msg.innerHTML = `
+                            Twój depozyt (40 zł) został pobrany.<br>
+                            Twoje saldo portfela: <strong>${data.new_balance} zł</strong>.<br><br>
+                            Możesz zamknąć tę stronę. Login i hasło otrzymasz na e-mail 5-go dnia miesiąca.
+                        `;
+                    } else {
+                        icon.innerHTML = "💰";
+                        icon.classList.remove('loader');
+                        title.innerText = "Portfel doładowany";
+                        msg.innerHTML = `${data.message}<br>Saldo: <strong>${data.new_balance} zł</strong>.`;
+                    }
                 } else {
-                    msg.innerText = "Coś poszło nie tak. Skontaktuj się z nami.";
-                    msg.style.color = "#ff4444";
+                    title.innerText = "Błąd";
+                    msg.innerText = "Nie udało się zweryfikować płatności.";
+                    title.style.color = "#ff4444";
                 }
             })
             .catch(err => {
                 console.error(err);
-                msg.innerText = "Błąd połączenia. Sprawdź swoje konto.";
+                msg.innerText = "Błąd połączenia z serwerem.";
             });
-        } else {
-            msg.innerText = "Błąd: Brak identyfikatora płatności.";
         }
     </script>
 </body>
