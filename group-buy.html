@@ -71,78 +71,82 @@
     </main>
 
     <script>
-    // Twój adres serwera backendowego (z Railway)
     const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
-
-    const form = document.querySelector('form'); // Zakładam, że masz tam formularz
+    const form = document.querySelector('form');
     const emailInput = document.querySelector('input[type="email"]');
     const btn = document.querySelector('button');
-    const messageBox = document.createElement('div'); // Stworzymy miejsce na komunikaty
     
-    // Dodajemy box na komunikaty pod przyciskiem, żeby ładnie wyglądało
-    btn.parentNode.insertBefore(messageBox, btn.nextSibling);
+    // Tworzymy kontener na komunikaty i formularz rejestracji
+    const messageBox = document.createElement('div');
     messageBox.style.marginTop = "15px";
     messageBox.style.fontWeight = "bold";
+    btn.parentNode.insertBefore(messageBox, btn.nextSibling);
 
-    // Funkcja pomocnicza do wyświetlania wiadomości
+    // Kontener na formularz rejestracji (domyślnie ukryty)
+    const registerBox = document.createElement('div');
+    registerBox.style.marginTop = "20px";
+    registerBox.style.padding = "15px";
+    registerBox.style.background = "rgba(255,255,255,0.1)";
+    registerBox.style.borderRadius = "8px";
+    registerBox.style.display = "none";
+    registerBox.innerHTML = `
+        <h3 style="font-size: 1rem; color: white; margin-bottom: 10px;">Nie znaleziono konta. Załóż je szybko:</h3>
+        <input type="password" id="new-password" placeholder="Wymyśl hasło (min. 6 znaków)" 
+               style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: none;">
+        <button id="register-btn" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Załóż konto i dołącz</button>
+    `;
+    btn.parentNode.insertBefore(registerBox, messageBox.nextSibling);
+
     function showMessage(text, color = 'white') {
         messageBox.innerText = text;
         messageBox.style.color = color;
     }
 
+    // --- LOGIKA DOŁĄCZANIA ---
     btn.addEventListener('click', async (e) => {
-        e.preventDefault(); // Żeby strona się nie przeładowała
+        e.preventDefault();
         const email = emailInput.value.trim();
-
-        if (!email) {
-            showMessage("Wpisz adres e-mail!", "#ff4444");
-            return;
-        }
+        if (!email) return showMessage("Wpisz adres e-mail!", "#ff4444");
 
         btn.disabled = true;
         btn.innerText = "Sprawdzanie...";
         showMessage("");
+        registerBox.style.display = "none"; // Ukryj rejestrację przy nowej próbie
 
         try {
-            // 1. Najpierw sprawdzamy stan portfela użytkownika
+            // 1. Sprawdzamy użytkownika
             const statusRes = await fetch(`${API_URL}/api/user/status`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
 
-            const statusData = await statusRes.json();
-
-            if (!statusRes.ok) {
-                // Jeśli błąd (np. brak użytkownika)
-                if(statusRes.status === 404) {
-                     throw new Error("Nie znaleziono takiego e-maila w bazie KDP Wingman. Zarejestruj się najpierw w rozszerzeniu.");
-                }
-                throw new Error(statusData.error || "Błąd połączenia");
+            if (statusRes.status === 404) {
+                showMessage("⚠️ Nie masz jeszcze konta. Uzupełnij hasło poniżej:", "#ffbb33");
+                btn.innerText = "Nie znaleziono konta";
+                registerBox.style.display = "block"; // POKAŻ FORMULARZ REJESTRACJI
+                return;
             }
 
-            // Mamy dane! Sprawdzamy logikę
-            const balance = statusData.wallet_balance;
-            const hasJoined = statusData.has_joined;
-
-            if (hasJoined) {
-                showMessage(`✅ Już jesteś na liście w tym miesiącu! (Portfel: ${balance} zł)`, "#00C851");
+            const statusData = await statusRes.json();
+            
+            // 2. Jeśli ma konto, sprawdzamy status
+            if (statusData.has_joined) {
+                showMessage(`✅ Już jesteś na liście w tym miesiącu!`, "#00C851");
                 btn.innerText = "Już dołączono";
                 return;
             }
 
-            // Jeśli nie dołączył, próbujemy pobrać środki (40 zł)
-            if (balance < 40) {
-                showMessage(`⚠️ Masz za mało środków (${balance} zł). Wymagane 40 zł.`, "#ffbb33");
+            if (statusData.wallet_balance < 40) {
+                showMessage(`⚠️ Masz za mało środków (${statusData.wallet_balance} zł). Wymagane 40 zł.`, "#ffbb33");
                 btn.innerText = "Doładuj konto";
                 btn.disabled = false;
-                // Tutaj w przyszłości podepniemy płatności (Stripe/Przelewy24)
+                // Tutaj w przyszłości wejdzie przycisk Stripe
                 return;
             }
 
-            // 2. Jeśli ma środki, robimy oficjalny zapis!
-            btn.innerText = "Przetwarzanie wpłaty...";
-            
+            // 3. Próba dołączenia (jeśli ma środki)
+            btn.innerText = "Przetwarzanie...";
             const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -150,7 +154,6 @@
             });
             
             const joinData = await joinRes.json();
-
             if (joinRes.ok) {
                 showMessage("🎉 Sukces! Opłacono i dodano do listy.", "#00C851");
                 btn.innerText = "Dołączono!";
@@ -164,6 +167,52 @@
             btn.innerText = "Spróbuj ponownie";
         }
     });
+
+    // --- LOGIKA REJESTRACJI ---
+    document.getElementById('register-btn').addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        const password = document.getElementById('new-password').value.trim();
+
+        if (password.length < 6) {
+            alert("Hasło musi mieć co najmniej 6 znaków!");
+            return;
+        }
+
+        const regBtn = document.getElementById('register-btn');
+        regBtn.innerText = "Zakładanie konta...";
+        regBtn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Konto założone! Teraz możesz dołączyć.");
+                registerBox.style.display = "none";
+                btn.disabled = false;
+                btn.click(); // Automatycznie kliknij główny przycisk po rejestracji
+            } else {
+                alert("Błąd: " + data.message);
+                regBtn.disabled = false;
+                regBtn.innerText = "Załóż konto i dołącz";
+            }
+        } catch (err) {
+            alert("Błąd połączenia: " + err.message);
+            regBtn.disabled = false;
+        }
+    });
+    
+    // Na start pobierz licznik (poprawka dla licznika 0)
+    fetch(`${API_URL}/api/group-buy/status`)
+        .then(r => r.json())
+        .then(d => {
+            if(d.users) document.querySelector('.text-5xl').innerText = d.users;
+        })
+        .catch(e => console.log("Błąd licznika", e));
 </script>
 
 </body>
