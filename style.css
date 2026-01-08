@@ -302,17 +302,18 @@ footer {
         flex-wrap: wrap; /* Pozwala elementom spadać niżej */
     }
 
-    /* Przycisk Hamburgera (domyślnie ukryty na PC, widoczny tu) */
+    /* Przycisk Hamburgera (Ikona Menu) */
     .menu-toggle {
-        display: block !important;
+        display: block !important; /* Wymuszamy widoczność na mobile */
         font-size: 1.8rem;
         cursor: pointer;
         color: var(--primary-color);
+        margin-left: auto; /* Przesuwa ikonę do prawej */
     }
 
     /* Menu mobilne (rozwijane) */
     nav ul {
-        display: none; /* Domyślnie schowane */
+        display: none; /* Domyślnie ukryte */
         flex-direction: column;
         width: 100%;
         text-align: center;
@@ -320,19 +321,27 @@ footer {
         padding: 20px 0;
         box-shadow: 0 10px 15px rgba(0,0,0,0.1);
         position: absolute;
-        top: 70px; /* Wysokość nagłówka */
+        top: 70px; /* Poniżej paska logo */
         left: 0;
         gap: 15px;
+        z-index: 1000;
     }
 
-    /* Klasa, którą doda JavaScript po kliknięciu */
+    /* Klasa 'active' dodawana przez JS pokaże menu */
     nav ul.active {
         display: flex;
     }
 
+    /* Przyciski w menu mobilnym */
     .nav-cta, .nav-login {
-        display: inline-block; /* Żeby przyciski wyglądały dobrze w pionie */
+        display: inline-block;
+        margin-top: 10px;
     }
+}
+
+/* Ukryj hamburgera na dużych ekranach (Desktop) */
+.menu-toggle {
+    display: none;
 }
 
 /* Ukryj hamburgera na dużych ekranach */
