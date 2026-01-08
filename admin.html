@@ -112,13 +112,15 @@
 
             const tWith = document.getElementById('withdraw-table').querySelector('tbody');
             tWith.innerHTML = data.withdrawals.length ? data.withdrawals.map(w => `
-                <tr>
-                    <td>${w.email}</td>
+                <tr style="background: #fff3cd;">
+                    <td>
+                        <strong>${w.email}</strong><br>
+                        <span style="font-size:0.85rem; color:#666;">Konto: ${w.account_number || 'Brak danych'}</span>
+                    </td>
                     <td style="color:red; font-weight:bold;">-${w.amount} zł</td>
                     <td>
-                        <button class="btn btn-red" onclick="confirmWithdraw(${w.id}, '${w.email}', ${w.amount})">
-                            Zrealizuj
-                        </button>
+                        <button class="btn btn-blue" onclick="navigator.clipboard.writeText('${w.account_number}')">Kopiuj NR</button>
+                        <button class="btn btn-red" onclick="confirmWithdraw(${w.id}, '${w.email}', ${w.amount})">Zrealizuj</button>
                     </td>
                 </tr>`).join('') : '<tr><td>Brak zleceń.</td></tr>';
         }
