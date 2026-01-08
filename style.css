@@ -341,3 +341,18 @@ footer {
     font-size: 1rem;
     padding: 12px 30px;
 }
+
+/* Styl przycisku logowania */
+.nav-login {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-login:hover {
+    background-color: var(--primary-color);
+    color: var(--background-white);
+}

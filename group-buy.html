@@ -20,9 +20,8 @@
                 <span>KDP <span class="logo-wingman">Wingman</span></span>
             </a>
             <ul>
-                <li><a href="#features">Funkcje</a></li>
-                <li><a href="#register">Rejestracja</a></li>
-                <li><a href="https://chrome.google.com/webstore/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" class="nav-cta" target="_blank" rel="noopener noreferrer">Pobierz Rozszerzenie</a></li>
+                <li><a href="index.html#features">Funkcje</a></li> <li><a href="index.html#register">Rejestracja</a></li>
+                <li><a href="dashboard.html" class="nav-login" style="border-color: #3b82f6; color: #3b82f6;">🔐 Zaloguj</a></li>
             </ul>
         </nav>
     </header>
@@ -53,6 +52,33 @@
                 <p class="mb-2"><i class="fas fa-hourglass-half mr-2"></i> Zapisy trwają do <strong>20-go dnia miesiąca</strong>.</p>
                 <p><i class="fas fa-envelope mr-2"></i> Dostęp (login/hasło) zostanie wysłany na maila <strong>5-go dnia kolejnego miesiąca</strong>.</p>
             </div>
+
+            <div class="max-w-4xl mx-auto mb-16 text-center">
+                <h2 class="text-2xl font-bold text-white mb-6">💸 Oszczędzamy razem od miesięcy</h2>
+                <p class="text-gray-400 mb-8">Zobacz dowody zakupu z poprzednich edycji. Transparentność to nasza zasada nr 1.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 hover:border-blue-500 transition">
+                        <img src="images/proof1.jpg" alt="Dowód opłacenia Helium 10" class="rounded-lg w-full object-cover h-48 opacity-80 hover:opacity-100 transition">
+                        <p class="text-sm text-gray-400 mt-3">Opłacona faktura (Styczeń)</p>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 hover:border-green-500 transition">
+                        <img src="images/proof2.jpg" alt="Zwroty nadpłaty" class="rounded-lg w-full object-cover h-48 opacity-80 hover:opacity-100 transition">
+                        <p class="text-sm text-gray-400 mt-3">Zwroty nadpłaty na konta użytkowników</p>
+                    </div>
+                </div>
+            </div>
+            ```
+
+### Co teraz musisz zrobić fizycznie?
+1.  W folderze `images` na swoim komputerze umieść dwa pliki:
+    * `proof1.jpg` (Screen faktury/płatności za Helium10 - zamaż dane wrażliwe!).
+    * `proof2.jpg` (Screen potwierdzeń przelewów zwrotnych do ludzi).
+2.  Zapisz zmiany w plikach: `style.css`, `index.html`, `group-buy.html`.
+3.  Wyślij to na GitHub/Railway.
+
+I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedażowej. 🚀
 
             <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700">
                 <form id="signupForm" class="flex flex-col gap-4">
@@ -190,6 +216,8 @@
         }
     });
 
+
+
     // --- LOGIKA REJESTRACJI ---
     document.getElementById('register-btn').addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -228,14 +256,34 @@
         }
     });
     
-    // Na start pobierz licznik (poprawka dla licznika 0)
+
+    
+    // Pobierz status zrzutki
     fetch(`${API_URL}/api/group-buy/status`)
-        .then(r => r.json())
-        .then(d => {
-            if(d.users) document.querySelector('.text-5xl').innerText = d.users;
+        .then(res => res.json())
+        .then(data => {
+            // Aktualizacja licznika na stronie
+            const countEl = document.getElementById('participant-count'); // Upewnij się, że masz takie ID w HTML
+            const priceEl = document.getElementById('current-price');     // Upewnij się, że masz takie ID w HTML
+            
+            if(countEl) countEl.innerText = data.users;
+            if(priceEl) priceEl.innerText = data.price + " zł";
+            
+            // Opcjonalnie: Pasek postępu
+            const progress = document.getElementById('progress-bar-fill');
+            if(progress) {
+                // Zakładamy cel np. 20 osób
+                let percent = (data.users / 20) * 100;
+                if(percent > 100) percent = 100;
+                progress.style.width = percent + "%";
+            }
         })
-        .catch(e => console.log("Błąd licznika", e));
+        .catch(err => console.error("Błąd licznika:", err));
+
+        
 </script>
+
+
 
 </body>
 </html>
