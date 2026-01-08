@@ -82,8 +82,14 @@
             </div>
 
             <div class="max-w-2xl mx-auto mb-16 p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-300">
-                <p class="mb-3 flex items-center justify-center gap-2"><span style="color: #a0134a;">●</span> Zapisy trwają do <strong>20-go dnia miesiąca</strong>.</p>
-                <p class="flex items-center justify-center gap-2"><span style="color: #a0134a;">●</span> Dostęp otrzymasz na maila <strong>5-go dnia kolejnego miesiąca</strong>.</p>
+                <p class="mb-3 flex items-center justify-center gap-2">
+                    <span style="color: #a0134a;">●</span> 
+                    Zapisy trwają do <strong>4-go dnia miesiąca</strong> (startu edycji).
+                </p>
+                <p class="flex items-center justify-center gap-2">
+                    <span style="color: #a0134a;">●</span> 
+                    Dostęp otrzymasz na maila <strong>5-go dnia miesiąca</strong>.
+                </p>
             </div>
 
             <section class="mb-20">
@@ -180,15 +186,34 @@
 
     function updateCountdown() {
         const now = new Date();
-        let targetDate = new Date(now.getFullYear(), now.getMonth(), 20, 23, 59, 59);
-        if (now > targetDate) targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 20, 23, 59, 59);
+        const currentDay = now.getDate();
+        
+        // Logika: Zbieramy do 4-go dnia NASTĘPNEGO miesiąca (chyba że jest początek miesiąca 1-4, wtedy do 4-go TEGO miesiąca)
+        let targetDate;
+        
+        if (currentDay < 5) {
+            // Jesteśmy np. 2 lutego -> Odliczamy do 4 lutego 23:59
+            targetDate = new Date(now.getFullYear(), now.getMonth(), 4, 23, 59, 59);
+        } else {
+            // Jesteśmy np. 10 lutego -> Odliczamy do 4 marca 23:59
+            targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 4, 23, 59, 59);
+        }
+
         const diff = targetDate - now;
+
+        // Jeśli jakimś cudem minęliśmy czas (np. jest 4-ty godzina 23:59:59), zablokuj
+        if (diff < 0) {
+             document.getElementById('countdown').innerText = "PRZETWARZANIE...";
+             return;
+        }
+
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
     }
-    setInterval(updateCountdown, 1000); updateCountdown();
+    setInterval(updateCountdown, 1000); 
+    updateCountdown();
 
     window.addEventListener('scroll', () => { document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 300); });
 
