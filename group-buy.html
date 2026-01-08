@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KDP Wingman - Przenieś swoje KDP na wyższy poziom</title>
+    <title>KDP Wingman - Wspólny Dostęp</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,51 +12,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Style dla Galerii Social Proof */
-        .gallery-container { position: relative; max-width: 900px; margin: 0 auto; overflow: hidden; }
-        .gallery-scroll { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 20px; scrollbar-width: none; }
+        /* Cherry Theme overrides */
+        .text-cherry { color: #a0134a; }
+        .bg-cherry { background-color: #a0134a; }
+        .border-cherry { border-color: #a0134a; }
+        .hover-cherry:hover { border-color: #a0134a; }
+
+        /* Galeria */
+        .gallery-container { position: relative; max-width: 1000px; margin: 0 auto; overflow: hidden; }
+        /* Zmienione na justify-center, żeby przy małej liczbie zdjęć były na środku */
+        .gallery-scroll { 
+            display: flex; 
+            gap: 20px; 
+            overflow-x: auto; 
+            scroll-behavior: smooth; 
+            padding: 20px 0; 
+            scrollbar-width: none; 
+            justify-content: center; /* Wyśrodkowanie zdjęć */
+        }
+        /* Jeśli zdjęć jest dużo, wracamy do startu */
+        .gallery-scroll.overflowing { justify-content: flex-start; }
+        
         .gallery-scroll::-webkit-scrollbar { display: none; }
         
         .proof-item { 
-            min-width: 250px; 
-            max-width: 300px; 
-            background: #1f2937; /* gray-800 */
+            min-width: 260px; 
+            max-width: 260px; 
+            background: #1f2937; 
             border-radius: 12px; 
             padding: 10px; 
-            border: 1px solid #374151; /* gray-700 */
+            border: 2px solid #374151; 
             cursor: pointer; 
-            transition: 0.3s;
+            transition: transform 0.3s, border-color 0.3s;
+            flex-shrink: 0;
         }
         .proof-item:hover { transform: translateY(-5px); border-color: #a0134a; }
         
-        /* Pełne zdjęcie w pionie (dla iPhone screenów) */
         .proof-img { 
             width: 100%; 
-            height: 400px; 
+            height: 420px; 
             object-fit: cover; 
             object-position: top; 
             border-radius: 8px; 
         }
 
-        /* Strzałki */
+        /* Strzałki - dodane type="button" */
         .scroll-btn { 
             position: absolute; top: 50%; transform: translateY(-50%); 
             background: #a0134a; color: white; border: none; 
-            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; 
-            z-index: 10; font-weight: bold; font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
+            z-index: 10; font-weight: bold; font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
         }
-        .scroll-left { left: 0; }
-        .scroll-right { right: 0; }
+        .scroll-btn:hover { background: #c2185b; }
+        .scroll-left { left: 10px; }
+        .scroll-right { right: 10px; }
 
-        /* Lightbox (Powiększenie) */
+        /* Lightbox */
         #lightbox { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 9999; display: none; 
+            background: rgba(0,0,0,0.95); z-index: 9999; display: none; 
             justify-content: center; align-items: center; padding: 20px;
+            backdrop-filter: blur(5px);
         }
         #lightbox img { max-height: 90vh; max-width: 90vw; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2rem; cursor: pointer; }
+        #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -70,7 +92,7 @@
             <ul>
                 <li><a href="index.html#features">Funkcje</a></li> 
                 <li><a href="index.html#register">Rejestracja</a></li>
-                <li><a href="dashboard.html" class="nav-login" style="border-color: #3b82f6; color: #3b82f6;">🔐 Zaloguj</a></li>
+                <li><a href="dashboard.html" class="nav-login" style="border-color: #a0134a; color: #a0134a;">🔐 Zaloguj</a></li>
             </ul>
         </nav>
     </header>
@@ -78,71 +100,90 @@
     <main class="py-20 bg-gray-900 min-h-screen text-white">
         <div class="container mx-auto px-4 text-center">
             
-            <h1 class="text-4xl font-bold mb-4 text-blue-400">Wspólny Dostęp Premium</h1>
-            <p class="text-gray-300 mb-10 text-lg">Dołącz do grupy i płać ułamek ceny. Koszt całkowity (80$) jest dzielony na wszystkich uczestników.</p>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Wspólny Dostęp <span style="color: #a0134a;">Premium</span></h1>
+            <p class="text-gray-300 mb-8 text-lg max-w-2xl mx-auto">
+                Dołącz do grupy i korzystaj z Helium 10 Platinum za ułamek ceny. 
+                Koszt całkowity ($80) jest dzielony na wszystkich.
+            </p>
 
-            <div class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div class="mb-12 inline-block bg-gray-800 px-8 py-4 rounded-full border border-gray-700 shadow-xl">
+                <p class="text-gray-400 text-sm uppercase tracking-widest mb-1">Koniec zapisów za:</p>
+                <div id="countdown" class="text-2xl md:text-3xl font-bold text-white font-mono">
+                    Ładowanie...
+                </div>
+            </div>
+
+            <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700">
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Zgłoszonych osób</p>
                     <div id="participant-count" class="text-6xl font-bold text-white">0</div>
-                    <p class="text-xs text-gray-500 mt-2">w tym miesiącu</p>
+                    <p class="text-xs text-gray-500 mt-2">w bieżącej edycji</p>
                 </div>
                 
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 border-green-500/30 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-green-500 text-black text-xs font-bold px-2 py-1 rounded-bl-lg">TERAZ</div>
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
+                    <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">TERAZ</div>
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
-                    <div id="current-price" class="text-6xl font-bold text-green-400">80.00 $</div>
-                    <p class="text-xs text-gray-500 mt-2">im więcej nas, tym taniej!</p>
+                    
+                    <div id="current-price-usd" class="text-5xl font-bold text-white mb-1">$80.00</div>
+                    
+                    <div id="current-price-pln" class="text-xl font-medium" style="color: #4ade80;">ok. 320 PLN</div>
+                    
+                    <p class="text-xs text-gray-500 mt-3">im więcej nas, tym taniej!</p>
                 </div>
             </div>
 
-            <div class="max-w-2xl mx-auto mb-10 p-6 bg-blue-900/20 border border-blue-500/30 rounded-xl text-blue-200">
-                <p class="mb-2"><i class="fas fa-hourglass-half mr-2"></i> Zapisy trwają do <strong>20-go dnia miesiąca</strong>.</p>
-                <p><i class="fas fa-envelope mr-2"></i> Dostęp (login/hasło) zostanie wysłany na maila <strong>5-go dnia kolejnego miesiąca</strong>.</p>
+            <div class="max-w-2xl mx-auto mb-16 p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-300">
+                <p class="mb-3 flex items-center justify-center gap-2">
+                    <span style="color: #a0134a;">●</span> Zapisy trwają do <strong>20-go dnia miesiąca</strong>.
+                </p>
+                <p class="flex items-center justify-center gap-2">
+                    <span style="color: #a0134a;">●</span> Dostęp otrzymasz na maila <strong>5-go dnia kolejnego miesiąca</strong>.
+                </p>
             </div>
 
-            <section style="padding: 40px 20px; margin-bottom: 60px;">
+            <section style="margin-bottom: 60px;">
                 <h2 class="text-2xl font-bold text-white mb-4">💸 Transparentność to podstawa</h2>
                 <p class="text-gray-400 mb-8 max-w-2xl mx-auto">
-                    Kliknij w zdjęcie, aby zobaczyć pełny dowód przelewu. 
-                    Oto dowody opłacenia narzędzi w poprzednich miesiącach.
+                    Kliknij w zdjęcie, aby powiększyć dowód.
                 </p>
 
                 <div class="gallery-container">
-                    <button class="scroll-btn scroll-left" onclick="scrollGallery(-1)">&#10094;</button>
+                    <button type="button" class="scroll-btn scroll-left" onclick="scrollGallery(-1)">&#10094;</button>
                     
                     <div class="gallery-scroll" id="gallery">
                         <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód 1">
+                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód">
                             <p class="text-gray-400 text-sm mt-2">Styczeń 2026</p>
                         </div>
                         <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof2.jpg" class="proof-img" alt="Dowód 2">
+                            <img src="images/proof2.jpg" class="proof-img" alt="Dowód">
                             <p class="text-gray-400 text-sm mt-2">Grudzień 2025</p>
                         </div>
                         <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód 3">
+                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód">
                             <p class="text-gray-400 text-sm mt-2">Listopad 2025</p>
+                        </div>
+                         <div class="proof-item" onclick="openLightbox(this)">
+                            <img src="images/proof2.jpg" class="proof-img" alt="Dowód">
+                            <p class="text-gray-400 text-sm mt-2">Październik 2025</p>
                         </div>
                     </div>
 
-                    <button class="scroll-btn scroll-right" onclick="scrollGallery(1)">&#10095;</button>
+                    <button type="button" class="scroll-btn scroll-right" onclick="scrollGallery(1)">&#10095;</button>
                 </div>
             </section>
 
-            <div id="lightbox" onclick="this.style.display='none'">
-                <span id="lightbox-close">&times;</span>
-                <img id="lightbox-img" src="">
-            </div>
-            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700">
+            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl">
+                <h3 class="text-xl font-bold mb-6">Dołącz do aktualnej edycji</h3>
                 <form id="signupForm" class="flex flex-col gap-4">
                     <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
                     <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
-                        class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-blue-500 focus:outline-none transition">
+                        class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-pink-500 focus:outline-none transition">
                     
                     <button type="submit" 
-                        class="w-full py-4 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1">
-                        Dołącz do listy
+                        class="w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1"
+                        style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);">
+                        Sprawdź status / Dołącz
                     </button>
                 </form>
                 <p id="message" class="mt-4 text-sm hidden"></p>
@@ -150,187 +191,132 @@
         </div>
     </main>
 
+    <div id="lightbox" onclick="this.style.display='none'">
+        <span id="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="">
+    </div>
+
     <script>
     const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
-    const form = document.querySelector('form');
-    const emailInput = document.querySelector('input[type="email"]');
-    const btn = document.querySelector('button');
-    
-    // Tworzymy kontener na komunikaty i formularz rejestracji
-    const messageBox = document.createElement('div');
-    messageBox.style.marginTop = "15px";
-    messageBox.style.fontWeight = "bold";
-    btn.parentNode.insertBefore(messageBox, btn.nextSibling);
+    const messageBox = document.getElementById('message');
+    const form = document.getElementById('signupForm');
+    const emailInput = document.getElementById('emailInput');
+    const btn = form.querySelector('button');
 
-    // Kontener na formularz rejestracji (domyślnie ukryty)
-    const registerBox = document.createElement('div');
-    registerBox.style.marginTop = "20px";
-    registerBox.style.padding = "15px";
-    registerBox.style.background = "rgba(255,255,255,0.1)";
-    registerBox.style.borderRadius = "8px";
-    registerBox.style.display = "none";
-    registerBox.innerHTML = `
-        <h3 style="font-size: 1rem; color: white; margin-bottom: 10px;">Nie znaleziono konta. Załóż je szybko:</h3>
-        <input type="password" id="new-password" placeholder="Wymyśl hasło (min. 6 znaków)" 
-               style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: none; color: #000;"> 
-        <button id="register-btn" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Załóż konto i dołącz</button>
-    `;
-    btn.parentNode.insertBefore(registerBox, messageBox.nextSibling);
+    // --- 1. LICZNIK CZASU (COUNTDOWN) ---
+    function updateCountdown() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth(); // 0-11
+        
+        // Cel: 20-ty dzień tego miesiąca, godzina 23:59:59
+        let targetDate = new Date(currentYear, currentMonth, 20, 23, 59, 59);
 
-    function showMessage(text, color = 'white') {
-        messageBox.innerText = text;
-        messageBox.style.color = color;
+        // Jeśli jest już po 20-tym, celujemy w 20-ty dzień NASTĘPNEGO miesiąca
+        if (now > targetDate) {
+            targetDate = new Date(currentYear, currentMonth + 1, 20, 23, 59, 59);
+        }
+
+        const diff = targetDate - now;
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
     }
+    setInterval(updateCountdown, 1000); // Odświeżaj co sekundę
+    updateCountdown(); // Pierwsze wywołanie od razu
 
-    // --- LOGIKA DOŁĄCZANIA ---
-    btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        if (!email) return showMessage("Wpisz adres e-mail!", "#ff4444");
-
-        btn.disabled = true;
-        btn.innerText = "Sprawdzanie...";
-        showMessage("");
-        registerBox.style.display = "none"; 
-
-        try {
-            // 1. Sprawdzamy użytkownika
-            const statusRes = await fetch(`${API_URL}/api/user/status`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
-
-            if (statusRes.status === 404) {
-                showMessage("⚠️ Nie masz jeszcze konta. Uzupełnij hasło poniżej:", "#ffbb33");
-                btn.innerText = "Nie znaleziono konta";
-                registerBox.style.display = "block"; 
-                return;
-            }
-
-            const statusData = await statusRes.json();
+    // --- 2. POBIERANIE STATUSU (CENA I LICZBA OSÓB) ---
+    fetch(`${API_URL}/api/group-buy/status`)
+        .then(res => res.json())
+        .then(data => {
+            const countEl = document.getElementById('participant-count');
+            const priceUsdEl = document.getElementById('current-price-usd');
+            const pricePlnEl = document.getElementById('current-price-pln');
             
-            // 2. Jeśli ma konto, sprawdzamy status
-            if (statusData.has_joined) {
-                showMessage(`✅ Już jesteś na liście w tym miesiącu!`, "#00C851");
-                btn.innerText = "Już dołączono";
-                return;
-            }
-
-            if (statusData.wallet_balance < 40) {
-                showMessage(`⚠️ Masz za mało środków (${statusData.wallet_balance} zł).`, "#ffbb33");
-                btn.innerText = "Zapłać 40 zł (Stripe)";
-                btn.disabled = false;
-                
-                // Płatność
-                btn.onclick = async () => {
-                    btn.innerText = "Łączenie z bankiem...";
-                    btn.disabled = true;
-                    try {
-                        const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email })
-                        });
-                        const payData = await payRes.json();
-                        if(payData.url) {
-                            window.location.href = payData.url; 
-                        } else {
-                            alert("Błąd płatności");
-                            btn.disabled = false;
-                        }
-                    } catch(err) {
-                        alert("Błąd: " + err.message);
-                        btn.disabled = false;
-                    }
-                };
-                return;
-            }
-
-            // 3. Próba dołączenia
-            btn.innerText = "Przetwarzanie...";
-            const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
+            if(countEl) countEl.innerText = data.users;
             
-            const joinData = await joinRes.json();
-            if (joinRes.ok) {
-                showMessage("🎉 Sukces! Opłacono i dodano do listy.", "#00C851");
-                btn.innerText = "Dołączono!";
-            } else {
-                throw new Error(joinData.error);
-            }
+            // Wyświetlanie cen z backendu
+            if(priceUsdEl) priceUsdEl.innerText = `$${data.priceUSD}`;
+            if(pricePlnEl) pricePlnEl.innerText = `ok. ${data.pricePLN} PLN`;
+        })
+        .catch(err => console.error("Błąd licznika:", err));
 
-        } catch (err) {
-            showMessage("❌ Błąd: " + err.message, "#ff4444");
-            btn.disabled = false;
-            btn.innerText = "Spróbuj ponownie";
-        }
-    });
-
-    // --- LOGIKA REJESTRACJI ---
-    document.getElementById('register-btn').addEventListener('click', async () => {
-        const email = emailInput.value.trim();
-        const password = document.getElementById('new-password').value.trim();
-
-        if (password.length < 6) {
-            alert("Hasło musi mieć co najmniej 6 znaków!");
-            return;
-        }
-
-        const regBtn = document.getElementById('register-btn');
-        regBtn.innerText = "Zakładanie konta...";
-        regBtn.disabled = true;
-
-        try {
-            const res = await fetch(`${API_URL}/api/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                alert("Konto założone! Teraz możesz dołączyć.");
-                registerBox.style.display = "none";
-                btn.disabled = false;
-                btn.click(); 
-            } else {
-                alert("Błąd: " + data.message);
-                regBtn.disabled = false;
-                regBtn.innerText = "Załóż konto i dołącz";
-            }
-        } catch (err) {
-            alert("Błąd połączenia: " + err.message);
-            regBtn.disabled = false;
-        }
-    });
-    
-    // --- SKRYPT GALERII ---
+    // --- 3. GALERIA (PRZEWIJANIE) ---
     function scrollGallery(direction) {
         const gal = document.getElementById('gallery');
+        // Przewija o 300px w lewo lub prawo
         gal.scrollBy({ left: direction * 300, behavior: 'smooth' });
     }
+    
     function openLightbox(element) {
         const src = element.querySelector('img').src;
         document.getElementById('lightbox-img').src = src;
         document.getElementById('lightbox').style.display = 'flex';
     }
 
-    // --- POBIERANIE STATUSU (LICZNIK) ---
-    fetch(`${API_URL}/api/group-buy/status`)
-        .then(res => res.json())
-        .then(data => {
-            const countEl = document.getElementById('participant-count');
-            const priceEl = document.getElementById('current-price');
-            
-            if(countEl) countEl.innerText = data.users;
-            if(priceEl) priceEl.innerText = data.price + " zł";
-        })
-        .catch(err => console.error("Błąd licznika:", err));
+    // --- 4. OBSŁUGA DOŁĄCZANIA (Twój stary kod, lekko dopasowany) ---
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        if (!email) {
+            messageBox.innerText = "Wpisz e-mail!";
+            messageBox.style.display = "block";
+            messageBox.style.color = "red";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Sprawdzanie...";
         
+        try {
+            // Logika sprawdzania (Status / Join) - skopiowana z Twojego poprzedniego pliku
+            const statusRes = await fetch(`${API_URL}/api/user/status`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+            });
+
+            if (statusRes.status === 404) {
+                // Nie ma konta - przekieruj do rejestracji na index.html lub pokaż komunikat
+                alert("Nie znaleziono konta. Zarejestruj się na stronie głównej!");
+                window.location.href = "index.html#register";
+                return;
+            }
+
+            const statusData = await statusRes.json();
+            
+            if (statusData.has_joined) {
+                alert("Już jesteś na liście!");
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            if (statusData.wallet_balance < 40) {
+                // PŁATNOŚĆ
+                if(confirm(`Masz za mało środków (${statusData.wallet_balance} zł). Przejść do płatności 40 zł?`)) {
+                    const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+                    });
+                    const payData = await payRes.json();
+                    if(payData.url) window.location.href = payData.url;
+                }
+            } else {
+                // AUTO JOIN
+                if(confirm("Masz środki w portfelu. Dołączyć do zrzutki?")) {
+                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+                    });
+                    if(joinRes.ok) { alert("Dołączono!"); window.location.href = "dashboard.html"; }
+                }
+            }
+        } catch (err) {
+            alert("Błąd: " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Sprawdź status / Dołącz";
+        }
+    });
 </script>
 
 </body>
