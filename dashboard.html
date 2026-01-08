@@ -6,13 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background: #1e293b; padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .box { background: #1e293b; padding: 40px; border-radius: 15px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-blue { background: #3b82f6; color: white; }
         .btn-red { background: #ef4444; color: white; }
         .balance { font-size: 2.5rem; font-weight: bold; color: #00C851; margin: 20px 0; }
         .hidden { display: none; }
+        
+        /* Style zakładek */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .tab-label { cursor: pointer; padding: 8px 12px; background: #334155; border-radius: 6px; font-size: 0.85rem; opacity: 0.7; transition: 0.2s; border: 1px solid transparent; }
+        .tab-label:hover { opacity: 1; }
+        input[type="radio"] { display: none; }
+        input[type="radio"]:checked + .tab-label { background: #3b82f6; opacity: 1; border-color: #60a5fa; font-weight: bold; }
+
+        .form-section { text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-top: 10px; }
+        label { font-size: 0.8rem; color: #94a3b8; margin-left: 2px; }
     </style>
 </head>
 <body>
@@ -29,13 +39,53 @@
         <h3>Twój Portfel</h3>
         <div class="balance" id="balance">0.00 zł</div>
         
-        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-            <label style="font-size: 0.9rem; color: #94a3b8;">Kwota do wypłaty (PLN)</label>
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <label style="font-size: 1rem; color: white; margin-bottom: 10px; display:block;">Ile chcesz wypłacić?</label>
             <input type="number" id="withdraw-amount" placeholder="np. 10.00">
-            
-            <label style="font-size: 0.9rem; color: #94a3b8; display:block; margin-top:10px;">Numer Konta Bankowego (PL)</label>
-            <input type="text" id="withdraw-account" placeholder="np. 11 1020 3040...">
-            
+
+            <p style="margin: 20px 0 10px 0; font-size: 0.9rem; color: #cbd5e1;">Gdzie wysłać pieniądze?</p>
+
+            <div class="tabs">
+                <label>
+                    <input type="radio" name="method" value="pl" checked onchange="switchTab('pl')">
+                    <span class="tab-label">🇵🇱 Polska</span>
+                </label>
+                <label>
+                    <input type="radio" name="method" value="uk" onchange="switchTab('uk')">
+                    <span class="tab-label">🇬🇧 UK</span>
+                </label>
+                <label>
+                    <input type="radio" name="method" value="other" onchange="switchTab('other')">
+                    <span class="tab-label">🌍 Inne / PayPal</span>
+                </label>
+            </div>
+
+            <div id="form-pl" class="form-section">
+                <label>Numer konta (26 cyfr)</label>
+                <input type="text" id="pl-account" placeholder="XX XXXX XXXX..." maxlength="32" oninput="formatPL(this)">
+            </div>
+
+            <div id="form-uk" class="form-section hidden">
+                <label>Imię i Nazwisko (Account Holder Name)</label>
+                <input type="text" id="uk-name" placeholder="np. John Smith">
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>Sort Code</label>
+                        <input type="text" id="uk-sort" placeholder="11-22-33" maxlength="8">
+                    </div>
+                    <div style="flex:2">
+                        <label>Account Number</label>
+                        <input type="text" id="uk-acc" placeholder="12345678" maxlength="10">
+                    </div>
+                </div>
+            </div>
+
+            <div id="form-other" class="form-section hidden">
+                <label>IBAN lub E-mail PayPal</label>
+                <input type="text" id="other-data" placeholder="np. DE12... lub jan@gmail.com">
+            </div>
+
             <button class="btn btn-blue" onclick="withdraw()">💸 Zleć Wypłatę</button>
         </div>
 
@@ -45,6 +95,23 @@
     <script>
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
         let userEmail = "";
+
+        // Przełączanie widoków (Logika zakładek)
+        function switchTab(type) {
+            document.getElementById('form-pl').classList.add('hidden');
+            document.getElementById('form-uk').classList.add('hidden');
+            document.getElementById('form-other').classList.add('hidden');
+            
+            document.getElementById('form-' + type).classList.remove('hidden');
+        }
+
+        // Formatowanie polskiego konta (Dodaje spacje co 4 cyfry)
+        function formatPL(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 26);
+            // Dodaj spacje co 4 znaki (XX XXXX XXXX...)
+            let formatted = v.replace(/(^.{2})|(.{4})/g, '$& ').trim();
+            input.value = formatted;
+        }
 
         async function login() {
             const email = document.getElementById('email').value;
@@ -78,25 +145,44 @@
 
         async function withdraw() {
             const amount = document.getElementById('withdraw-amount').value;
-            const account = document.getElementById('withdraw-account').value; // Pobieramy numer
+            const type = document.querySelector('input[name="method"]:checked').value;
+            
+            let finalAccountString = "";
+
+            // Logika sklejania danych w zależności od wyboru
+            if (type === 'pl') {
+                const num = document.getElementById('pl-account').value;
+                if(num.length < 20) return alert("Polski numer konta jest za krótki!");
+                finalAccountString = `[PL] ${num}`;
+            } 
+            else if (type === 'uk') {
+                const name = document.getElementById('uk-name').value;
+                const sort = document.getElementById('uk-sort').value;
+                const acc = document.getElementById('uk-acc').value;
+                if(!name || !sort || !acc) return alert("Uzupełnij wszystkie dane dla UK!");
+                finalAccountString = `[UK] ${name} | SC: ${sort} | ACC: ${acc}`;
+            } 
+            else {
+                const other = document.getElementById('other-data').value;
+                if(!other) return alert("Wpisz dane do przelewu!");
+                finalAccountString = `[INNE] ${other}`;
+            }
 
             if(!amount || amount <= 0) return alert("Wpisz kwotę!");
-            if(!account || account.length < 5) return alert("Wpisz numer konta!"); // Sprawdzamy
-
-            if(!confirm(`Czy na pewno chcesz wypłacić ${amount} zł na konto: ${account}?`)) return;
+            if(!confirm(`Czy wypłacić ${amount} zł na:\n${finalAccountString}?`)) return;
 
             try {
                 const res = await fetch(`${API}/api/wallet/withdraw`, {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
-                    // Wysyłamy numer do backendu
-                    body: JSON.stringify({ email: userEmail, amount: amount, accountNumber: account })
+                    // Wysyłamy gotowy, sklejony tekst do bazy
+                    body: JSON.stringify({ email: userEmail, amount: amount, accountNumber: finalAccountString })
                 });
                 const data = await res.json();
                 
                 if(res.ok) {
-                    alert("✅ Sukces! " + data.message + "\n\nTwoje środki zostaną wysłane w ciągu 24 godzin.");
-                    
+                    alert("✅ Sukces! Zlecenie przyjęte.\nOczekuj przelewu do 24h.");
+                    // Wyczyść pola
                     document.getElementById('withdraw-amount').value = "";
                     refreshBalance();
                 } else {
