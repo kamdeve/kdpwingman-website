@@ -12,94 +12,49 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Cherry Theme overrides */
-        .text-cherry { color: #a0134a; }
-        .bg-cherry { background-color: #a0134a; }
-        .border-cherry { border-color: #a0134a; }
-        .hover-cherry:hover { border-color: #a0134a; }
-
-        /* Galeria */
+        /* Style dla Galerii */
         .gallery-container { position: relative; max-width: 1000px; margin: 0 auto; overflow: hidden; }
-        .gallery-scroll { 
-            display: flex; 
-            gap: 20px; 
-            overflow-x: auto; 
-            scroll-behavior: smooth; 
-            padding: 20px 0; 
-            scrollbar-width: none; 
-            justify-content: center; 
-        }
+        .gallery-scroll { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; padding: 20px 0; scrollbar-width: none; justify-content: center; }
         .gallery-scroll.overflowing { justify-content: flex-start; }
         .gallery-scroll::-webkit-scrollbar { display: none; }
         
-        .proof-item { 
-            min-width: 260px; max-width: 260px; 
-            background: #1f2937; border-radius: 12px; padding: 10px; 
-            border: 2px solid #374151; cursor: pointer; 
-            transition: transform 0.3s, border-color 0.3s; flex-shrink: 0;
-        }
+        .proof-item { min-width: 260px; max-width: 260px; background: #1f2937; border-radius: 12px; padding: 10px; border: 2px solid #374151; cursor: pointer; transition: transform 0.3s, border-color 0.3s; flex-shrink: 0; }
         .proof-item:hover { transform: translateY(-5px); border-color: #a0134a; }
-        
         .proof-img { width: 100%; height: 420px; object-fit: cover; object-position: top; border-radius: 8px; }
 
-        /* Strzałki */
-        .scroll-btn { 
-            position: absolute; top: 50%; transform: translateY(-50%); 
-            background: #a0134a; color: white; border: none; 
-            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
-            z-index: 10; font-weight: bold; font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
+        .scroll-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #a0134a; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 10; font-weight: bold; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .scroll-btn:hover { background: #c2185b; }
         .scroll-left { left: 10px; }
         .scroll-right { right: 10px; }
 
-        /* Lightbox */
-        #lightbox { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.95); z-index: 9999; display: none; 
-            justify-content: center; align-items: center; padding: 20px;
-            backdrop-filter: blur(5px);
-        }
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
         #lightbox img { max-height: 90vh; max-width: 90vw; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; }
 
-        /* Przycisk Wróć na górę */
-        #backToTop {
-            position: fixed; bottom: 30px; right: 30px;
-            background: #a0134a; color: white;
-            width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            opacity: 0; pointer-events: none; transition: 0.3s;
-            z-index: 100;
-        }
+        #backToTop { position: fixed; bottom: 30px; right: 30px; background: #a0134a; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: 0.3s; z-index: 100; }
         #backToTop.visible { opacity: 1; pointer-events: auto; }
         #backToTop:hover { background: #c2185b; transform: translateY(-5px); }
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-white">
 
     <header>
-        <nav class="container">
-            <a href="#" class="logo">
-                <img src="images/logo.svg" alt="KDP Wingman Icon">
-                <span>KDP <span class="logo-wingman">Wingman</span></span>
+        <nav class="container mx-auto py-4 flex justify-between items-center">
+            <a href="#" class="logo flex items-center gap-2 text-xl font-bold text-white no-underline">
+                <img src="images/logo.svg" alt="Icon" class="h-10">
+                <span>KDP <span style="color:#a0134a;">Wingman</span></span>
             </a>
-            <ul>
-                <li><a href="index.html#features">Funkcje</a></li> 
-                <li><a href="index.html#register">Rejestracja</a></li>
-                <li><a href="dashboard.html" class="nav-login" style="border-color: #a0134a; color: #a0134a;">🔐 Zaloguj</a></li>
+            <ul class="flex gap-6 items-center list-none">
+                <li><a href="index.html#features" class="text-white hover:text-pink-500 transition">Funkcje</a></li> 
+                <li><a href="dashboard.html" class="border-2 border-pink-700 text-pink-500 px-4 py-2 rounded-lg font-semibold hover:bg-pink-700 hover:text-white transition">🔐 Zaloguj</a></li>
             </ul>
         </nav>
     </header>
 
-    <main class="py-20 bg-gray-900 min-h-screen text-white">
+    <main class="py-20 min-h-screen">
         <div class="container mx-auto px-4 text-center">
             
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Wspólny Dostęp <span style="color: #a0134a;">Premium</span></h1>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Wspólny Dostęp <span style="color: #a0134a;">Premium</span></h1>
             <p class="text-gray-300 mb-8 text-lg max-w-2xl mx-auto">
                 Dołącz do grupy i korzystaj z Helium 10 Platinum za ułamek ceny. 
                 Koszt całkowity ($80) jest dzielony na wszystkich.
@@ -107,9 +62,7 @@
 
             <div class="mb-12 inline-block bg-gray-800 px-8 py-4 rounded-full border border-gray-700 shadow-xl">
                 <p class="text-gray-400 text-sm uppercase tracking-widest mb-1">Koniec zapisów za:</p>
-                <div id="countdown" class="text-2xl md:text-3xl font-bold text-white font-mono">
-                    Ładowanie...
-                </div>
+                <div id="countdown" class="text-2xl md:text-3xl font-bold text-white font-mono">Ładowanie...</div>
             </div>
 
             <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -129,53 +82,42 @@
             </div>
 
             <div class="max-w-2xl mx-auto mb-16 p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-300">
-                <p class="mb-3 flex items-center justify-center gap-2">
-                    <span style="color: #a0134a;">●</span> Zapisy trwają do <strong>20-go dnia miesiąca</strong>.
-                </p>
-                <p class="flex items-center justify-center gap-2">
-                    <span style="color: #a0134a;">●</span> Dostęp otrzymasz na maila <strong>5-go dnia kolejnego miesiąca</strong>.
-                </p>
+                <p class="mb-3 flex items-center justify-center gap-2"><span style="color: #a0134a;">●</span> Zapisy trwają do <strong>20-go dnia miesiąca</strong>.</p>
+                <p class="flex items-center justify-center gap-2"><span style="color: #a0134a;">●</span> Dostęp otrzymasz na maila <strong>5-go dnia kolejnego miesiąca</strong>.</p>
             </div>
 
             <section class="mb-20">
                 <h2 class="text-3xl font-bold text-white mb-10">Jak to działa? <span style="color: #a0134a;">Proste zasady.</span></h2>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto text-left">
                     
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 relative overflow-hidden">
                         <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">1</div>
-                        <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4 text-blue-400 text-xl font-bold">
-                            <i class="fas fa-lock"></i>
-                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4 text-blue-400 text-xl font-bold"><i class="fas fa-lock"></i></div>
                         <h3 class="text-xl font-bold text-white mb-2">Wpłacasz Depozyt</h3>
-                        <p class="text-gray-400 text-sm">Wpłacasz bezpieczny depozyt 40 zł. To Twoja rezerwacja miejsca w grupie. Pieniądze są bezpieczne.</p>
-                        </div>
+                        <p class="text-gray-400 text-sm">Wpłacasz depozyt 40 zł. To Twoja rezerwacja miejsca.</p>
+                    </div>
 
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 relative overflow-hidden">
                         <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">2</div>
-                        <div class="w-12 h-12 rounded-full bg-yellow-900 flex items-center justify-center mb-4 text-yellow-400 text-xl font-bold">
-                            <i class="fas fa-users"></i>
-                        </div>
+                        <div class="w-12 h-12 rounded-full bg-yellow-900 flex items-center justify-center mb-4 text-yellow-400 text-xl font-bold"><i class="fas fa-users"></i></div>
                         <h3 class="text-xl font-bold text-white mb-2">Zbieramy Grupę</h3>
-                        <p class="text-gray-400 text-sm">Czekamy do 20-go dnia miesiąca. Im więcej osób dołączy, tym niższa będzie cena końcowa dla każdego.</p>
+                        <p class="text-gray-400 text-sm">Czekamy do 20-go. Im więcej osób, tym niższa cena końcowa.</p>
                     </div>
 
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 relative overflow-hidden">
                         <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">3</div>
-                        <div class="w-12 h-12 rounded-full bg-green-900 flex items-center justify-center mb-4 text-green-400 text-xl font-bold">
-                            <i class="fas fa-key"></i>
-                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-900 flex items-center justify-center mb-4 text-green-400 text-xl font-bold"><i class="fas fa-key"></i></div>
                         <h3 class="text-xl font-bold text-white mb-2">Dostajesz Dostęp</h3>
-                        <p class="text-gray-400 text-sm">5-go dnia miesiąca otrzymujesz na e-mail login i hasło do narzędzia Premium (ważne przez 30 dni).</p>
+                        <p class="text-gray-400 text-sm">5-go dnia miesiąca otrzymujesz login i hasło (ważne 30 dni).</p>
                     </div>
 
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 relative overflow-hidden">
                         <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">4</div>
-                        <div class="w-12 h-12 rounded-full bg-pink-900 flex items-center justify-center mb-4 text-pink-400 text-xl font-bold">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Zwrot Reszty</h3>
-                        <p class="text-gray-400 text-sm">Nadwyżka (różnica między 40 zł a faktycznym kosztem) wraca automatycznie na Twój wirtualny portfel.</p>
+                        <div class="w-12 h-12 rounded-full bg-pink-900 flex items-center justify-center mb-4 text-pink-400 text-xl font-bold"><i class="fas fa-wallet"></i></div>
+                        <h3 class="text-xl font-bold text-white mb-2">Rozliczenie</h3>
+                        <p class="text-gray-400 text-sm">
+                            Od depozytu odejmujemy koszt narzędzia oraz <strong>10 zł opłaty serwisowej</strong>. Reszta wraca na Twój portfel.
+                        </p>
                     </div>
 
                 </div>
@@ -183,39 +125,23 @@
 
             <section style="margin-bottom: 60px;">
                 <h2 class="text-2xl font-bold text-white mb-4">💸 Transparentność to podstawa</h2>
-                <p class="text-gray-400 mb-8 max-w-2xl mx-auto">
-                    Kliknij w zdjęcie, aby powiększyć dowód. Oto dowody opłacenia narzędzi w poprzednich miesiącach.
-                </p>
-
                 <div class="gallery-container">
                     <button type="button" class="scroll-btn scroll-left" onclick="scrollGallery(-1)">&#10094;</button>
-                    
                     <div class="gallery-scroll" id="gallery">
-                        <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód">
-                            <p class="text-gray-400 text-sm mt-2">Styczeń 2026</p>
-                        </div>
-                        <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof2.jpg" class="proof-img" alt="Dowód">
-                            <p class="text-gray-400 text-sm mt-2">Grudzień 2025</p>
-                        </div>
-                        <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód">
-                            <p class="text-gray-400 text-sm mt-2">Listopad 2025</p>
-                        </div>
+                        <div class="proof-item" onclick="openLightbox(this)"><img src="images/proof1.jpg" class="proof-img" alt="Dowód"><p class="text-gray-400 text-sm mt-2">Styczeń 2026</p></div>
+                        <div class="proof-item" onclick="openLightbox(this)"><img src="images/proof2.jpg" class="proof-img" alt="Dowód"><p class="text-gray-400 text-sm mt-2">Grudzień 2025</p></div>
+                        <div class="proof-item" onclick="openLightbox(this)"><img src="images/proof1.jpg" class="proof-img" alt="Dowód"><p class="text-gray-400 text-sm mt-2">Listopad 2025</p></div>
                     </div>
-
                     <button type="button" class="scroll-btn scroll-right" onclick="scrollGallery(1)">&#10095;</button>
                 </div>
             </section>
 
-            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl">
+            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl mb-20">
                 <h3 class="text-xl font-bold mb-6">Dołącz do aktualnej edycji</h3>
                 <form id="signupForm" class="flex flex-col gap-4">
                     <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
                     <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
                         class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-pink-500 focus:outline-none transition">
-                    
                     <button type="submit" 
                         class="w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1"
                         style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);">
@@ -224,17 +150,26 @@
                 </form>
                 <p id="message" class="mt-4 text-sm hidden"></p>
             </div>
+
         </div>
     </main>
 
-    <div id="lightbox" onclick="this.style.display='none'">
-        <span id="lightbox-close">&times;</span>
-        <img id="lightbox-img" src="">
-    </div>
+    <footer class="bg-gray-950 py-10 border-t border-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex flex-col md:flex-row justify-center gap-6 mb-6 text-sm text-gray-400">
+                <a href="terms.html" class="hover:text-white transition">Regulamin Zrzutki</a>
+                <a href="privacy.html" class="hover:text-white transition">Polityka Prywatności</a>
+                <a href="mailto:kontakt@kdpwingman.com" class="hover:text-white transition">Kontakt</a>
+            </div>
+            <p class="text-xs text-gray-600">
+                &copy; 2025 KDP Wingman. Serwis ułatwia wspólny zakup dostępu do narzędzi analitycznych.<br>
+                Nie jesteśmy powiązani z Amazon ani Helium 10. Opłata serwisowa jest bezzwrotna w przypadku realizacji usługi.
+            </p>
+        </div>
+    </footer>
 
-    <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <i class="fas fa-arrow-up"></i>
-    </div>
+    <div id="lightbox" onclick="this.style.display='none'"><span id="lightbox-close">&times;</span><img id="lightbox-img" src=""></div>
+    <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fas fa-arrow-up"></i></div>
 
     <script>
     const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
@@ -243,7 +178,6 @@
     const emailInput = document.getElementById('emailInput');
     const btn = form.querySelector('button');
 
-    // --- 1. LICZNIK CZASU ---
     function updateCountdown() {
         const now = new Date();
         let targetDate = new Date(now.getFullYear(), now.getMonth(), 20, 23, 59, 59);
@@ -254,36 +188,19 @@
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
     }
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
+    setInterval(updateCountdown, 1000); updateCountdown();
 
-    // --- 2. BACK TO TOP ---
-    window.addEventListener('scroll', () => {
-        const btnTop = document.getElementById('backToTop');
-        if (window.scrollY > 300) btnTop.classList.add('visible');
-        else btnTop.classList.remove('visible');
-    });
+    window.addEventListener('scroll', () => { document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 300); });
 
-    // --- 3. POBIERANIE STATUSU ---
-    fetch(`${API_URL}/api/group-buy/status`)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('participant-count').innerText = data.users;
-            document.getElementById('current-price-usd').innerText = `$${data.priceUSD}`;
-            document.getElementById('current-price-pln').innerText = `ok. ${data.pricePLN} PLN`;
-        })
-        .catch(err => console.error("Błąd licznika:", err));
+    fetch(`${API_URL}/api/group-buy/status`).then(res => res.json()).then(data => {
+        document.getElementById('participant-count').innerText = data.users;
+        document.getElementById('current-price-usd').innerText = `$${data.priceUSD}`;
+        document.getElementById('current-price-pln').innerText = `ok. ${data.pricePLN} PLN`;
+    }).catch(e => console.error(e));
 
-    // --- 4. GALERIA ---
-    function scrollGallery(direction) {
-        document.getElementById('gallery').scrollBy({ left: direction * 300, behavior: 'smooth' });
-    }
-    function openLightbox(element) {
-        document.getElementById('lightbox-img').src = element.querySelector('img').src;
-        document.getElementById('lightbox').style.display = 'flex';
-    }
+    function scrollGallery(d) { document.getElementById('gallery').scrollBy({ left: d * 300, behavior: 'smooth' }); }
+    function openLightbox(el) { document.getElementById('lightbox-img').src = el.querySelector('img').src; document.getElementById('lightbox').style.display = 'flex'; }
 
-    // --- 5. LOGIKA DOŁĄCZANIA (Twój kod) ---
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const email = emailInput.value.trim();
@@ -309,6 +226,5 @@
         } catch (err) { alert("Błąd: " + err.message); } finally { btn.disabled = false; btn.innerText = "Sprawdź status / Dołącz"; }
     });
     </script>
-
 </body>
 </html>
