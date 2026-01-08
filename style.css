@@ -292,12 +292,52 @@ footer {
 /* RESPONSIVE DESIGN */
 @media(max-width: 768px) {
     h2 { font-size: 2rem; }
-    .features-grid, .steps-grid {
+    
+    .features-grid, .steps-grid, .feature-row, .feature-row-reverse {
         grid-template-columns: 1fr;
     }
-    nav ul {
-        display: none; /* Uproszczenie na start - ukrywamy menu na mobile */
+
+    /* Układ nagłówka na telefonie */
+    nav {
+        flex-wrap: wrap; /* Pozwala elementom spadać niżej */
     }
+
+    /* Przycisk Hamburgera (domyślnie ukryty na PC, widoczny tu) */
+    .menu-toggle {
+        display: block !important;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: var(--primary-color);
+    }
+
+    /* Menu mobilne (rozwijane) */
+    nav ul {
+        display: none; /* Domyślnie schowane */
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        background: white;
+        padding: 20px 0;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        position: absolute;
+        top: 70px; /* Wysokość nagłówka */
+        left: 0;
+        gap: 15px;
+    }
+
+    /* Klasa, którą doda JavaScript po kliknięciu */
+    nav ul.active {
+        display: flex;
+    }
+
+    .nav-cta, .nav-login {
+        display: inline-block; /* Żeby przyciski wyglądały dobrze w pionie */
+    }
+}
+
+/* Ukryj hamburgera na dużych ekranach */
+.menu-toggle {
+    display: none;
 }
 
 /* === STYLE DLA STRONY PODZIĘKOWANIA === */

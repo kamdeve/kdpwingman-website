@@ -66,10 +66,19 @@
             </div>
 
             <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700">
+                
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700 relative">
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Zgłoszonych osób</p>
                     <div id="participant-count" class="text-6xl font-bold text-white">0</div>
-                    <p class="text-xs text-gray-500 mt-2">w bieżącej edycji</p>
+                    
+                    <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4 mb-2">
+                        <div id="progress-bar-visual" class="bg-blue-600 h-2.5 rounded-full" style="width: 5%"></div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-400">
+                        <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>10 osób</strong><br>
+                        <span class="text-gray-500">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
+                    </p>
                 </div>
                 
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
@@ -77,7 +86,13 @@
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
                     <div id="current-price-usd" class="text-5xl font-bold text-white mb-1">$80.00</div>
                     <div id="current-price-pln" class="text-xl font-medium" style="color: #4ade80;">ok. 320 PLN</div>
-                    <p class="text-xs text-gray-500 mt-3">im więcej nas, tym taniej!</p>
+                    
+                    <div class="mt-4 p-2 bg-gray-900/50 rounded border border-gray-600 text-left">
+                        <p class="text-xs text-gray-300">
+                            <i class="fas fa-history text-yellow-400"></i> <strong>Historycznie:</strong><br>
+                            Cena końcowa zazwyczaj spada poniżej <strong>20 PLN</strong>.
+                        </p>
+                    </div>
                 </div>
             </div>
 

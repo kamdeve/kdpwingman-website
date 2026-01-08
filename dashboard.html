@@ -68,7 +68,13 @@
             <p style="color: #94a3b8;">Zaloguj się do panelu</p>
             <input type="email" id="email" placeholder="E-mail">
             <input type="password" id="pass" placeholder="Hasło">
+            
             <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
+            
+            <p style="margin-top: 15px; font-size: 0.85rem;">
+                <a href="#" onclick="forgotPass()" style="color: #94a3b8; text-decoration: underline;">Nie pamiętasz hasła?</a>
+            </p>
+
             <p id="login-msg" style="color:#ef4444; margin-top:10px; font-size:0.9rem;"></p>
         </div>
     </div>
@@ -262,6 +268,11 @@
                 else { const d = await res.json(); alert("Błąd: " + d.error); }
             } catch(e) { alert("Błąd sieci"); }
         }
+
+        function forgotPass() {
+            alert("🔒 Procedura Resetowania Hasła\n\nSystem automatycznego resetowania jest w trakcie wdrażania.\n\nAby odzyskać dostęp, napisz do nas na:\n📧 kamil.sznicer@o2.pl lub na Facebook\n\n(Pisz z adresu e-mail przypisanego do konta). Zresetujemy Twoje hasło ręcznie w ciągu 24h.");
+        }
+
         function logout() { location.reload(); }
     </script>
 </body>
