@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Twój Portfel - KDP Wingman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #1e293b; padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .btn-red { background: #ef4444; color: white; }
+        .balance { font-size: 2.5rem; font-weight: bold; color: #00C851; margin: 20px 0; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="login-view" class="box">
+        <h2>🔐 Zaloguj się do portfela</h2>
+        <input type="email" id="email" placeholder="Twój e-mail">
+        <input type="password" id="pass" placeholder="Hasło">
+        <button class="btn btn-blue" onclick="login()">Zaloguj</button>
+        <p id="login-msg" style="color:#ef4444; margin-top:10px;"></p>
+    </div>
+
+    <div id="dash-view" class="box hidden">
+        <h3>Twój Portfel</h3>
+        <div class="balance" id="balance">0.00 zł</div>
+        
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <label style="font-size: 0.9rem; color: #94a3b8;">Wypłać środki (PLN)</label>
+            <input type="number" id="withdraw-amount" placeholder="np. 10.00">
+            <button class="btn btn-blue" onclick="withdraw()">💸 Zleć Wypłatę</button>
+        </div>
+
+        <button class="btn btn-red" onclick="logout()">Wyloguj</button>
+    </div>
+
+    <script>
+        const API = "https://kdpwingmanv2backend-production.up.railway.app";
+        let userEmail = "";
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            const msg = document.getElementById('login-msg');
+
+            try {
+                const res = await fetch(`${API}/api/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ email, password: pass })
+                });
+                if(!res.ok) throw new Error("Błędne dane");
+                
+                userEmail = email;
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('dash-view').classList.remove('hidden');
+                refreshBalance();
+            } catch(e) { msg.innerText = e.message; }
+        }
+
+        async function refreshBalance() {
+            const res = await fetch(`${API}/api/user/status`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email: userEmail })
+            });
+            const data = await res.json();
+            document.getElementById('balance').innerText = data.wallet_balance.toFixed(2) + " zł";
+        }
+
+        async function withdraw() {
+            const amount = document.getElementById('withdraw-amount').value;
+            if(!amount || amount <= 0) return alert("Wpisz kwotę!");
+            if(!confirm(`Czy na pewno chcesz wypłacić ${amount} zł?`)) return;
+
+            try {
+                const res = await fetch(`${API}/api/wallet/withdraw`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ email: userEmail, amount: amount })
+                });
+                const data = await res.json();
+                
+                if(res.ok) {
+                    alert("✅ Sukces! " + data.message);
+                    document.getElementById('withdraw-amount').value = "";
+                    refreshBalance();
+                } else {
+                    alert("Błąd: " + data.error);
+                }
+            } catch(e) { alert("Błąd połączenia"); }
+        }
+
+        function logout() { location.reload(); }
+    </script>
+</body>
+</html>

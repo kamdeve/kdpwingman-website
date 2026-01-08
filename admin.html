@@ -2,173 +2,139 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Zrzutki - KDP Wingman</title>
+    <title>Panel Admina - Autopilot</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
-        
-        /* Styl okna logowania */
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .login-input { padding: 10px; font-size: 16px; width: 200px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-        
-        .header-stats { display: flex; justify-content: space-around; margin: 30px 0; background: #f8f9fa; padding: 20px; border-radius: 8px; }
-        .stat-box { text-align: center; }
-        .stat-value { font-size: 2rem; font-weight: bold; color: #007bff; }
-        .stat-label { color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        
+        body { font-family: sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; }
+        .settle-box { background: #e3f2fd; padding: 20px; border-radius: 10px; border-left: 5px solid #2196F3; margin: 20px 0; }
+        .preview-box { background: white; padding: 15px; margin-top: 10px; border-radius: 5px; font-family: monospace; border: 1px solid #ddd; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background-color: #f1f3f5; font-weight: 600; color: #495057; }
-        tr:hover { background-color: #f8f9fa; }
-        
-        .status-paid { color: #28a745; font-weight: bold; background: #d4edda; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; }
-        
-        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-        .btn:hover { background: #0056b3; }
-        
-        /* Ukrywanie panelu głównego przed zalogowaniem */
-        #main-content { display: none; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .btn { padding: 10px 20px; cursor: pointer; color: white; border: none; border-radius: 5px; font-size:1rem; }
+        .btn-green { background: #28a745; }
+        .btn-blue { background: #007bff; }
+        .btn-red { background: #dc3545; }
+        .tag { background: #ffeb3b; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-
-    <div id="login-overlay">
-        <div class="login-box">
-            <h2>🔐 Panel Administratora</h2>
-            <p>Podaj klucz dostępu:</p>
-            <input type="password" id="admin-pass" class="login-input" placeholder="Hasło...">
-            <br>
-            <button class="btn" onclick="tryLogin()">Zaloguj</button>
-            <p id="login-msg" style="color: red; margin-top: 10px; font-size: 14px;"></p>
+    <div class="container">
+        <h1>👑 Centrum Dowodzenia</h1>
+        <div id="login-sec">
+            <input type="password" id="pass" placeholder="Hasło..."> <button onclick="login()" class="btn btn-blue">Login</button>
         </div>
-    </div>
-
-    <div id="main-content" class="container">
-        <h1>👑 Panel Zarządzania Zrzutką</h1>
         
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button class="btn" onclick="loadParticipants()">🔄 Odśwież Listę</button>
-            <button class="btn" style="background: #6c757d; margin-left: 10px;" onclick="copyEmails()">📋 Kopiuj E-maile</button>
-        </div>
+        <div id="panel" style="display:none; margin-top: 20px;">
+            <div style="display:flex; justify-content:space-between; background:#f8f9fa; padding:15px; border-radius:8px;">
+                <div>Uczestników: <strong id="count">0</strong></div>
+                <div>Depozyty: <strong id="pool">0 zł</strong></div>
+                <div>Kurs NBP: <strong id="rate" class="tag">Loading...</strong></div>
+            </div>
 
-        <div class="header-stats">
-            <div class="stat-box">
-                <div class="stat-value" id="month-display">--</div>
-                <div class="stat-label">Miesiąc</div>
+            <div class="settle-box">
+                <h3>🤖 Automatyczne Rozliczenie Miesiąca</h3>
+                <p>System pobierze kurs z NBP, obliczy koszt 80 USD w złotówkach i odda resztę.</p>
+                
+                <div class="preview-box" id="preview">
+                    Ładowanie danych NBP...
+                </div>
+                <br>
+                <button class="btn btn-green" onclick="settle()">🚀 Uruchom Procedurę Rozliczenia</button>
             </div>
-            <div class="stat-box">
-                <div class="stat-value" id="count-display">0</div>
-                <div class="stat-label">Opłaconych</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="money-display">0 zł</div>
-                <div class="stat-label">Skarbonka</div>
-            </div>
-        </div>
 
-        <table id="table">
-            <thead>
-                <tr>
-                    <th>Email Uczestnika</th>
-                    <th>Kwota</th>
-                    <th>Data Wpłaty</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-        </table>
+            <h3>💸 Zlecenia Wypłat</h3>
+            <table id="withdraw-table"><tbody></tbody></table>
+
+            <h3>📋 Uczestnicy</h3>
+            <table id="users-table"><tbody></tbody></table>
+        </div>
     </div>
 
     <script>
-        const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
-        let SECRET_KEY = ""; // Teraz jest puste! Uzupełnimy po wpisaniu hasła.
+        const API = "https://kdpwingmanv2backend-production.up.railway.app";
+        let KEY = "";
+        let USER_COUNT = 0;
+        let CURRENT_RATE = 0;
 
-        // Funkcja logowania
-        function tryLogin() {
-            const pass = document.getElementById('admin-pass').value;
-            if (!pass) return;
-
-            // Zapisujemy to co wpisał użytkownik jako klucz
-            SECRET_KEY = pass;
-            
-            // Próbujemy pobrać dane. Jeśli hasło złe, backend odrzuci.
-            loadParticipants(true);
+        function login() {
+            KEY = document.getElementById('pass').value;
+            loadData();
         }
 
-        async function loadParticipants(isLoginAttempt = false) {
-            const msg = document.getElementById('login-msg');
-            if(isLoginAttempt) msg.innerText = "Sprawdzanie...";
-
+        async function loadData() {
             try {
-                const res = await fetch(`${API_URL}/api/admin/participants?secret=${SECRET_KEY}`);
+                const res = await fetch(`${API}/api/admin/participants?secret=${KEY}`);
                 const data = await res.json();
-
-                if (!res.ok) {
-                    if(isLoginAttempt) {
-                        msg.innerText = "❌ Błędne hasło!";
-                    } else {
-                        alert("Błąd autoryzacji. Odśwież stronę.");
-                    }
-                    return;
-                }
-
-                // SUKCES - Pokaż panel, ukryj logowanie
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-
-                // Wypełnij dane
-                document.getElementById('month-display').innerText = data.month;
-                document.getElementById('count-display').innerText = data.count;
+                if(data.error) return alert("Błąd hasła");
                 
-                let totalMoney = 0;
-                if(data.participants.length > 0) {
-                    totalMoney = data.participants.reduce((acc, curr) => acc + parseFloat(curr.amount_paid), 0);
-                }
-                document.getElementById('money-display').innerText = totalMoney.toFixed(2) + " zł";
-
-                const tbody = document.getElementById('tbody');
-                tbody.innerHTML = '';
+                document.getElementById('login-sec').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
                 
-                if (data.participants.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Brak wpłat w tym miesiącu.</td></tr>';
-                } else {
-                    data.participants.forEach(p => {
-                        const row = `<tr>
-                            <td><strong>${p.email}</strong></td>
-                            <td>${p.amount_paid} zł</td>
-                            <td>${new Date(p.joined_at).toLocaleString('pl-PL')}</td>
-                            <td><span class="status-paid">✅ Opłacono</span></td>
-                        </tr>`;
-                        tbody.innerHTML += row;
-                    });
-                }
+                USER_COUNT = data.count;
+                CURRENT_RATE = data.currentRate || 3.95; // Domyślnie jeśli błąd NBP
 
-            } catch (err) {
-                if(isLoginAttempt) msg.innerText = "Błąd połączenia z serwerem.";
-                console.error(err);
-            }
+                document.getElementById('count').innerText = USER_COUNT;
+                document.getElementById('rate').innerText = CURRENT_RATE + " PLN";
+                document.getElementById('pool').innerText = (USER_COUNT * 40).toFixed(2) + " zł";
+                
+                renderTables(data);
+                updatePreview();
+
+            } catch(e) { alert("Błąd połączenia"); }
         }
 
-        // Funkcja dla Ciebie - kopiuje wszystkie maile do schowka (żebyś mógł wkleić do Outlooka/Gmaila)
-        function copyEmails() {
-            const rows = document.querySelectorAll('#tbody tr td strong');
-            if(rows.length === 0) return alert("Brak maili do skopiowania");
+        function updatePreview() {
+            if(USER_COUNT === 0) return document.getElementById('preview').innerHTML = "Brak uczestników.";
+
+            const costUSD = 80;
+            const costPLN = costUSD * CURRENT_RATE;
+            const perPerson = costPLN / USER_COUNT;
+            const fee = 10;
+            const totalDeduction = perPerson + fee;
+            const refund = 40 - totalDeduction;
+
+            let html = `
+                Faktura: $80 * ${CURRENT_RATE} (NBP) = <strong>${costPLN.toFixed(2)} PLN</strong><br>
+                Na osobę: ${perPerson.toFixed(2)} zł + 10 zł (Serwis) = <span style="color:red">-${totalDeduction.toFixed(2)} zł</span><br>
+                Depozyt: 40.00 zł<br>
+                -----------------------------------<br>
+                <strong>ZWROT DLA KLIENTA: <span style="color:green; font-size:1.2rem;">+${refund.toFixed(2)} zł</span></strong>
+            `;
             
-            let emails = [];
-            rows.forEach(el => emails.push(el.innerText));
+            if(refund < 0) html += `<br><strong style="color:red">⚠️ UWAGA: Brakuje pieniędzy! Zwiększ depozyt w przyszłości.</strong>`;
             
-            navigator.clipboard.writeText(emails.join(', '));
-            alert("Skopiowano " + emails.length + " maili do schowka!");
+            document.getElementById('preview').innerHTML = html;
+        }
+
+        function renderTables(data) {
+            const tUser = document.getElementById('users-table').querySelector('tbody');
+            tUser.innerHTML = data.participants.map(p => `<tr><td>${p.email}</td><td>${p.amount_paid} zł</td></tr>`).join('');
+
+            const tWith = document.getElementById('withdraw-table').querySelector('tbody');
+            tWith.innerHTML = data.withdrawals.length ? data.withdrawals.map(w => `
+                <tr>
+                    <td>${w.email}</td>
+                    <td style="color:red; font-weight:bold;">-${w.amount} zł</td>
+                    <td><button onclick="alert('Zrób przelew ręczny!')">Zrealizuj</button></td>
+                </tr>`).join('') : '<tr><td>Brak zleceń.</td></tr>';
+        }
+
+        async function settle() {
+            if (!confirm(`Czy uruchomić AUTOMATYCZNE ROZLICZENIE wg kursu NBP (${CURRENT_RATE})?`)) return;
+            
+            const res = await fetch(`${API}/api/admin/settle`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ secret: KEY }) // Nie wysyłamy kwoty, backend sam pobierze NBP
+            });
+            const d = await res.json();
+            alert(d.message || d.error);
+            loadData();
         }
         
-        // Obsługa Entera w polu hasła
-        document.getElementById('admin-pass').addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                tryLogin();
-            }
+        // Enter = Login
+        document.getElementById('pass').addEventListener("keypress", function(e) {
+            if (e.key === "Enter") login();
         });
     </script>
 </body>
