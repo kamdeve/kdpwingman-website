@@ -202,29 +202,38 @@
     const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
     
     // Elementy DOM
-    const form = document.getElementById('signupForm'); // Upewnij się, że <form> ma id="signupForm"
+    const form = document.getElementById('signupForm'); 
     const emailInput = document.getElementById('emailInput');
     const btn = form.querySelector('button');
-    const messageBox = document.getElementById('message'); // Upewnij się, że <p> pod formą ma id="message"
+    
+    // Tworzymy kontener na komunikaty
+    const messageBox = document.createElement('div');
+    messageBox.style.marginTop = "15px";
+    messageBox.style.fontWeight = "bold";
+    messageBox.style.display = 'none';
+    form.appendChild(messageBox); // Dodajemy pod przyciskiem
 
-    // Tworzymy dynamicznie pole na hasło (domyślnie ukryte)
+    // Tworzymy dynamicznie pola na hasło (domyślnie ukryte)
     const passwordContainer = document.createElement('div');
     passwordContainer.style.display = 'none';
     passwordContainer.style.marginTop = '10px';
     passwordContainer.innerHTML = `
         <input type="password" id="quick-password" placeholder="Ustaw hasło (min. 6 znaków)" 
         class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-blue-500 focus:outline-none transition mb-2">
+        
+        <input type="password" id="quick-password-confirm" placeholder="Powtórz hasło" 
+        class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-blue-500 focus:outline-none transition mb-2">
+        
         <p class="text-xs text-gray-400 mb-2">Konto zostanie utworzone automatycznie. Nie musisz potwierdzać maila.</p>
     `;
-    // Wstawiamy pole hasła PRZED przyciskiem
+    // Wstawiamy pola hasła PRZED przyciskiem
     form.insertBefore(passwordContainer, btn);
 
-    // Funkcja pomocnicza do komunikatów (Naprawa błędu "not defined")
+    // Funkcja pomocnicza do komunikatów
     function showMessage(text, color = 'white') {
         messageBox.innerText = text;
         messageBox.style.display = 'block';
         messageBox.style.color = color;
-        messageBox.className = "mt-4 text-sm font-bold";
     }
 
     // --- GŁÓWNA LOGIKA ---
@@ -232,16 +241,20 @@
         e.preventDefault();
         const email = emailInput.value.trim();
         const passwordInput = document.getElementById('quick-password');
+        const confirmInput = document.getElementById('quick-password-confirm');
+        
         const password = passwordInput.value.trim();
+        const confirmPass = confirmInput.value.trim();
 
         if (!email) return showMessage("Wpisz adres e-mail!", "#ff4444");
 
         // RESET UI
         messageBox.style.display = 'none';
         
-        // SCENARIUSZ A: Rejestracja nowego użytkownika (jeśli pole hasła jest widoczne)
+        // SCENARIUSZ A: Rejestracja nowego użytkownika (jeśli pola hasła są widoczne)
         if (passwordContainer.style.display === 'block') {
             if (password.length < 6) return showMessage("Hasło musi mieć min. 6 znaków!", "#ff4444");
+            if (password !== confirmPass) return showMessage("Hasła nie są takie same!", "#ff4444");
             
             btn.disabled = true;
             btn.innerText = "Tworzenie konta...";
@@ -259,12 +272,10 @@
                     throw new Error(errData.message || "Błąd rejestracji");
                 }
 
-                // Sukces rejestracji -> Ukrywamy hasło i idziemy dalej
                 showMessage("✅ Konto utworzone! Przechodzę do płatności...", "#00C851");
                 passwordContainer.style.display = 'none';
                 
-                // Automatycznie przechodzimy do logiki sprawdzania (która teraz wykryje nowe konto i puści do płatności)
-                // Czekamy 1s dla efektu
+                // Automatycznie przechodzimy do logiki sprawdzania
                 setTimeout(() => checkUserStatus(email), 1000);
 
             } catch (err) {
@@ -288,7 +299,7 @@
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
             });
 
-            // 1. NIE MA KONTA -> Pokaż pole hasła (Inline Registration)
+            // 1. NIE MA KONTA -> Pokaż pola hasła
             if (statusRes.status === 404) {
                 showMessage("⚠️ Nie masz konta. Ustaw hasło, aby dołączyć:", "#ffbb33");
                 passwordContainer.style.display = 'block';
@@ -318,7 +329,6 @@
                 btn.innerText = `Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
                 btn.disabled = false;
 
-                // Nadpisujemy kliknięcie na płatność
                 btn.onclick = async (ev) => {
                     ev.preventDefault();
                     btn.innerText = "Łączenie z bankiem...";
@@ -336,7 +346,7 @@
                 return;
             } 
             
-            // 4. MA ŚRODKI (np. ze zwrotów) -> Auto Join
+            // 4. MA ŚRODKI -> Auto Join
             else {
                 if(confirm("Masz środki w portfelu. Dołączyć do zrzutki?")) {
                     const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
@@ -358,28 +368,52 @@
             btn.innerText = "Spróbuj ponownie";
         }
     }
-    
-    // Obsługa Menu Mobilnego (dodana dla pewności)
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navMenu = document.querySelector('nav ul');
-    if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-    }
 
-    // Licznik i Galeria (bez zmian) - zostaw resztę skryptów poniżej lub upewnij się, że są wczytane.
-    // ... (Tu powinien być kod od licznika i galerii, który już masz w pliku) ...
-     fetch(`${API_URL}/api/group-buy/status`)
+    // --- LICZNIK CZASU (POPRAWIONY) ---
+    function updateCountdown() {
+        const now = new Date();
+        const currentDay = now.getDate();
+        
+        // Celujemy w 4-go dnia NASTĘPNEGO miesiąca (lub tego, jeśli jest początek)
+        let targetDate;
+        
+        // Jeśli jest np. 1-4 stycznia, celujemy w 4 stycznia
+        if (currentDay <= 4) {
+            targetDate = new Date(now.getFullYear(), now.getMonth(), 4, 23, 59, 59);
+        } else {
+            // Jeśli jest po 4-tym, celujemy w 4-go NASTĘPNEGO miesiąca
+            targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 4, 23, 59, 59);
+        }
+
+        const diff = targetDate - now;
+        const countdownEl = document.getElementById('countdown');
+
+        if (diff < 0) {
+             if(countdownEl) countdownEl.innerText = "0d 0h 0m";
+             return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if(countdownEl) countdownEl.innerText = `${days}d ${hours}h ${minutes}m`;
+    }
+    
+    // Uruchom od razu, nie czekaj 1 sekundy
+    updateCountdown(); 
+    setInterval(updateCountdown, 1000);
+
+    // --- POBIERANIE STATUSU (LICZNIK I CENY) ---
+    fetch(`${API_URL}/api/group-buy/status`)
         .then(res => res.json())
         .then(data => {
             const countEl = document.getElementById('participant-count'); 
             const priceUsdEl = document.getElementById('current-price-usd');
             const pricePlnEl = document.getElementById('current-price-pln');
-            const userCountEl = document.getElementById('userCount'); // Obsługa ID z Twojego pliku
-            const priceElOld = document.getElementById('pricePerPerson'); // Obsługa ID z Twojego pliku
+            const userCountEl = document.getElementById('userCount'); 
+            const priceElOld = document.getElementById('pricePerPerson'); 
 
-            // Obsługa różnych ID (bo widzę w plikach różne wersje)
             if(countEl) countEl.innerText = data.users;
             if(userCountEl) userCountEl.innerText = data.users;
             
@@ -387,7 +421,6 @@
             if(pricePlnEl) pricePlnEl.innerText = `ok. ${data.pricePLN} PLN`;
             if(priceElOld) priceElOld.innerText = data.priceUSD + " $";
             
-            // Pasek postępu wizualny
              const visualBar = document.getElementById('progress-bar-visual');
              if(visualBar) {
                  let percent = Math.max(5, (data.users / 10) * 100); 
@@ -397,6 +430,14 @@
         })
         .catch(err => console.error("Błąd licznika:", err));
 
+    // Obsługa Menu Mobilnego
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('nav ul');
+    if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
 </script>
 
 </body>
