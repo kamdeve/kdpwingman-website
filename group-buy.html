@@ -237,18 +237,71 @@
             const statusData = await statusRes.json();
             if (statusData.has_joined) { alert("Już jesteś na liście!"); window.location.href = "dashboard.html"; return; }
             if (statusData.wallet_balance < 40) {
-                if(confirm(`Masz za mało środków (${statusData.wallet_balance} zł). Przejść do płatności 40 zł?`)) {
-                    const payRes = await fetch(`${API_URL}/api/create-checkout-session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
-                    const payData = await payRes.json();
-                    if(payData.url) window.location.href = payData.url;
-                }
+                // --- SCENARIUSZ 1: DOPŁATA (BRAKUJE ŚRODKÓW) ---
+                const missingAmount = (40 - statusData.wallet_balance).toFixed(2);
+                let payAmount = parseFloat(missingAmount);
+                if(payAmount < 5) payAmount = 5.00; // Minimum dla Stripe
+
+                // Pokazujemy info o braku środków
+                showMessage(`⚠️ Masz ${statusData.wallet_balance.toFixed(2)} zł. Brakuje ${missingAmount} zł.`, "#ffbb33");
+                
+                // Zmieniamy przycisk na "DOPŁAĆ"
+                btn.innerText = `Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                btn.disabled = false;
+                
+                // Nadpisujemy działanie przycisku (teraz kliknięcie = płatność)
+                btn.onclick = async () => {
+                    btn.innerText = "Łączenie z bankiem...";
+                    btn.disabled = true;
+                    try {
+                        const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, amount: payAmount }) 
+                        });
+                        const payData = await payRes.json();
+                        if(payData.url) window.location.href = payData.url;
+                        else { 
+                            alert("Błąd płatności"); 
+                            btn.disabled = false; 
+                            btn.innerText = `Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                        }
+                    } catch(err) {
+                        alert("Błąd: " + err.message);
+                        btn.disabled = false;
+                        btn.innerText = `Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                    }
+                };
+                return; // Ważne: przerywamy funkcję, czekamy na kliknięcie usera
+
             } else {
+                // --- SCENARIUSZ 2: SĄ ŚRODKI (AUTO-JOIN) ---
                 if(confirm("Masz środki w portfelu. Dołączyć do zrzutki?")) {
-                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
-                    if(joinRes.ok) { alert("Dołączono!"); window.location.href = "dashboard.html"; }
+                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    if(joinRes.ok) { 
+                        alert("Dołączono!"); 
+                        window.location.href = "dashboard.html"; 
+                    } else {
+                        const d = await joinRes.json();
+                        throw new Error(d.error || "Błąd dołączania");
+                    }
+                } else {
+                    // Jeśli anulował confirm - resetujemy przycisk
+                    btn.disabled = false;
+                    btn.innerText = "Sprawdź status / Dołącz";
                 }
             }
-        } catch (err) { alert("Błąd: " + err.message); } finally { btn.disabled = false; btn.innerText = "Sprawdź status / Dołącz"; }
+
+        } catch (err) {
+            showMessage("❌ Błąd: " + err.message, "#ff4444");
+            btn.disabled = false;
+            btn.innerText = "Sprawdź status / Dołącz";
+        }
+        // USUNĘLIŚMY BLOK FINALLY, żeby nie psuł efektu przycisku "Dopłać"
     });
     </script>
 </body>
