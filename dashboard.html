@@ -5,98 +5,159 @@
     <title>Panel Klienta - KDP Wingman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #3b82f6; --success: #00C851; }
+        /* ZMIANA KOLORU NA WIŚNIOWY (Wingman Cherry) */
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #a0134a; --accent-hover: #800f3b; --success: #00C851; }
+        
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
         
         /* Navbar */
         .navbar { background: var(--card); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .logo { font-weight: bold; font-size: 1.2rem; color: var(--accent); text-decoration: none;}
-        .logout { color: #ef4444; text-decoration: none; font-size: 0.9rem; cursor: pointer; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--accent); }
+        .logout { color: #94a3b8; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
+        .logout:hover { color: #ef4444; }
 
         /* Layout */
-        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        @media(max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        @media(max-width: 900px) { .container { grid-template-columns: 1fr; } }
 
         /* Karty */
-        .card { background: var(--card); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #334155; }
-        .card h3 { margin-top: 0; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .card { background: var(--card); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #334155; margin-bottom: 30px; }
+        .card h3 { margin-top: 0; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
         
-        /* Portfel */
+        /* Elementy formularza */
+        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
+        input:focus { border-color: var(--accent); outline: none; }
+        
+        .btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; }
+        .btn-primary { background: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        /* Portfel i Zakładki */
         .balance { font-size: 2.5rem; font-weight: 700; color: var(--success); margin: 10px 0; }
-        .input-group { margin-top: 15px; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-blue { background: var(--accent); color: white; }
-        .btn-blue:hover { opacity: 0.9; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #0f172a; padding: 5px; border-radius: 8px; }
+        .tab-label { flex: 1; text-align: center; cursor: pointer; padding: 8px; border-radius: 6px; font-size: 0.85rem; color: #94a3b8; transition: 0.2s; }
+        .tab-label:hover { background: rgba(255,255,255,0.05); }
+        input[type="radio"] { display: none; }
+        input[type="radio"]:checked + .tab-label { background: var(--accent); color: white; font-weight: bold; }
 
-        /* Sekcja Zrzutki */
-        .app-item { display: flex; align-items: center; gap: 15px; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; }
-        .app-icon { width: 50px; height: 50px; background: #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .status-active { background: rgba(0, 200, 81, 0.2); color: var(--success); }
-        .status-wait { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        /* Historia */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .history-table td { padding: 12px 0; border-bottom: 1px solid #334155; color: #cbd5e1; }
+        .history-table tr:last-child td { border-bottom: none; }
+        .date-col { color: #64748b; font-size: 0.8rem; }
 
-        /* Login Screen */
+        /* Status Zrzutki */
+        .app-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid transparent; transition: 0.3s; }
+        .app-item:hover { border-color: var(--accent); background: rgba(160, 19, 74, 0.1); }
+        .app-icon { width: 45px; height: 45px; background: #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .status-active { background: var(--success); color: black; }
+        .status-wait { background: #ffc107; color: black; }
+
+        .hidden { display: none !important; }
         #login-view { display: flex; justify-content: center; align-items: center; height: 100vh; }
         .login-box { width: 100%; max-width: 400px; text-align: center; }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="login-view">
         <div class="card login-box">
-            <h2 style="color: var(--accent);">KDP Wingman</h2>
-            <p>Zaloguj się do panelu</p>
+            <h2 style="color: white;">KDP <span>Wingman</span></h2>
+            <p style="color: #94a3b8;">Zaloguj się do panelu</p>
             <input type="email" id="email" placeholder="E-mail">
             <input type="password" id="pass" placeholder="Hasło">
-            <button class="btn btn-blue" onclick="login()">Wejdź</button>
-            <p id="login-msg" style="color:#ef4444; margin-top:10px;"></p>
+            <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
+            <p id="login-msg" style="color:#ef4444; margin-top:10px; font-size:0.9rem;"></p>
         </div>
     </div>
 
     <div id="dash-view" class="hidden">
         <div class="navbar">
-            <a href="index.html" class="logo">KDP Wingman</a>
+            <a href="index.html" class="logo">KDP <span>Wingman</span></a>
             <span class="logout" onclick="logout()">Wyloguj</span>
         </div>
 
         <div class="container">
             
-            <div class="card">
-                <h3>🚀 Aktywne Narzędzia</h3>
-                <p style="color: #cbd5e1; font-size: 0.95rem;">Tutaj widzisz status zrzutek, w których bierzesz udział w tym miesiącu.</p>
-
-                <div class="app-item">
-                    <div class="app-icon">💎</div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: bold; font-size: 1.1rem;">Helium 10 Platinum</div>
-                        <div style="font-size: 0.85rem; color: #94a3b8;">Edycja: Styczeń 2026</div>
+            <div>
+                <div class="card">
+                    <h3>🚀 Status w tym miesiącu</h3>
+                    <div class="app-item">
+                        <div class="app-icon">💎</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 1rem;">Helium 10 Platinum</div>
+                            <div id="current-month-label" style="font-size: 0.8rem; color: #94a3b8;">...</div>
+                        </div>
+                        <div id="status-badge" class="status-badge status-wait">OCZEKIWANIE</div>
                     </div>
-                    <div id="status-badge" class="status-badge status-wait">NIEOPŁACONE</div>
+
+                    <div id="access-info" class="hidden" style="margin-top: 20px; padding: 15px; background: rgba(0, 200, 81, 0.1); border: 1px solid var(--success); border-radius: 8px;">
+                        <strong style="color: var(--success)">✅ Dostęp aktywny!</strong><br>
+                        <span style="font-size: 0.9rem; color: #cbd5e1;">Dane logowania otrzymasz na maila 5-go dnia miesiąca.</span>
+                    </div>
+
+                    <div id="join-btn-container" style="margin-top: 20px;">
+                        <a href="group-buy.html" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">Dołącz teraz (40 zł)</a>
+                    </div>
                 </div>
 
-                <div id="access-info" class="hidden" style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent); border-radius: 8px;">
-                    <strong>🎉 Masz dostęp!</strong><br>
-                    Login i hasło zostaną wysłane na Twój e-mail 5-go dnia miesiąca.
-                </div>
-
-                <div id="join-btn-container" style="margin-top: 20px;">
-                    <a href="group-buy.html" class="btn btn-blue" style="display:block; text-align:center; text-decoration:none;">Dołącz do zrzutki</a>
+                <div class="card">
+                    <h3>📜 Historia Twoich Zrzutek</h3>
+                    <table class="history-table">
+                        <tbody id="history-list">
+                            <tr><td colspan="2" style="text-align:center;">Ładowanie...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="card">
-                <h3>💰 Twój Portfel</h3>
-                <div class="balance" id="balance">0.00 zł</div>
-                <p style="font-size: 0.8rem; color: #94a3b8;">Środki ze zwrotów (nadpłaty).</p>
-                
-                <hr style="border-color: #334155; margin: 20px 0;">
+            <div>
+                <div class="card">
+                    <h3>💰 Twój Portfel (Zwroty)</h3>
+                    <div class="balance" id="balance">0.00 zł</div>
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px;">
+                        Gdy koszt narzędzia wyjdzie mniejszy niż 40 zł, różnica wróci tutaj automatycznie.
+                    </p>
+                    
+                    <hr style="border-color: #334155; margin-bottom: 20px;">
 
-                <h4 style="margin-bottom: 5px;">Wypłać środki</h4>
-                <input type="number" id="withdraw-amount" placeholder="Kwota (PLN)">
-                <input type="text" id="withdraw-account" placeholder="Numer konta / PayPal">
-                <button class="btn btn-blue" onclick="withdraw()">Zleć wypłatę</button>
+                    <label style="font-size: 0.9rem; color: white;">Kwota do wypłaty</label>
+                    <input type="number" id="withdraw-amount" placeholder="np. 10.00">
+
+                    <p style="margin: 15px 0 5px 0; font-size: 0.9rem; color: white;">Metoda zwrotu:</p>
+                    <div class="tabs">
+                        <label>
+                            <input type="radio" name="method" value="pl" checked onchange="switchTab('pl')">
+                            <span class="tab-label">🇵🇱 PL</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="method" value="uk" onchange="switchTab('uk')">
+                            <span class="tab-label">🇬🇧 UK</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="method" value="other" onchange="switchTab('other')">
+                            <span class="tab-label">🌍 Inne</span>
+                        </label>
+                    </div>
+
+                    <div id="form-pl">
+                        <input type="text" id="pl-account" placeholder="Numer konta (PL...)" oninput="formatPL(this)" maxlength="32">
+                    </div>
+                    <div id="form-uk" class="hidden">
+                        <input type="text" id="uk-name" placeholder="Imię i Nazwisko">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="uk-sort" placeholder="Sort Code" maxlength="8">
+                            <input type="text" id="uk-acc" placeholder="Account No" maxlength="10">
+                        </div>
+                    </div>
+                    <div id="form-other" class="hidden">
+                        <input type="text" id="other-data" placeholder="IBAN lub PayPal e-mail">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="withdraw()">Zleć wypłatę</button>
+                </div>
             </div>
 
         </div>
@@ -105,6 +166,19 @@
     <script>
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
         let userEmail = "";
+
+        // Przełączanie zakładek
+        function switchTab(type) {
+            document.getElementById('form-pl').classList.add('hidden');
+            document.getElementById('form-uk').classList.add('hidden');
+            document.getElementById('form-other').classList.add('hidden');
+            document.getElementById('form-' + type).classList.remove('hidden');
+        }
+
+        function formatPL(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 26);
+            input.value = v.replace(/(^.{2})|(.{4})/g, '$& ').trim();
+        }
 
         async function login() {
             const email = document.getElementById('email').value;
@@ -119,52 +193,73 @@
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('dash-view').classList.remove('hidden');
                 loadDashboardData();
+                loadHistory();
             } catch(e) { document.getElementById('login-msg').innerText = e.message; }
         }
 
         async function loadDashboardData() {
-            // 1. Pobierz dane usera (saldo + status zrzutki)
             const res = await fetch(`${API}/api/user/status`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ email: userEmail })
             });
             const data = await res.json();
-
-            // Ustaw saldo
             document.getElementById('balance').innerText = data.wallet_balance.toFixed(2) + " zł";
-
-            // Ustaw status zrzutki
-            const badge = document.getElementById('status-badge');
-            const accessInfo = document.getElementById('access-info');
-            const joinBtn = document.getElementById('join-btn-container');
+            document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
             if (data.has_joined) {
-                badge.innerText = "OPŁACONE";
-                badge.className = "status-badge status-active";
-                accessInfo.classList.remove('hidden');
-                joinBtn.classList.add('hidden'); // Ukryj przycisk, bo już kupił
-            } else {
-                badge.innerText = "NIEAKTYWNY";
-                badge.className = "status-badge status-wait";
-                accessInfo.classList.add('hidden');
-                joinBtn.classList.remove('hidden');
+                document.getElementById('status-badge').innerText = "OPŁACONE";
+                document.getElementById('status-badge').className = "status-badge status-active";
+                document.getElementById('access-info').classList.remove('hidden');
+                document.getElementById('join-btn-container').classList.add('hidden');
             }
+        }
+
+        async function loadHistory() {
+            try {
+                const res = await fetch(`${API}/api/user/history`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const data = await res.json();
+                const list = document.getElementById('history-list');
+                
+                if(data.history && data.history.length > 0) {
+                    list.innerHTML = data.history.map(h => `
+                        <tr>
+                            <td>
+                                <strong>Helium 10</strong><br>
+                                <span class="date-col">Edycja: ${h.month_target}</span>
+                            </td>
+                            <td style="text-align:right; font-weight:bold; color: var(--success);">
+                                -${h.amount_paid} zł
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#64748b;">Brak historii wpłat.</td></tr>';
+                }
+            } catch(e) { console.log(e); }
         }
 
         async function withdraw() {
             const amount = document.getElementById('withdraw-amount').value;
-            const account = document.getElementById('withdraw-account').value;
-            if(!amount || !account) return alert("Uzupełnij dane!");
-            if(!confirm(`Wypłacić ${amount} zł na ${account}?`)) return;
+            const type = document.querySelector('input[name="method"]:checked').value;
+            let accountStr = "";
+
+            if (type === 'pl') accountStr = "[PL] " + document.getElementById('pl-account').value;
+            else if (type === 'uk') accountStr = `[UK] ${document.getElementById('uk-name').value} | SC:${document.getElementById('uk-sort').value} ACC:${document.getElementById('uk-acc').value}`;
+            else accountStr = "[INNE] " + document.getElementById('other-data').value;
+
+            if(!amount || accountStr.length < 8) return alert("Uzupełnij dane!");
+            if(!confirm(`Wypłacić ${amount} zł?`)) return;
 
             try {
                 const res = await fetch(`${API}/api/wallet/withdraw`, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ email: userEmail, amount, accountNumber: account })
+                    body: JSON.stringify({ email: userEmail, amount, accountNumber: accountStr })
                 });
-                const d = await res.json();
-                if(res.ok) { alert("✅ " + d.message); loadDashboardData(); } 
-                else alert("Błąd: " + d.error);
+                if(res.ok) { alert("Zlecenie przyjęte! 24h."); loadDashboardData(); } 
+                else { const d = await res.json(); alert("Błąd: " + d.error); }
             } catch(e) { alert("Błąd sieci"); }
         }
         function logout() { location.reload(); }

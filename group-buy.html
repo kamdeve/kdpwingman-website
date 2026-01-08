@@ -10,6 +10,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Style dla Galerii Social Proof */
+        .gallery-container { position: relative; max-width: 900px; margin: 0 auto; overflow: hidden; }
+        .gallery-scroll { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 20px; scrollbar-width: none; }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+        
+        .proof-item { 
+            min-width: 250px; 
+            max-width: 300px; 
+            background: #1f2937; /* gray-800 */
+            border-radius: 12px; 
+            padding: 10px; 
+            border: 1px solid #374151; /* gray-700 */
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .proof-item:hover { transform: translateY(-5px); border-color: #a0134a; }
+        
+        /* Pełne zdjęcie w pionie (dla iPhone screenów) */
+        .proof-img { 
+            width: 100%; 
+            height: 400px; 
+            object-fit: cover; 
+            object-position: top; 
+            border-radius: 8px; 
+        }
+
+        /* Strzałki */
+        .scroll-btn { 
+            position: absolute; top: 50%; transform: translateY(-50%); 
+            background: #a0134a; color: white; border: none; 
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; 
+            z-index: 10; font-weight: bold; font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .scroll-left { left: 0; }
+        .scroll-right { right: 0; }
+
+        /* Lightbox (Powiększenie) */
+        #lightbox { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 9999; display: none; 
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        #lightbox img { max-height: 90vh; max-width: 90vw; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2rem; cursor: pointer; }
+    </style>
 </head>
 <body>
 
@@ -20,14 +68,14 @@
                 <span>KDP <span class="logo-wingman">Wingman</span></span>
             </a>
             <ul>
-                <li><a href="index.html#features">Funkcje</a></li> <li><a href="index.html#register">Rejestracja</a></li>
+                <li><a href="index.html#features">Funkcje</a></li> 
+                <li><a href="index.html#register">Rejestracja</a></li>
                 <li><a href="dashboard.html" class="nav-login" style="border-color: #3b82f6; color: #3b82f6;">🔐 Zaloguj</a></li>
             </ul>
         </nav>
     </header>
 
-    <main>
-        <main class="py-20 bg-gray-900 min-h-screen text-white">
+    <main class="py-20 bg-gray-900 min-h-screen text-white">
         <div class="container mx-auto px-4 text-center">
             
             <h1 class="text-4xl font-bold mb-4 text-blue-400">Wspólny Dostęp Premium</h1>
@@ -36,14 +84,14 @@
             <div class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700">
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Zgłoszonych osób</p>
-                    <div id="userCount" class="text-6xl font-bold text-white">0</div>
+                    <div id="participant-count" class="text-6xl font-bold text-white">0</div>
                     <p class="text-xs text-gray-500 mt-2">w tym miesiącu</p>
                 </div>
                 
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 border-green-500/30 relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-green-500 text-black text-xs font-bold px-2 py-1 rounded-bl-lg">TERAZ</div>
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
-                    <div id="pricePerPerson" class="text-6xl font-bold text-green-400">80.00 $</div>
+                    <div id="current-price" class="text-6xl font-bold text-green-400">80.00 $</div>
                     <p class="text-xs text-gray-500 mt-2">im więcej nas, tym taniej!</p>
                 </div>
             </div>
@@ -53,33 +101,39 @@
                 <p><i class="fas fa-envelope mr-2"></i> Dostęp (login/hasło) zostanie wysłany na maila <strong>5-go dnia kolejnego miesiąca</strong>.</p>
             </div>
 
-            <div class="max-w-4xl mx-auto mb-16 text-center">
-                <h2 class="text-2xl font-bold text-white mb-6">💸 Oszczędzamy razem od miesięcy</h2>
-                <p class="text-gray-400 mb-8">Zobacz dowody zakupu z poprzednich edycji. Transparentność to nasza zasada nr 1.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 hover:border-blue-500 transition">
-                        <img src="images/proof1.jpg" alt="Dowód opłacenia Helium 10" class="rounded-lg w-full object-cover h-48 opacity-80 hover:opacity-100 transition">
-                        <p class="text-sm text-gray-400 mt-3">Opłacona faktura (Styczeń)</p>
-                    </div>
+            <section style="padding: 40px 20px; margin-bottom: 60px;">
+                <h2 class="text-2xl font-bold text-white mb-4">💸 Transparentność to podstawa</h2>
+                <p class="text-gray-400 mb-8 max-w-2xl mx-auto">
+                    Kliknij w zdjęcie, aby zobaczyć pełny dowód przelewu. 
+                    Oto dowody opłacenia narzędzi w poprzednich miesiącach.
+                </p>
+
+                <div class="gallery-container">
+                    <button class="scroll-btn scroll-left" onclick="scrollGallery(-1)">&#10094;</button>
                     
-                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 hover:border-green-500 transition">
-                        <img src="images/proof2.jpg" alt="Zwroty nadpłaty" class="rounded-lg w-full object-cover h-48 opacity-80 hover:opacity-100 transition">
-                        <p class="text-sm text-gray-400 mt-3">Zwroty nadpłaty na konta użytkowników</p>
+                    <div class="gallery-scroll" id="gallery">
+                        <div class="proof-item" onclick="openLightbox(this)">
+                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód 1">
+                            <p class="text-gray-400 text-sm mt-2">Styczeń 2026</p>
+                        </div>
+                        <div class="proof-item" onclick="openLightbox(this)">
+                            <img src="images/proof2.jpg" class="proof-img" alt="Dowód 2">
+                            <p class="text-gray-400 text-sm mt-2">Grudzień 2025</p>
+                        </div>
+                        <div class="proof-item" onclick="openLightbox(this)">
+                            <img src="images/proof1.jpg" class="proof-img" alt="Dowód 3">
+                            <p class="text-gray-400 text-sm mt-2">Listopad 2025</p>
+                        </div>
                     </div>
+
+                    <button class="scroll-btn scroll-right" onclick="scrollGallery(1)">&#10095;</button>
                 </div>
+            </section>
+
+            <div id="lightbox" onclick="this.style.display='none'">
+                <span id="lightbox-close">&times;</span>
+                <img id="lightbox-img" src="">
             </div>
-            ```
-
-### Co teraz musisz zrobić fizycznie?
-1.  W folderze `images` na swoim komputerze umieść dwa pliki:
-    * `proof1.jpg` (Screen faktury/płatności za Helium10 - zamaż dane wrażliwe!).
-    * `proof2.jpg` (Screen potwierdzeń przelewów zwrotnych do ludzi).
-2.  Zapisz zmiany w plikach: `style.css`, `index.html`, `group-buy.html`.
-3.  Wyślij to na GitHub/Railway.
-
-I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedażowej. 🚀
-
             <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700">
                 <form id="signupForm" class="flex flex-col gap-4">
                     <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
@@ -137,7 +191,7 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
         btn.disabled = true;
         btn.innerText = "Sprawdzanie...";
         showMessage("");
-        registerBox.style.display = "none"; // Ukryj rejestrację przy nowej próbie
+        registerBox.style.display = "none"; 
 
         try {
             // 1. Sprawdzamy użytkownika
@@ -150,7 +204,7 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
             if (statusRes.status === 404) {
                 showMessage("⚠️ Nie masz jeszcze konta. Uzupełnij hasło poniżej:", "#ffbb33");
                 btn.innerText = "Nie znaleziono konta";
-                registerBox.style.display = "block"; // POKAŻ FORMULARZ REJESTRACJI
+                registerBox.style.display = "block"; 
                 return;
             }
 
@@ -168,7 +222,7 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
                 btn.innerText = "Zapłać 40 zł (Stripe)";
                 btn.disabled = false;
                 
-                // Nowa funkcja po kliknięciu: IDŹ DO PŁATNOŚCI
+                // Płatność
                 btn.onclick = async () => {
                     btn.innerText = "Łączenie z bankiem...";
                     btn.disabled = true;
@@ -180,7 +234,7 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
                         });
                         const payData = await payRes.json();
                         if(payData.url) {
-                            window.location.href = payData.url; // Przekierowanie do Stripe!
+                            window.location.href = payData.url; 
                         } else {
                             alert("Błąd płatności");
                             btn.disabled = false;
@@ -193,7 +247,7 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
                 return;
             }
 
-            // 3. Próba dołączenia (jeśli ma środki)
+            // 3. Próba dołączenia
             btn.innerText = "Przetwarzanie...";
             const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
                 method: 'POST',
@@ -215,8 +269,6 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
             btn.innerText = "Spróbuj ponownie";
         }
     });
-
-
 
     // --- LOGIKA REJESTRACJI ---
     document.getElementById('register-btn').addEventListener('click', async () => {
@@ -244,7 +296,7 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
                 alert("Konto założone! Teraz możesz dołączyć.");
                 registerBox.style.display = "none";
                 btn.disabled = false;
-                btn.click(); // Automatycznie kliknij główny przycisk po rejestracji
+                btn.click(); 
             } else {
                 alert("Błąd: " + data.message);
                 regBtn.disabled = false;
@@ -256,34 +308,30 @@ I gotowe! Masz przycisk logowania w menu i sekcję zaufania na stronie sprzedaż
         }
     });
     
+    // --- SKRYPT GALERII ---
+    function scrollGallery(direction) {
+        const gal = document.getElementById('gallery');
+        gal.scrollBy({ left: direction * 300, behavior: 'smooth' });
+    }
+    function openLightbox(element) {
+        const src = element.querySelector('img').src;
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
 
-    
-    // Pobierz status zrzutki
+    // --- POBIERANIE STATUSU (LICZNIK) ---
     fetch(`${API_URL}/api/group-buy/status`)
         .then(res => res.json())
         .then(data => {
-            // Aktualizacja licznika na stronie
-            const countEl = document.getElementById('participant-count'); // Upewnij się, że masz takie ID w HTML
-            const priceEl = document.getElementById('current-price');     // Upewnij się, że masz takie ID w HTML
+            const countEl = document.getElementById('participant-count');
+            const priceEl = document.getElementById('current-price');
             
             if(countEl) countEl.innerText = data.users;
             if(priceEl) priceEl.innerText = data.price + " zł";
-            
-            // Opcjonalnie: Pasek postępu
-            const progress = document.getElementById('progress-bar-fill');
-            if(progress) {
-                // Zakładamy cel np. 20 osób
-                let percent = (data.users / 20) * 100;
-                if(percent > 100) percent = 100;
-                progress.style.width = percent + "%";
-            }
         })
         .catch(err => console.error("Błąd licznika:", err));
-
         
 </script>
-
-
 
 </body>
 </html>
