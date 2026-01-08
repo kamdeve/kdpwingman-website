@@ -86,7 +86,8 @@
                 const data = await res.json();
                 
                 if(res.ok) {
-                    alert("✅ Sukces! " + data.message);
+                    alert("✅ Sukces! " + data.message + "\n\nTwoje środki zostaną wysłane w ciągu 24 godzin.");
+                    
                     document.getElementById('withdraw-amount').value = "";
                     refreshBalance();
                 } else {

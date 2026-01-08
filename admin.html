@@ -115,7 +115,11 @@
                 <tr>
                     <td>${w.email}</td>
                     <td style="color:red; font-weight:bold;">-${w.amount} zł</td>
-                    <td><button onclick="alert('Zrób przelew ręczny!')">Zrealizuj</button></td>
+                    <td>
+                        <button class="btn btn-red" onclick="confirmWithdraw(${w.id}, '${w.email}', ${w.amount})">
+                            Zrealizuj
+                        </button>
+                    </td>
                 </tr>`).join('') : '<tr><td>Brak zleceń.</td></tr>';
         }
 
@@ -130,6 +134,25 @@
             const d = await res.json();
             alert(d.message || d.error);
             loadData();
+        }
+
+        async function confirmWithdraw(id, email, amount) {
+            if(!confirm(`Czy potwierdzasz, że wykonałeś przelew ręczny na kwotę ${amount} zł dla ${email}?`)) return;
+
+            try {
+                const res = await fetch(`${API}/api/admin/confirm-withdraw`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ secret: KEY, withdrawId: id })
+                });
+                const d = await res.json();
+                if(res.ok) {
+                    alert("✅ " + d.message);
+                    loadData(); // Odśwież tabelę
+                } else {
+                    alert("Błąd: " + d.error);
+                }
+            } catch(e) { alert("Błąd połączenia"); }
         }
         
         // Enter = Login
