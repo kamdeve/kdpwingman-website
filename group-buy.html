@@ -20,7 +20,6 @@
 
         /* Galeria */
         .gallery-container { position: relative; max-width: 1000px; margin: 0 auto; overflow: hidden; }
-        /* Zmienione na justify-center, żeby przy małej liczbie zdjęć były na środku */
         .gallery-scroll { 
             display: flex; 
             gap: 20px; 
@@ -28,43 +27,29 @@
             scroll-behavior: smooth; 
             padding: 20px 0; 
             scrollbar-width: none; 
-            justify-content: center; /* Wyśrodkowanie zdjęć */
+            justify-content: center; 
         }
-        /* Jeśli zdjęć jest dużo, wracamy do startu */
         .gallery-scroll.overflowing { justify-content: flex-start; }
-        
         .gallery-scroll::-webkit-scrollbar { display: none; }
         
         .proof-item { 
-            min-width: 260px; 
-            max-width: 260px; 
-            background: #1f2937; 
-            border-radius: 12px; 
-            padding: 10px; 
-            border: 2px solid #374151; 
-            cursor: pointer; 
-            transition: transform 0.3s, border-color 0.3s;
-            flex-shrink: 0;
+            min-width: 260px; max-width: 260px; 
+            background: #1f2937; border-radius: 12px; padding: 10px; 
+            border: 2px solid #374151; cursor: pointer; 
+            transition: transform 0.3s, border-color 0.3s; flex-shrink: 0;
         }
         .proof-item:hover { transform: translateY(-5px); border-color: #a0134a; }
         
-        .proof-img { 
-            width: 100%; 
-            height: 420px; 
-            object-fit: cover; 
-            object-position: top; 
-            border-radius: 8px; 
-        }
+        .proof-img { width: 100%; height: 420px; object-fit: cover; object-position: top; border-radius: 8px; }
 
-        /* Strzałki - dodane type="button" */
+        /* Strzałki */
         .scroll-btn { 
             position: absolute; top: 50%; transform: translateY(-50%); 
             background: #a0134a; color: white; border: none; 
             width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
             z-index: 10; font-weight: bold; font-size: 1.5rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
         .scroll-btn:hover { background: #c2185b; }
         .scroll-left { left: 10px; }
@@ -79,6 +64,20 @@
         }
         #lightbox img { max-height: 90vh; max-width: 90vw; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; }
+
+        /* Przycisk Wróć na górę */
+        #backToTop {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #a0134a; color: white;
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            opacity: 0; pointer-events: none; transition: 0.3s;
+            z-index: 100;
+        }
+        #backToTop.visible { opacity: 1; pointer-events: auto; }
+        #backToTop:hover { background: #c2185b; transform: translateY(-5px); }
     </style>
 </head>
 <body>
@@ -123,11 +122,8 @@
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
                     <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">TERAZ</div>
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
-                    
                     <div id="current-price-usd" class="text-5xl font-bold text-white mb-1">$80.00</div>
-                    
                     <div id="current-price-pln" class="text-xl font-medium" style="color: #4ade80;">ok. 320 PLN</div>
-                    
                     <p class="text-xs text-gray-500 mt-3">im więcej nas, tym taniej!</p>
                 </div>
             </div>
@@ -141,10 +137,54 @@
                 </p>
             </div>
 
+            <section class="mb-20">
+                <h2 class="text-3xl font-bold text-white mb-10">Jak to działa? <span style="color: #a0134a;">Proste zasady.</span></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto text-left">
+                    
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                        <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">1</div>
+                        <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4 text-blue-400 text-xl font-bold">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Wpłacasz Depozyt</h3>
+                        <p class="text-gray-400 text-sm">Wpłacasz bezpieczny depozyt 40 zł. To Twoja rezerwacja miejsca w grupie. Pieniądze są bezpieczne.</p>
+                        </div>
+
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                        <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">2</div>
+                        <div class="w-12 h-12 rounded-full bg-yellow-900 flex items-center justify-center mb-4 text-yellow-400 text-xl font-bold">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Zbieramy Grupę</h3>
+                        <p class="text-gray-400 text-sm">Czekamy do 20-go dnia miesiąca. Im więcej osób dołączy, tym niższa będzie cena końcowa dla każdego.</p>
+                    </div>
+
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                        <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">3</div>
+                        <div class="w-12 h-12 rounded-full bg-green-900 flex items-center justify-center mb-4 text-green-400 text-xl font-bold">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Dostajesz Dostęp</h3>
+                        <p class="text-gray-400 text-sm">5-go dnia miesiąca otrzymujesz na e-mail login i hasło do narzędzia Premium (ważne przez 30 dni).</p>
+                    </div>
+
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition relative overflow-hidden">
+                        <div class="text-6xl font-bold text-gray-700 absolute -top-4 -right-4 opacity-20">4</div>
+                        <div class="w-12 h-12 rounded-full bg-pink-900 flex items-center justify-center mb-4 text-pink-400 text-xl font-bold">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Zwrot Reszty</h3>
+                        <p class="text-gray-400 text-sm">Nadwyżka (różnica między 40 zł a faktycznym kosztem) wraca automatycznie na Twój wirtualny portfel.</p>
+                    </div>
+
+                </div>
+            </section>
+
             <section style="margin-bottom: 60px;">
                 <h2 class="text-2xl font-bold text-white mb-4">💸 Transparentność to podstawa</h2>
                 <p class="text-gray-400 mb-8 max-w-2xl mx-auto">
-                    Kliknij w zdjęcie, aby powiększyć dowód.
+                    Kliknij w zdjęcie, aby powiększyć dowód. Oto dowody opłacenia narzędzi w poprzednich miesiącach.
                 </p>
 
                 <div class="gallery-container">
@@ -162,10 +202,6 @@
                         <div class="proof-item" onclick="openLightbox(this)">
                             <img src="images/proof1.jpg" class="proof-img" alt="Dowód">
                             <p class="text-gray-400 text-sm mt-2">Listopad 2025</p>
-                        </div>
-                         <div class="proof-item" onclick="openLightbox(this)">
-                            <img src="images/proof2.jpg" class="proof-img" alt="Dowód">
-                            <p class="text-gray-400 text-sm mt-2">Październik 2025</p>
                         </div>
                     </div>
 
@@ -196,6 +232,10 @@
         <img id="lightbox-img" src="">
     </div>
 
+    <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
     <script>
     const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
     const messageBox = document.getElementById('message');
@@ -203,121 +243,72 @@
     const emailInput = document.getElementById('emailInput');
     const btn = form.querySelector('button');
 
-    // --- 1. LICZNIK CZASU (COUNTDOWN) ---
+    // --- 1. LICZNIK CZASU ---
     function updateCountdown() {
         const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth(); // 0-11
-        
-        // Cel: 20-ty dzień tego miesiąca, godzina 23:59:59
-        let targetDate = new Date(currentYear, currentMonth, 20, 23, 59, 59);
-
-        // Jeśli jest już po 20-tym, celujemy w 20-ty dzień NASTĘPNEGO miesiąca
-        if (now > targetDate) {
-            targetDate = new Date(currentYear, currentMonth + 1, 20, 23, 59, 59);
-        }
-
+        let targetDate = new Date(now.getFullYear(), now.getMonth(), 20, 23, 59, 59);
+        if (now > targetDate) targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 20, 23, 59, 59);
         const diff = targetDate - now;
-
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
         document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
     }
-    setInterval(updateCountdown, 1000); // Odświeżaj co sekundę
-    updateCountdown(); // Pierwsze wywołanie od razu
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
 
-    // --- 2. POBIERANIE STATUSU (CENA I LICZBA OSÓB) ---
+    // --- 2. BACK TO TOP ---
+    window.addEventListener('scroll', () => {
+        const btnTop = document.getElementById('backToTop');
+        if (window.scrollY > 300) btnTop.classList.add('visible');
+        else btnTop.classList.remove('visible');
+    });
+
+    // --- 3. POBIERANIE STATUSU ---
     fetch(`${API_URL}/api/group-buy/status`)
         .then(res => res.json())
         .then(data => {
-            const countEl = document.getElementById('participant-count');
-            const priceUsdEl = document.getElementById('current-price-usd');
-            const pricePlnEl = document.getElementById('current-price-pln');
-            
-            if(countEl) countEl.innerText = data.users;
-            
-            // Wyświetlanie cen z backendu
-            if(priceUsdEl) priceUsdEl.innerText = `$${data.priceUSD}`;
-            if(pricePlnEl) pricePlnEl.innerText = `ok. ${data.pricePLN} PLN`;
+            document.getElementById('participant-count').innerText = data.users;
+            document.getElementById('current-price-usd').innerText = `$${data.priceUSD}`;
+            document.getElementById('current-price-pln').innerText = `ok. ${data.pricePLN} PLN`;
         })
         .catch(err => console.error("Błąd licznika:", err));
 
-    // --- 3. GALERIA (PRZEWIJANIE) ---
+    // --- 4. GALERIA ---
     function scrollGallery(direction) {
-        const gal = document.getElementById('gallery');
-        // Przewija o 300px w lewo lub prawo
-        gal.scrollBy({ left: direction * 300, behavior: 'smooth' });
+        document.getElementById('gallery').scrollBy({ left: direction * 300, behavior: 'smooth' });
     }
-    
     function openLightbox(element) {
-        const src = element.querySelector('img').src;
-        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox-img').src = element.querySelector('img').src;
         document.getElementById('lightbox').style.display = 'flex';
     }
 
-    // --- 4. OBSŁUGA DOŁĄCZANIA (Twój stary kod, lekko dopasowany) ---
+    // --- 5. LOGIKA DOŁĄCZANIA (Twój kod) ---
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const email = emailInput.value.trim();
-        if (!email) {
-            messageBox.innerText = "Wpisz e-mail!";
-            messageBox.style.display = "block";
-            messageBox.style.color = "red";
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = "Sprawdzanie...";
-        
+        if (!email) { messageBox.innerText = "Wpisz e-mail!"; messageBox.style.display = "block"; messageBox.style.color = "red"; return; }
+        btn.disabled = true; btn.innerText = "Sprawdzanie...";
         try {
-            // Logika sprawdzania (Status / Join) - skopiowana z Twojego poprzedniego pliku
-            const statusRes = await fetch(`${API_URL}/api/user/status`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
-            });
-
-            if (statusRes.status === 404) {
-                // Nie ma konta - przekieruj do rejestracji na index.html lub pokaż komunikat
-                alert("Nie znaleziono konta. Zarejestruj się na stronie głównej!");
-                window.location.href = "index.html#register";
-                return;
-            }
-
+            const statusRes = await fetch(`${API_URL}/api/user/status`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+            if (statusRes.status === 404) { alert("Nie znaleziono konta. Zarejestruj się na stronie głównej!"); window.location.href = "index.html#register"; return; }
             const statusData = await statusRes.json();
-            
-            if (statusData.has_joined) {
-                alert("Już jesteś na liście!");
-                window.location.href = "dashboard.html";
-                return;
-            }
-
+            if (statusData.has_joined) { alert("Już jesteś na liście!"); window.location.href = "dashboard.html"; return; }
             if (statusData.wallet_balance < 40) {
-                // PŁATNOŚĆ
                 if(confirm(`Masz za mało środków (${statusData.wallet_balance} zł). Przejść do płatności 40 zł?`)) {
-                    const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
-                    });
+                    const payRes = await fetch(`${API_URL}/api/create-checkout-session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
                     const payData = await payRes.json();
                     if(payData.url) window.location.href = payData.url;
                 }
             } else {
-                // AUTO JOIN
                 if(confirm("Masz środki w portfelu. Dołączyć do zrzutki?")) {
-                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
-                    });
+                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
                     if(joinRes.ok) { alert("Dołączono!"); window.location.href = "dashboard.html"; }
                 }
             }
-        } catch (err) {
-            alert("Błąd: " + err.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Sprawdź status / Dołącz";
-        }
+        } catch (err) { alert("Błąd: " + err.message); } finally { btn.disabled = false; btn.innerText = "Sprawdź status / Dołącz"; }
     });
-</script>
+    </script>
 
 </body>
 </html>
