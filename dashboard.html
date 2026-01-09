@@ -58,6 +58,13 @@
         .hidden { display: none !important; }
         #login-view { display: flex; justify-content: center; align-items: center; height: 100vh; }
         .login-box { width: 100%; max-width: 400px; text-align: center; }
+
+        /* Nowy Panel Statystyk w Dashboardzie */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .stat-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: white; }
+        .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+        .countdown-box { background: #1e293b; border: 1px solid #a0134a; color: #a0134a; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; font-family: monospace; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -194,13 +201,35 @@
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ email, password: pass })
                 });
-                if(!res.ok) throw new Error("Błędne dane");
+                if(!res.ok) throw new Error("Błąd logowania");
+                
+                // ZAPISUJEMY SESJĘ!
+                localStorage.setItem('wingman_user', email);
                 userEmail = email;
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('dash-view').classList.remove('hidden');
-                loadDashboardData();
-                loadHistory();
-            } catch(e) { document.getElementById('login-msg').innerText = e.message; }
+                
+                initDashboard(); // Uruchom widok
+            } catch(e) { document.getElementById('login-msg').innerText = "Błędne dane"; }
+        }
+
+        // --- 2. FUNKCJA INICJUJĄCA (Sprawdza czy już zalogowano) ---
+        function initDashboard() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dash-view').classList.remove('hidden');
+            loadDashboardData();
+            loadHistory();
+        }
+
+        function logout() { 
+            localStorage.removeItem('wingman_user'); // Czyścimy sesję
+            location.reload(); 
+        }
+
+        // --- 3. AUTOMATYCZNY START (Na dole skryptu) ---
+        // Sprawdź przy wejściu na stronę, czy jest zapisany user
+        const savedUser = localStorage.getItem('wingman_user');
+        if(savedUser) {
+            userEmail = savedUser;
+            initDashboard();
         }
 
         async function loadDashboardData() {
@@ -213,19 +242,59 @@
             document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
             const container = document.getElementById('join-btn-container');
+            const accessInfo = document.getElementById('access-info');
 
-            // --- SCENARIUSZ 1: JUŻ DOŁĄCZYŁEŚ ---
+            // --- SCENARIUSZ 1: JUŻ DOŁĄCZYŁEŚ (PEŁNE STATYSTYKI) ---
             if (data.has_joined) {
-                document.getElementById('status-badge').innerText = "OPŁACONE";
+                document.getElementById('status-badge').innerText = "UCZESTNICZYSZ";
                 document.getElementById('status-badge').className = "status-badge status-active";
-                document.getElementById('access-info').classList.remove('hidden');
-                container.classList.add('hidden'); // Ukrywamy przyciski
+                
+                container.classList.add('hidden'); // Ukrywamy przyciski płatności
+                accessInfo.classList.remove('hidden'); // Pokazujemy panel
+
+                // Budujemy Panel Statystyk
+                if (data.stats) {
+                    accessInfo.style.background = "none";
+                    accessInfo.style.border = "none";
+                    accessInfo.style.padding = "0";
+                    
+                    accessInfo.innerHTML = `
+                        <div id="dash-countdown" class="countdown-box">Ładowanie...</div>
+
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <strong style="color: #10b981">✅ Twoje miejsce jest bezpieczne!</strong><br>
+                            <span style="font-size: 0.85rem; color: #cbd5e1;">Zrzutka aktywna. Dane logowania 5-go.</span>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-value" style="color: #fbbf24">#${data.stats.my_number}</div>
+                                <div class="stat-label">Twój Numer</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">+${data.stats.people_behind}</div>
+                                <div class="stat-label">Dołączyło po Tobie</div>
+                            </div>
+                            <div class="stat-box" style="grid-column: span 2;">
+                                <div class="stat-value" style="color: #4ade80">ok. ${data.stats.current_price_pln} zł</div>
+                                <div class="stat-label">Aktualna cena (Szacowana)</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Uruchom licznik w dashboardzie
+                    startDashCountdown();
+                } else {
+                     // Fallback jeśli brak statystyk
+                     accessInfo.innerHTML = '<strong style="color: var(--success)">✅ Dostęp aktywny!</strong><br><span style="font-size: 0.9rem; color: #cbd5e1;">Dane logowania otrzymasz na maila 5-go dnia miesiąca.</span>';
+                }
+
             } 
             
             // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ PEŁNĄ KWOTĘ (>= 40 zł) ---
             else if (data.wallet_balance >= 40) {
-                container.classList.remove('hidden'); 
-                container.innerHTML = `
+                 container.classList.remove('hidden'); 
+                 container.innerHTML = `
                     <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
                         <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">Masz środki w portfelu!</h3>
                         <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">Możesz dołączyć do obecnej edycji bez dopłacania.</p>
@@ -262,9 +331,9 @@
                             // 3. Pokaż Modal (zamiast alertu)
                             const modal = document.getElementById('success-modal');
                             modal.classList.remove('hidden');
-                            modal.style.display = 'flex'; // Wymuś flex
+                            modal.style.display = 'flex'; 
                             
-                            // 4. Odśwież tło (dane w dashboardzie)
+                            // 4. Odśwież tło
                             loadDashboardData(); 
                         } else {
                             const errData = await joinRes.json();
@@ -278,7 +347,8 @@
                         btn.innerText = "🚀 Dołącz teraz";
                     }
                 };
-            }
+
+            } 
             
             // --- SCENARIUSZ 3: BRAKUJE ŚRODKÓW (DOPŁATA BEZ WYCHODZENIA) ---
             else {
@@ -329,6 +399,27 @@
                     }
                 };
             }
+        }
+
+        // --- FUNKCJA ODLICZANIA (Wklej to pod funkcją loadDashboardData) ---
+        function startDashCountdown() {
+            const el = document.getElementById('dash-countdown');
+            if(!el) return;
+
+            function update() {
+                const now = new Date();
+                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+                const diff = lastDay - now;
+
+                if (diff < 0) { el.innerText = "KONIEC ZAPISÓW"; return; }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                el.innerText = `Koniec za: ${days}d ${hours}h ${minutes}m`;
+            }
+            update();
+            setInterval(update, 60000); // Odświeżaj co minutę
         }
 
         async function loadHistory() {
