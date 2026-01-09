@@ -235,7 +235,7 @@
                     </div>
                 `;
 
-                // Obsługa AUTO-JOIN z gratulacjami
+                // Obsługa AUTO-JOIN (Z MODALEM SUKCESU)
                 document.getElementById('instant-join-btn').onclick = async function() {
                     const btn = this;
                     btn.disabled = true;
@@ -250,8 +250,21 @@
 
                         if (joinRes.ok) {
                             const joinData = await joinRes.json();
-                            // --- SMACZEK GAMIFIKACJI 🎉 ---
-                            alert(`🎉 GRATULACJE!\n\nDołączyłeś do zrzutki!\nTwój numer na liście: #${joinData.number}\n\nLecimy po sukces! 🚀`);
+                            
+                            // 1. Pobierz aktualne ceny, żeby wyświetlić w modalu
+                            const statusRes = await fetch(`${API}/api/group-buy/status`);
+                            const statusData = await statusRes.json();
+
+                            // 2. Wypełnij Modal danymi
+                            document.getElementById('modal-number').innerText = "#" + joinData.number;
+                            document.getElementById('modal-price').innerText = statusData.pricePLN;
+
+                            // 3. Pokaż Modal (zamiast alertu)
+                            const modal = document.getElementById('success-modal');
+                            modal.classList.remove('hidden');
+                            modal.style.display = 'flex'; // Wymuś flex
+                            
+                            // 4. Odśwież tło (dane w dashboardzie)
                             loadDashboardData(); 
                         } else {
                             const errData = await joinRes.json();
@@ -271,10 +284,7 @@
             else {
                 container.classList.remove('hidden');
                 
-                // Obliczamy ile brakuje
                 const missing = (40.00 - data.wallet_balance).toFixed(2);
-                
-                // Minimalna kwota dla Stripe to ok 2-5zł. Ustawiamy bezpiecznik.
                 let payAmount = parseFloat(missing);
                 if(payAmount < 5) payAmount = 5.00;
 
@@ -293,7 +303,6 @@
                     </div>
                 `;
 
-                // Obsługa PŁATNOŚCI STRIPE (Bezpośrednio!)
                 document.getElementById('stripe-pay-btn').onclick = async function() {
                     const btn = this;
                     btn.disabled = true;
@@ -303,13 +312,12 @@
                         const payRes = await fetch(`${API}/api/create-checkout-session`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: userEmail, amount: payAmount }) // Wysyłamy dopłatę!
+                            body: JSON.stringify({ email: userEmail, amount: payAmount }) 
                         });
                         const payData = await payRes.json();
                         
-                        if(payData.url) {
-                            window.location.href = payData.url; // Przekierowanie prosto do Stripe
-                        } else {
+                        if(payData.url) window.location.href = payData.url;
+                        else {
                             alert("Błąd płatności");
                             btn.disabled = false;
                             btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
@@ -377,6 +385,33 @@
         }
 
         function logout() { location.reload(); }
+
+        function closeModal() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            location.reload(); // Odśwież stronę, aby zobaczyć zielony status
+        }
     </script>
+<div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4);">
+            <div style="font-size: 4rem; margin-bottom: 10px;">🎉</div>
+            <h2 style="color: white; font-size: 2rem; margin: 0;">GRATULACJE!</h2>
+            <p style="color: #cbd5e1; margin-bottom: 30px;">Dołączyłeś do zrzutki.</p>
+
+            <div style="background: #0f172a; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155;">
+                <p style="text-transform: uppercase; color: #64748b; font-size: 0.8rem; letter-spacing: 1px;">Twój numer na liście</p>
+                <div id="modal-number" style="font-size: 4rem; font-weight: bold; color: white;">#0</div>
+                <div style="width: 100%; height: 2px; background: #334155; margin: 15px 0;"></div>
+                <p style="color: #94a3b8; font-size: 0.9rem;">
+                    Dzięki Tobie cena spadła do: <br>
+                    <strong style="color: #4ade80; font-size: 1.2rem;">ok. <span id="modal-price">...</span> PLN</strong>
+                </p>
+            </div>
+
+            <button onclick="closeModal()" class="btn btn-primary" style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%); font-size: 1.1rem; padding: 15px;">Lecimy po sukces! 🚀</button>
+        </div>
+    </div>
+
 </body>
 </html>
