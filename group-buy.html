@@ -373,31 +373,45 @@
     function updateCountdown() {
         const now = new Date();
         const currentDay = now.getDate();
+        const joinBtn = document.querySelector('#signupForm button'); // Uchwyt do przycisku
         
-        // Celujemy w 4-go dnia NASTĘPNEGO miesiąca (lub tego, jeśli jest początek)
-        let targetDate;
-        
-        // Jeśli jest np. 1-4 stycznia, celujemy w 4 stycznia
-        if (currentDay <= 4) {
-            targetDate = new Date(now.getFullYear(), now.getMonth(), 4, 23, 59, 59);
-        } else {
-            // Jeśli jest po 4-tym, celujemy w 4-go NASTĘPNEGO miesiąca
-            targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 4, 23, 59, 59);
+        // --- SCENARIUSZ PRZERWY (Dni 1-4) ---
+        if (currentDay >= 1 && currentDay <= 4) {
+            document.getElementById('countdown').innerText = "PRZERWA TECHNICZNA";
+            document.getElementById('countdown').style.color = "#ffbb33"; // Pomarańczowy
+            
+            // Wyłączamy przycisk
+            if(joinBtn) {
+                joinBtn.disabled = true;
+                joinBtn.innerText = "Startujemy 5-go!";
+                joinBtn.style.background = "#555";
+                joinBtn.style.cursor = "not-allowed";
+            }
+            
+            // Informacja tekstowa dla usera
+            const infoBox = document.querySelector('.max-w-2xl'); // Ramka z info
+            if(infoBox) infoBox.innerHTML = `<p class="text-center text-yellow-400 font-bold">📢 Trwa rozliczanie poprzedniej edycji.<br>Zapisy na nowy miesiąc ruszają 5-go o północy.</p>`;
+            return;
         }
 
-        const diff = targetDate - now;
-        const countdownEl = document.getElementById('countdown');
+        // --- SCENARIUSZ ZAPISÓW (Dni 5-31) ---
+        // Celujemy w OSTATNI dzień tego miesiąca, godzina 23:59:59
+        const lastDayOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        
+        const diff = lastDayOfThisMonth - now;
 
-        if (diff < 0) {
-             if(countdownEl) countdownEl.innerText = "0d 0h 0m";
-             return;
+        // Jeśli przycisk był wyłączony, włącz go z powrotem
+        if(joinBtn && joinBtn.disabled && joinBtn.innerText === "Startujemy 5-go!") {
+             joinBtn.disabled = false;
+             joinBtn.innerText = "Sprawdź status / Dołącz";
+             joinBtn.style.background = ""; // Reset koloru
+             joinBtn.style.cursor = "pointer";
         }
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        
-        if(countdownEl) countdownEl.innerText = `${days}d ${hours}h ${minutes}m`;
+        document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
     }
     
     // Uruchom od razu, nie czekaj 1 sekundy

@@ -84,8 +84,31 @@
                 
                 renderTables(data);
                 updatePreview();
+                const settleBtn = document.querySelector('button[onclick="settleMonth()"]');
+            
+            // Jeśli przycisk istnieje w HTML, zaktualizuj go
+            if(settleBtn) {
+                if (data.isSettled) {
+                    // Jeśli miesiąc zamknięty -> Zablokuj przycisk
+                    settleBtn.disabled = true;
+                    settleBtn.innerText = "✅ MIESIĄC ROZLICZONY";
+                    // Szary kolor
+                    settleBtn.className = "w-full bg-gray-500 cursor-not-allowed text-white font-bold py-3 rounded shadow";
+                } else {
+                    // Jeśli miesiąc otwarty -> Odblokuj
+                    settleBtn.disabled = false;
+                    settleBtn.innerText = "🚀 Uruchom Procedurę Rozliczenia";
+                    // Zielony kolor
+                    settleBtn.className = "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded shadow transition";
+                }
+            }
+            
             } catch(e) { alert("Błąd połączenia"); }
+
+            
         }
+
+        
 
         function updatePreview() {
             if(USER_COUNT === 0) return document.getElementById('preview').innerHTML = "Brak uczestników.";
