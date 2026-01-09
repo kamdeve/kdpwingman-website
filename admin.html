@@ -52,27 +52,57 @@
                             <th class="py-2 px-3 text-left">Zwrócono łącznie</th>
                         </tr>
                     </thead>
-                    <tbody id="settlements-table-body" class="text-gray-600">
-                        </tbody>
+                    <tbody id="settlements-table-body" class="text-gray-600"></tbody>
                 </table>
             </div>
 
             <h3>💸 Zlecenia Wypłat (Do zrobienia)</h3>
-            <table id="withdraw-table">
-                <thead><tr><th>Użytkownik / Konto</th><th>Kwota</th><th>Akcja</th></tr></thead>
-                <tbody></tbody>
-            </table>
+            <div class="bg-white rounded shadow overflow-hidden mb-8">
+                <table id="withdraw-table" class="min-w-full">
+                    <thead><tr><th>Użytkownik / Konto</th><th>Kwota</th><th>Akcja</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
 
             <h3 style="margin-top: 40px; color: #6c757d;">📜 Historia Zrealizowanych Wypłat</h3>
-            <table id="history-table">
-                <thead><tr><th>Data Zlecenia</th><th>Data Realizacji (Admin)</th><th>Użytkownik / Konto</th><th>Kwota</th></tr></thead>
-                <tbody></tbody>
-            </table>
+            <div class="bg-white rounded shadow overflow-hidden mb-8">
+                <table id="history-table" class="min-w-full">
+                    <thead><tr><th>Data Zlecenia</th><th>Data Realizacji (Admin)</th><th>Użytkownik / Konto</th><th>Kwota</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
 
-            <h3 style="margin-top: 40px;">📋 Obecni Uczestnicy</h3>
-            <table id="users-table"><tbody></tbody></table>
+            <h3 style="margin-top: 40px;">📋 Obecni Uczestnicy (Bieżąca Edycja)</h3>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table id="users-table" class="min-w-full">
+                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                        <tr>
+                            <th class="py-3 px-4 text-left">Okres</th>
+                            <th class="py-3 px-4 text-left">Email</th>
+                            <th class="py-3 px-4 text-left">Wpłata</th>
+                            <th class="py-3 px-4 text-left">Data dołączenia</th>
+                            <th class="py-3 px-4 text-center">Akcja</th> </tr>
+                    </thead>
+                    <tbody class="text-sm"></tbody>
+                </table>
+            </div>
+
+            <h3 style="margin-top: 40px; color: #64748b;">🕰️ Uczestnicy z Poprzedniego Miesiąca</h3>
+            <div class="bg-gray-50 rounded-lg shadow overflow-hidden border border-gray-200">
+                <table class="min-w-full">
+                    <thead class="bg-gray-200 text-gray-500 uppercase text-xs">
+                        <tr>
+                            <th class="py-3 px-4 text-left">Okres</th>
+                            <th class="py-3 px-4 text-left">Email</th>
+                            <th class="py-3 px-4 text-left">Wpłata</th>
+                            <th class="py-3 px-4 text-left">Data dołączenia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="past-users-table-body" class="text-sm">
+                        </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
     <script>
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
@@ -146,24 +176,67 @@
         }
 
         function renderTables(data) {
-            // 1. Uczestnicy
-            const tUser = document.getElementById('users-table').querySelector('tbody');
-            tUser.innerHTML = data.participants.map(p => `<tr><td>${p.email}</td><td>${p.amount_paid} zł</td></tr>`).join('');
+        // --- 1. OBECNI UCZESTNICY (Zaktualizowane o przycisk USUWANIA) ---
+        const tUser = document.getElementById('users-table').querySelector('tbody');
+        
+        if (data.participants.length === 0) {
+            tUser.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-gray-500">Brak uczestników w tym miesiącu.</td></tr>';
+        } else {
+            tUser.innerHTML = data.participants.map(p => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 font-bold text-blue-600">${p.month_target}</td> <td class="p-3">${p.email}</td>
+                    <td class="p-3 text-green-600 font-bold">${p.amount_paid} zł</td>
+                    <td class="p-3 text-gray-500 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="removeParticipant(${p.user_id}, '${p.month_target}', '${p.email}')" 
+                                class="bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1 rounded text-xs font-bold border border-red-200 transition">
+                            ❌ Anuluj
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-            // 2. Oczekujące Wypłaty
-            const tWith = document.getElementById('withdraw-table').querySelector('tbody');
+        // --- 2. UCZESTNICY Z POPRZEDNIEGO MIESIĄCA (NOWOŚĆ) ---
+        // (Upewnij się, że dodałeś odpowiedni HTML dla tej tabeli, jak w instrukcji wyżej)
+        const pastTableBody = document.getElementById('past-users-table-body');
+        if(pastTableBody) {
+             if(!data.pastParticipants || data.pastParticipants.length === 0) {
+                pastTableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">Brak danych z poprzedniego miesiąca.</td></tr>';
+             } else {
+                pastTableBody.innerHTML = data.pastParticipants.map(p => `
+                    <tr class="border-b hover:bg-gray-50 bg-gray-50">
+                        <td class="p-3 text-gray-500">${p.month_target}</td>
+                        <td class="p-3 text-gray-600">${p.email}</td>
+                        <td class="p-3 text-gray-600">${p.amount_paid} zł</td>
+                        <td class="p-3 text-gray-400 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+             }
+        }
+
+        // --- 3. OCZEKUJĄCE WYPŁATY (Twoja wersja ze screena - bez zmian) ---
+        // Szukamy tabeli po ID 'withdraw-table' (tak masz na screenie) lub 'withdrawals-table'
+        const withdrawTableEl = document.getElementById('withdraw-table') || document.getElementById('withdrawals-table');
+        
+        if (withdrawTableEl) {
+            const tWith = withdrawTableEl.querySelector('tbody');
             tWith.innerHTML = data.withdrawals.length ? data.withdrawals.map(w => `
                 <tr style="background: #fff3cd;">
-                    <td><strong>${w.email}</strong><br><span style="font-size:0.8rem; color:#666;">Data zgł.: ${new Date(w.created_at).toLocaleString()}</span><br>Konto: <strong>${w.account_number || '---'}</strong></td>
+                    <td><strong>${w.email}</strong><br><span style="font-size:0.8rem; color:#666;">Data: ${new Date(w.created_at).toLocaleString()}</span></td>
                     <td style="color:red; font-weight:bold;">-${w.amount} zł</td>
                     <td>
-                        <button class="btn btn-blue" onclick="navigator.clipboard.writeText('${w.account_number}')">Kopiuj NR</button>
+                        <button class="btn btn-blue" style="margin-right:5px;" onclick="navigator.clipboard.writeText('${w.account_number}')">Kopiuj</button>
                         <button class="btn btn-red" onclick="confirmWithdraw(${w.id}, '${w.email}', ${w.amount})">Zrealizuj</button>
+                        <br><span style="font-size:0.7rem; font-family:monospace;">${w.account_number}</span>
                     </td>
                 </tr>`).join('') : '<tr><td colspan="3">Brak zleceń.</td></tr>';
+        }
 
-            // 3. HISTORIA (NOWOŚĆ!)
-            const tHist = document.getElementById('history-table').querySelector('tbody');
+        // --- 4. HISTORIA WYPŁAT (Twoja wersja ze screena - bez zmian) ---
+        const historyTableEl = document.getElementById('history-table');
+        if (historyTableEl) {
+            const tHist = historyTableEl.querySelector('tbody');
             tHist.innerHTML = data.history && data.history.length ? data.history.map(h => `
                 <tr class="history-row">
                     <td>${new Date(h.created_at).toLocaleDateString()}</td>
@@ -172,6 +245,7 @@
                     <td>-${h.amount} zł</td>
                 </tr>`).join('') : '<tr><td colspan="4">Pusta historia.</td></tr>';
         }
+    }
 
         async function confirmWithdraw(id, email, amount) {
             if(!confirm(`Czy zrealizowałeś przelew ${amount} zł dla ${email}?`)) return;
@@ -186,6 +260,27 @@
             const res = await fetch(`${API}/api/admin/settle`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ secret: KEY }) });
             const d = await res.json(); alert(d.message || d.error); loadData();
         }
+
+        async function removeParticipant(userId, month, email) {
+        if(!confirm(`⚠️ CZY NA PEWNO?\n\nChcesz usunąć użytkownika: ${email} z edycji ${month}?\n\n- Licznik uczestników się zmniejszy.\n- Środki (wpłacona kwota) wrócą AUTOMATYCZNIE na jego wirtualny portfel.\n- Użytkownik nie otrzyma dostępu.`)) return;
+
+        try {
+            const res = await fetch(`${API}/api/admin/remove-participant`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secret: KEY, userId, month })
+            });
+            const data = await res.json();
+            
+            if(data.success) {
+                alert("✅ SUKCES: " + data.message);
+                loadData(); // Odśwież tabelę
+            } else {
+                alert("Błąd: " + data.error);
+            }
+        } catch(e) { alert("Błąd połączenia: " + e.message); }
+    }
+
     </script>
 </body>
 </html>
