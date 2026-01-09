@@ -212,20 +212,19 @@
             document.getElementById('balance').innerText = data.wallet_balance.toFixed(2) + " zł";
             document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
-            // SCENARIUSZ 1: Użytkownik już dołączył (Status OPŁACONE)
+            const container = document.getElementById('join-btn-container');
+
+            // --- SCENARIUSZ 1: JUŻ DOŁĄCZYŁEŚ ---
             if (data.has_joined) {
                 document.getElementById('status-badge').innerText = "OPŁACONE";
                 document.getElementById('status-badge').className = "status-badge status-active";
                 document.getElementById('access-info').classList.remove('hidden');
-                document.getElementById('join-btn-container').classList.add('hidden');
+                container.classList.add('hidden'); // Ukrywamy przyciski
             } 
             
-            // SCENARIUSZ 2: (NOWOŚĆ) Użytkownik NIE dołączył, ale MA ŚRODKI (>= 40 zł)
+            // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ PEŁNĄ KWOTĘ (>= 40 zł) ---
             else if (data.wallet_balance >= 40) {
-                const container = document.getElementById('join-btn-container');
                 container.classList.remove('hidden'); 
-                
-                // Wstrzykujemy dynamicznie zielony panel z przyciskiem
                 container.innerHTML = `
                     <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
                         <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">Masz środki w portfelu!</h3>
@@ -236,7 +235,7 @@
                     </div>
                 `;
 
-                // Obsługa kliknięcia (AJAX - bez przeładowania strony!)
+                // Obsługa AUTO-JOIN z gratulacjami
                 document.getElementById('instant-join-btn').onclick = async function() {
                     const btn = this;
                     btn.disabled = true;
@@ -250,8 +249,9 @@
                         });
 
                         if (joinRes.ok) {
-                            alert("✅ Sukces! Dołączono do zrzutki.");
-                            // Magia: wywołujemy tę samą funkcję, żeby odświeżyła widok na "OPŁACONE"
+                            const joinData = await joinRes.json();
+                            // --- SMACZEK GAMIFIKACJI 🎉 ---
+                            alert(`🎉 GRATULACJE!\n\nDołączyłeś do zrzutki!\nTwój numer na liście: #${joinData.number}\n\nLecimy po sukces! 🚀`);
                             loadDashboardData(); 
                         } else {
                             const errData = await joinRes.json();
@@ -267,15 +267,59 @@
                 };
             }
             
-            // SCENARIUSZ 3: Domyślny (Brak środków -> Zostaje standardowy link do płatności)
+            // --- SCENARIUSZ 3: BRAKUJE ŚRODKÓW (DOPŁATA BEZ WYCHODZENIA) ---
             else {
-                // Jeśli użytkownik wcześniej miał przycisk "Szybki start", ale wypłacił środki,
-                // musimy przywrócić domyślny wygląd przycisku.
-                const container = document.getElementById('join-btn-container');
-                if (container.innerHTML.includes('Masz środki')) {
-                    container.innerHTML = `<a href="group-buy.html" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">Dołącz teraz (40 zł)</a>`;
-                }
                 container.classList.remove('hidden');
+                
+                // Obliczamy ile brakuje
+                const missing = (40.00 - data.wallet_balance).toFixed(2);
+                
+                // Minimalna kwota dla Stripe to ok 2-5zł. Ustawiamy bezpiecznik.
+                let payAmount = parseFloat(missing);
+                if(payAmount < 5) payAmount = 5.00;
+
+                container.innerHTML = `
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 10px; text-align: center;">
+                        <h3 style="color: #ef4444; margin: 0 0 10px 0; font-size: 1rem;">Dołącz do zrzutki</h3>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 5px;">
+                            W portfelu: <strong>${data.wallet_balance.toFixed(2)} zł</strong>
+                        </p>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
+                            Brakuje: <strong>${missing} zł</strong>
+                        </p>
+                        <button id="stripe-pay-btn" class="btn btn-primary" style="width: 100%; margin-top: 0;">
+                            💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)
+                        </button>
+                    </div>
+                `;
+
+                // Obsługa PŁATNOŚCI STRIPE (Bezpośrednio!)
+                document.getElementById('stripe-pay-btn').onclick = async function() {
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerText = "Łączenie z bankiem...";
+
+                    try {
+                        const payRes = await fetch(`${API}/api/create-checkout-session`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail, amount: payAmount }) // Wysyłamy dopłatę!
+                        });
+                        const payData = await payRes.json();
+                        
+                        if(payData.url) {
+                            window.location.href = payData.url; // Przekierowanie prosto do Stripe
+                        } else {
+                            alert("Błąd płatności");
+                            btn.disabled = false;
+                            btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                        }
+                    } catch(err) {
+                        alert("Błąd: " + err.message);
+                        btn.disabled = false;
+                        btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                    }
+                };
             }
         }
 
