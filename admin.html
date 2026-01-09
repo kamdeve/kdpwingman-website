@@ -42,6 +42,21 @@
                 <button class="btn btn-green" onclick="settle()">🚀 Uruchom Procedurę Rozliczenia</button>
             </div>
 
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm">
+                <h4 style="margin-top: 20px; font-weight: bold; color: #475569;">📜 Archiwum Rozliczeń:</h4>
+                <table class="min-w-full mt-2 bg-white rounded overflow-hidden shadow-sm" style="font-size: 0.85rem;">
+                    <thead class="bg-gray-200 text-gray-600 uppercase text-xs">
+                        <tr>
+                            <th class="py-2 px-3 text-left">Edycja</th>
+                            <th class="py-2 px-3 text-left">Data Rozliczenia</th>
+                            <th class="py-2 px-3 text-left">Zwrócono łącznie</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settlements-table-body" class="text-gray-600">
+                        </tbody>
+                </table>
+            </div>
+
             <h3>💸 Zlecenia Wypłat (Do zrobienia)</h3>
             <table id="withdraw-table">
                 <thead><tr><th>Użytkownik / Konto</th><th>Kwota</th><th>Akcja</th></tr></thead>
@@ -102,7 +117,18 @@
                     settleBtn.className = "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded shadow transition";
                 }
             }
-            
+
+            const settleBody = document.getElementById('settlements-table-body');
+            if(settleBody && data.settlements) {
+                settleBody.innerHTML = data.settlements.map(s => `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-2 px-3 font-bold text-blue-600">${s.month_target}</td>
+                        <td class="py-2 px-3">${new Date(s.processed_at).toLocaleString()}</td>
+                        <td class="py-2 px-3 text-green-600 font-bold">-${s.total_refunded} zł/os.</td>
+                    </tr>
+                `).join('');
+            }
+
             } catch(e) { alert("Błąd połączenia"); }
 
             
