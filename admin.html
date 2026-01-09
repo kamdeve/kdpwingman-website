@@ -184,10 +184,15 @@
         } else {
             tUser.innerHTML = data.participants.map(p => `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3 font-bold text-blue-600">${p.month_target}</td> <td class="p-3">${p.email}</td>
+                    <td class="p-3 font-bold text-blue-600">${p.month_target}</td>
+                    <td class="p-3">${p.email}</td>
                     <td class="p-3 text-green-600 font-bold">${p.amount_paid} zł</td>
                     <td class="p-3 text-gray-500 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
-                    <td class="p-3 text-center">
+                    <td class="p-3 text-center flex items-center justify-center gap-2">
+                        <input type="number" id="refund-input-${p.user_id}" value="${p.amount_paid}" 
+                               style="width: 60px; padding: 4px; border: 1px solid #ccc; rounded; text-align: center;" 
+                               title="Kwota zwrotu">
+                        
                         <button onclick="removeParticipant(${p.user_id}, '${p.month_target}', '${p.email}')" 
                                 class="bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1 rounded text-xs font-bold border border-red-200 transition">
                             ❌ Anuluj
@@ -262,13 +267,18 @@
         }
 
         async function removeParticipant(userId, month, email) {
-        if(!confirm(`⚠️ CZY NA PEWNO?\n\nChcesz usunąć użytkownika: ${email} z edycji ${month}?\n\n- Licznik uczestników się zmniejszy.\n- Środki (wpłacona kwota) wrócą AUTOMATYCZNIE na jego wirtualny portfel.\n- Użytkownik nie otrzyma dostępu.`)) return;
+        // Pobierz wartość z pola input obok przycisku
+        const inputEl = document.getElementById(`refund-input-${userId}`);
+        const customAmount = inputEl ? inputEl.value : null;
+
+        if(!confirm(`⚠️ CZY NA PEWNO?\n\nUsuwasz: ${email}\nZwrot do portfela: ${customAmount} zł\n\nKliknij OK, aby potwierdzić.`)) return;
 
         try {
             const res = await fetch(`${API}/api/admin/remove-participant`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ secret: KEY, userId, month })
+                // Wysyłamy 'customRefund'
+                body: JSON.stringify({ secret: KEY, userId, month, customRefund: customAmount })
             });
             const data = await res.json();
             

@@ -212,11 +212,70 @@
             document.getElementById('balance').innerText = data.wallet_balance.toFixed(2) + " zł";
             document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
+            // SCENARIUSZ 1: Użytkownik już dołączył (Status OPŁACONE)
             if (data.has_joined) {
                 document.getElementById('status-badge').innerText = "OPŁACONE";
                 document.getElementById('status-badge').className = "status-badge status-active";
                 document.getElementById('access-info').classList.remove('hidden');
                 document.getElementById('join-btn-container').classList.add('hidden');
+            } 
+            
+            // SCENARIUSZ 2: (NOWOŚĆ) Użytkownik NIE dołączył, ale MA ŚRODKI (>= 40 zł)
+            else if (data.wallet_balance >= 40) {
+                const container = document.getElementById('join-btn-container');
+                container.classList.remove('hidden'); 
+                
+                // Wstrzykujemy dynamicznie zielony panel z przyciskiem
+                container.innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
+                        <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">Masz środki w portfelu!</h3>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">Możesz dołączyć do obecnej edycji bez dopłacania.</p>
+                        <button id="instant-join-btn" class="btn btn-primary" style="width: 100%; background: #10b981; border: none; margin-top: 0;">
+                            🚀 Dołącz teraz (kliknij raz)
+                        </button>
+                    </div>
+                `;
+
+                // Obsługa kliknięcia (AJAX - bez przeładowania strony!)
+                document.getElementById('instant-join-btn').onclick = async function() {
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerText = "Przetwarzanie...";
+
+                    try {
+                        const joinRes = await fetch(`${API}/api/group-buy/join`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail })
+                        });
+
+                        if (joinRes.ok) {
+                            alert("✅ Sukces! Dołączono do zrzutki.");
+                            // Magia: wywołujemy tę samą funkcję, żeby odświeżyła widok na "OPŁACONE"
+                            loadDashboardData(); 
+                        } else {
+                            const errData = await joinRes.json();
+                            alert("Błąd: " + (errData.error || "Nie udało się dołączyć"));
+                            btn.disabled = false;
+                            btn.innerText = "🚀 Dołącz teraz";
+                        }
+                    } catch (e) {
+                        alert("Błąd połączenia: " + e.message);
+                        btn.disabled = false;
+                        btn.innerText = "🚀 Dołącz teraz";
+                    }
+                };
+            }
+            
+            // SCENARIUSZ 3: Domyślny (Brak środków -> Zostaje standardowy link do płatności)
+            else {
+                // Jeśli użytkownik wcześniej miał przycisk "Szybki start", ale wypłacił środki,
+                // musimy przywrócić domyślny wygląd przycisku.
+                const container = document.getElementById('join-btn-container');
+                if (container.innerHTML.includes('Masz środki')) {
+                    container.innerHTML = `<a href="group-buy.html" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">Dołącz teraz (40 zł)</a>`;
+                }
+                container.classList.remove('hidden');
             }
         }
 
