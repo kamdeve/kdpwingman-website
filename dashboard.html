@@ -235,30 +235,67 @@
         }
 
         async function loadDashboardData() {
+            // 1. Pobieranie danych z backendu
             const res = await fetch(`${API}/api/user/status`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ email: userEmail })
             });
             const data = await res.json();
+            
+            // 2. Aktualizacja podstawowych informacji
             document.getElementById('balance').innerText = data.wallet_balance.toFixed(2) + " zł";
             document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
             const container = document.getElementById('join-btn-container');
             const accessInfo = document.getElementById('access-info');
 
-            // --- SCENARIUSZ 1: UCZESTNICZYSZ (PEŁNE STATYSTYKI FINANSOWE) ---
+            // --- PRZYGOTOWANIE SEKCJI AUTOPILOTA (Wspólna dla wszystkich scenariuszy) ---
+            // To jest ta część, która decyduje: "Włącz" czy "Anuluj"?
+            let subHtml = "";
+            if (data.is_subscriber) {
+                // Jeśli jest subskrybentem -> Pokaż panel zarządzania (Anuluj)
+                subHtml = `
+                    <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;">
+                        <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px solid #059669;">
+                            <h4 style="margin: 0; color: #10b981;">✈️ Autopilot Aktywny</h4>
+                            <p style="font-size: 0.8rem; color: #94a3b8; margin: 10px 0;">
+                                Co miesiąc pobieramy <strong>40 zł</strong> z Twojej karty.<br>
+                                Ewentualne nadpłaty (różnica ceny) wracają na Twój portfel i możesz je wypłacić.
+                            </p>
+                            <button id="cancel-sub-btn" class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; width: auto; font-size: 0.85rem; padding: 8px 20px; margin-top:5px;">
+                                Anuluj Subskrypcję
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Jeśli NIE jest -> Pokaż ofertę (Włącz)
+                subHtml = `
+                    <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;">
+                        <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
+                            Nie chcesz klikać co miesiąc?
+                        </p>
+                        <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
+                            ✈️ Włącz Autopilota (40 zł / mc)
+                        </button>
+                    </div>
+                `;
+            }
+
+            // --- SCENARIUSZ 1: UCZESTNICZYSZ (Pełne statystyki) ---
             if (data.has_joined) {
                 document.getElementById('status-badge').innerText = "UCZESTNICZYSZ";
                 document.getElementById('status-badge').className = "status-badge status-active";
                 
-                container.classList.add('hidden');
-                accessInfo.classList.remove('hidden');
+                container.classList.add('hidden'); // Ukrywamy przyciski płatności
+                accessInfo.classList.remove('hidden'); // Pokazujemy panel statystyk
 
                 if (data.stats) {
                     accessInfo.style.background = "none";
                     accessInfo.style.border = "none";
                     accessInfo.style.padding = "0";
                     
+                    // Wklejamy Twój rozbudowany HTML statystyk + dodajemy subHtml na dole
                     accessInfo.innerHTML = `
                         <div id="dash-countdown" class="countdown-box">Ładowanie...</div>
 
@@ -275,52 +312,43 @@
                             </div>
 
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                
                                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
                                     <div style="font-size:0.7rem; color:#94a3b8;">Twój Depozyt</div>
                                     <div style="font-size:1.1rem; font-weight:bold;">${data.stats.deposit} zł</div>
                                 </div>
-
                                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-                                    <div style="font-size:0.7rem; color:#94a3b8;">Cena gdy wchodziłeś</div>
+                                    <div style="font-size:0.7rem; color:#94a3b8;">Cena na wejściu</div>
                                     <div style="font-size:1.1rem; font-weight:bold; color:#cbd5e1;">${data.stats.price_when_joined} zł</div>
                                 </div>
-
                                 <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #059669; padding:10px; border-radius:8px;">
                                     <div style="font-size:0.7rem; color:#10b981;">📉 Spójrz jak spada!</div>
                                     <div style="font-size:1.2rem; font-weight:bold; color:#10b981;">ok. ${data.stats.current_price} zł</div>
                                 </div>
-
                                 <div style="background:rgba(236, 72, 153, 0.1); border:1px solid #db2777; padding:10px; border-radius:8px;">
                                     <div style="font-size:0.7rem; color:#ec4899;">Przewidywany Zwrot</div>
                                     <div style="font-size:1.2rem; font-weight:bold; color:#ec4899;">ok. ${data.stats.projected_refund} zł</div>
                                 </div>
-
                             </div>
                             <p style="margin-top:15px; font-size:0.75rem; color:#64748b; text-align:center;">
                                 *Zwrot = Depozyt - (Cena + 10zł opłaty). Kwota wróci na portfel po zakończeniu zrzutki.
                             </p>
                         </div>
 
-                        <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 20px;">
-    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
-        Chcesz mieć spokój? Włącz Autopilota ✈️
-    </p>
-   <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
-    Włącz Subskrypcję (40 zł / mc)
-</button>
-</div>
-                        
+                        ${subHtml} 
                     `;
+                    // ^^^ Tutaj wstrzykujemy sekcję Autopilota
+                    
                     startDashCountdown();
                 } else {
-                     accessInfo.innerHTML = '<strong style="color: var(--success)">✅ Dostęp aktywny!</strong>';
+                     accessInfo.innerHTML = '<strong style="color: var(--success)">✅ Dostęp aktywny!</strong>' + subHtml;
                 }
-            }
+
+            } 
             
             // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ PEŁNĄ KWOTĘ (>= 40 zł) ---
             else if (data.wallet_balance >= 40) {
                  container.classList.remove('hidden'); 
+                 // Wklejamy HTML + subHtml
                  container.innerHTML = `
                     <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
                         <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">Masz środki w portfelu!</h3>
@@ -329,9 +357,10 @@
                             🚀 Dołącz teraz (kliknij raz)
                         </button>
                     </div>
+                    ${subHtml}
                 `;
 
-                // Obsługa AUTO-JOIN (Z MODALEM SUKCESU)
+                // Obsługa AUTO-JOIN (Twoja pełna wersja z Modalem)
                 document.getElementById('instant-join-btn').onclick = async function() {
                     const btn = this;
                     btn.disabled = true;
@@ -346,21 +375,16 @@
 
                         if (joinRes.ok) {
                             const joinData = await joinRes.json();
-                            
-                            // 1. Pobierz aktualne ceny, żeby wyświetlić w modalu
                             const statusRes = await fetch(`${API}/api/group-buy/status`);
                             const statusData = await statusRes.json();
 
-                            // 2. Wypełnij Modal danymi
                             document.getElementById('modal-number').innerText = "#" + joinData.number;
                             document.getElementById('modal-price').innerText = statusData.pricePLN;
 
-                            // 3. Pokaż Modal (zamiast alertu)
                             const modal = document.getElementById('success-modal');
                             modal.classList.remove('hidden');
                             modal.style.display = 'flex'; 
                             
-                            // 4. Odśwież tło
                             loadDashboardData(); 
                         } else {
                             const errData = await joinRes.json();
@@ -377,7 +401,7 @@
 
             } 
             
-            // --- SCENARIUSZ 3: BRAKUJE ŚRODKÓW (DOPŁATA BEZ WYCHODZENIA) ---
+            // --- SCENARIUSZ 3: BRAKUJE ŚRODKÓW (DOPŁATA) ---
             else {
                 container.classList.remove('hidden');
                 
@@ -398,6 +422,7 @@
                             💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)
                         </button>
                     </div>
+                    ${subHtml}
                 `;
 
                 document.getElementById('stripe-pay-btn').onclick = async function() {
@@ -424,6 +449,24 @@
                         btn.disabled = false;
                         btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
                     }
+                };
+            }
+
+            // --- 4. AKTYWACJA PRZYCISKU ANULOWANIA (Jeśli istnieje) ---
+            const cancelBtn = document.getElementById('cancel-sub-btn');
+            if(cancelBtn) {
+                cancelBtn.onclick = async function() {
+                    if(!confirm("Czy na pewno chcesz wyłączyć Autopilota? W przyszłym miesiącu będziesz musiał dołączyć ręcznie.")) return;
+                    this.innerText = "Anulowanie...";
+                    try {
+                        const res = await fetch(`${API}/api/cancel-subscription`, {
+                            method: 'POST', headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ email: userEmail })
+                        });
+                        const d = await res.json();
+                        alert(d.message);
+                        loadDashboardData(); // Odśwież widok
+                    } catch(e) { alert("Błąd połączenia"); }
                 };
             }
         }
