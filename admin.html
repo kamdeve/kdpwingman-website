@@ -87,6 +87,18 @@
                 </table>
             </div>
 
+            
+            <h3 style="margin-top: 40px; color: #a0134a;">✈️ Piloci Autopilota (Subskrybenci)</h3>
+<div class="bg-white rounded shadow overflow-hidden">
+    <table id="subs-table" class="min-w-full">
+        <thead class="bg-pink-50 text-gray-600 uppercase text-xs">
+            <tr><th>Email</th><th>Saldo Portfela</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
             <h3 style="margin-top: 40px; color: #64748b;">🕰️ Uczestnicy z Poprzedniego Miesiąca</h3>
             <div class="bg-gray-50 rounded-lg shadow overflow-hidden border border-gray-200">
                 <table class="min-w-full">
@@ -200,6 +212,20 @@
                     </td>
                 </tr>
             `).join('');
+            // --- 5. SUBSKRYBENCI (WKLEJ TO NA SAMYM DOLE) ---
+        const subsBody = document.getElementById('subs-table').querySelector('tbody');
+        if(subsBody) { // Dodatkowy if, żeby nie wywaliło błędu jak nie znajdzie tabeli
+            if(data.subscribers && data.subscribers.length > 0) {
+                subsBody.innerHTML = data.subscribers.map(s => `
+                    <tr class="border-b">
+                        <td class="p-3 font-bold text-pink-600">✈️ ${s.email}</td>
+                        <td class="p-3">${s.wallet_balance} zł</td>
+                    </tr>
+                `).join('');
+            } else {
+                subsBody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-gray-500">Brak subskrybentów.</td></tr>';
+            }
+        }
         }
 
         // --- 2. UCZESTNICY Z POPRZEDNIEGO MIESIĄCA (NOWOŚĆ) ---
