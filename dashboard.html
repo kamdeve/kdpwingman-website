@@ -306,9 +306,9 @@
     <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
         Chcesz mieć spokój? Włącz Autopilota ✈️
     </p>
-    <button id="sub-btn" class="btn" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
-        Włącz Subskrypcję (40 zł / mc)
-    </button>
+   <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
+    Włącz Subskrypcję (40 zł / mc)
+</button>
 </div>
                         
                     `;
@@ -515,6 +515,30 @@
         localStorage.removeItem('wingman_user'); // Usuń sesję
         window.location.href = "index.html"; // Wyrzuć na stronę główną (nie dashboard!)
     });
+
+    // --- NOWA FUNKCJA DO OBSŁUGI SUBSKRYPCJI ---
+        async function startSubscription() {
+            const btn = document.getElementById('sub-btn');
+            if(btn) btn.innerText = "Łączenie ze Stripe...";
+            
+            try {
+                const res = await fetch(`${API}/api/create-subscription-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const d = await res.json();
+                if(d.url) {
+                    window.location.href = d.url;
+                } else {
+                    alert("Błąd tworzenia subskrypcji: " + (d.error || "Nieznany"));
+                    if(btn) btn.innerText = "Włącz Subskrypcję (40 zł / mc)";
+                }
+            } catch(e) { 
+                alert("Błąd połączenia"); 
+                if(btn) btn.innerText = "Włącz Subskrypcję (40 zł / mc)";
+            }
+        }
     </script>
 <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
         <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4);">
