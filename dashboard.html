@@ -249,18 +249,17 @@
             const container = document.getElementById('join-btn-container');
             const accessInfo = document.getElementById('access-info');
 
-            // --- PRZYGOTOWANIE SEKCJI AUTOPILOTA (Wspólna dla wszystkich scenariuszy) ---
-            // To jest ta część, która decyduje: "Włącz" czy "Anuluj"?
+            // --- PRZYGOTOWANIE SEKCJI AUTOPILOTA (Decyzja: Włącz czy Anuluj?) ---
             let subHtml = "";
             if (data.is_subscriber) {
-                // Jeśli jest subskrybentem -> Pokaż panel zarządzania (Anuluj)
+                // JEŚLI JEST SUBSKRYBENTEM -> CZERWONY PRZYCISK ANULOWANIA
                 subHtml = `
                     <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;">
                         <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px solid #059669;">
                             <h4 style="margin: 0; color: #10b981;">✈️ Autopilot Aktywny</h4>
                             <p style="font-size: 0.8rem; color: #94a3b8; margin: 10px 0;">
                                 Co miesiąc pobieramy <strong>40 zł</strong> z Twojej karty.<br>
-                                Ewentualne nadpłaty (różnica ceny) wracają na Twój portfel i możesz je wypłacić.
+                                Ewentualne nadpłaty wracają na Twój portfel i możesz je wypłacić.
                             </p>
                             <button id="cancel-sub-btn" class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; width: auto; font-size: 0.85rem; padding: 8px 20px; margin-top:5px;">
                                 Anuluj Subskrypcję
@@ -269,7 +268,7 @@
                     </div>
                 `;
             } else {
-                // Jeśli NIE jest -> Pokaż ofertę (Włącz)
+                // JEŚLI NIE JEST -> ZIELONY PRZYCISK WŁĄCZENIA
                 subHtml = `
                     <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;">
                         <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
@@ -287,15 +286,15 @@
                 document.getElementById('status-badge').innerText = "UCZESTNICZYSZ";
                 document.getElementById('status-badge').className = "status-badge status-active";
                 
-                container.classList.add('hidden'); // Ukrywamy przyciski płatności
-                accessInfo.classList.remove('hidden'); // Pokazujemy panel statystyk
+                container.classList.add('hidden'); 
+                accessInfo.classList.remove('hidden');
 
                 if (data.stats) {
                     accessInfo.style.background = "none";
                     accessInfo.style.border = "none";
                     accessInfo.style.padding = "0";
                     
-                    // Wklejamy Twój rozbudowany HTML statystyk + dodajemy subHtml na dole
+                    // --- TUTAJ BYŁ BŁĄD: Wstawiamy teraz zmienną ${subHtml} zamiast sztywnego kodu ---
                     accessInfo.innerHTML = `
                         <div id="dash-countdown" class="countdown-box">Ładowanie...</div>
 
@@ -336,7 +335,7 @@
 
                         ${subHtml} 
                     `;
-                    // ^^^ Tutaj wstrzykujemy sekcję Autopilota
+                    // ^^^ TERAZ JEST POPRAWNIE: Używamy zmiennej subHtml, która zawiera odpowiedni przycisk
                     
                     startDashCountdown();
                 } else {
@@ -348,7 +347,6 @@
             // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ PEŁNĄ KWOTĘ (>= 40 zł) ---
             else if (data.wallet_balance >= 40) {
                  container.classList.remove('hidden'); 
-                 // Wklejamy HTML + subHtml
                  container.innerHTML = `
                     <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
                         <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">Masz środki w portfelu!</h3>
@@ -360,7 +358,7 @@
                     ${subHtml}
                 `;
 
-                // Obsługa AUTO-JOIN (Twoja pełna wersja z Modalem)
+                // Obsługa AUTO-JOIN
                 document.getElementById('instant-join-btn').onclick = async function() {
                     const btn = this;
                     btn.disabled = true;
