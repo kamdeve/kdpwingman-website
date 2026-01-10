@@ -545,6 +545,40 @@
 
         function logout() { location.reload(); }
 
+async function startSubscription() {
+            const btn = document.getElementById('sub-btn');
+            if(btn) {
+                btn.disabled = true;
+                btn.innerText = "Łączenie ze Stripe...";
+            }
+            
+            try {
+                const res = await fetch(`${API}/api/create-subscription-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const d = await res.json();
+                
+                if(d.url) {
+                    window.location.href = d.url; // Przekierowanie do płatności
+                } else {
+                    alert("Błąd tworzenia subskrypcji: " + (d.error || "Nieznany błąd"));
+                    if(btn) {
+                        btn.disabled = false;
+                        btn.innerText = "✈️ Włącz Autopilota (40 zł / mc)";
+                    }
+                }
+            } catch(e) { 
+                alert("Błąd połączenia z serwerem"); 
+                console.error(e);
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerText = "✈️ Włącz Autopilota (40 zł / mc)";
+                }
+            }
+        }
+        
         function closeModal() {
             const modal = document.getElementById('success-modal');
             modal.classList.add('hidden');
