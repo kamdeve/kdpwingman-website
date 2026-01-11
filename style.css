@@ -405,3 +405,5 @@ footer {
     background-color: var(--primary-color);
     color: var(--background-white);
 }
+
+.hidden { display: none !important; }

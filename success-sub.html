@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Autopilot Włączony - KDP Wingman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #a0134a; --accent-hover: #800f3b; --success: #00C851; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
+        
+        .container { max-width: 600px; padding: 20px; }
+        .card { background: var(--card); border-radius: 16px; padding: 40px 30px; box-shadow: 0 0 40px rgba(160, 19, 74, 0.3); border: 2px solid var(--accent); position: relative; overflow: hidden; }
+        
+        /* Efekt poświaty */
+        .card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(160,19,74,0.15) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+        .content { position: relative; z-index: 1; }
+
+        h1 { font-size: 2.2rem; margin: 10px 0; color: white; }
+        p { color: #cbd5e1; line-height: 1.6; font-size: 1.05rem; }
+        
+        .icon-box { font-size: 5rem; margin-bottom: 20px; animation: popIn 0.5s ease-out; }
+        
+        .info-box { background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 10px; padding: 20px; margin: 30px 0; text-align: left; }
+        .info-item { display: flex; align-items: start; gap: 15px; margin-bottom: 15px; }
+        .info-item:last-child { margin-bottom: 0; }
+        .check { color: #4ade80; font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+
+        .btn { display: inline-block; width: 100%; padding: 15px; background: linear-gradient(90deg, #a0134a 0%, #d63384 100%); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; text-decoration: none; transition: 0.3s; box-sizing: border-box; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(160, 19, 74, 0.4); }
+
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="content">
+                <div class="icon-box">✈️</div>
+                <h1 style="color: #4ade80;">Autopilot Aktywny!</h1>
+                <p>Twoja subskrypcja została pomyślnie skonfigurowana.</p>
+
+                <div class="info-box">
+                    <div class="info-item">
+                        <div class="check">✔</div>
+                        <div>
+                            <strong>Płatność przyjęta</strong><br>
+                            <span style="font-size: 0.9rem; color: #94a3b8;">Twoje 40 zł zostało zaksięgowane. Zostałeś automatycznie dopisany do listy zrzutki.</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="check">✔</div>
+                        <div>
+                            <strong>Spokój na przyszłość</strong><br>
+                            <span style="font-size: 0.9rem; color: #94a3b8;">Kolejne wpłaty będą pobierane automatycznie co miesiąc. Możesz zrezygnować w każdej chwili.</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="check">🔑</div>
+                        <div>
+                            <strong>Dostęp do narzędzi</strong><br>
+                            <span style="font-size: 0.9rem; color: #cbd5e1;">Dane logowania otrzymasz na e-mail <strong>5-go dnia miesiąca</strong>.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="dashboard.html" class="btn">Wróć do Panelu Klienta 🚀</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
