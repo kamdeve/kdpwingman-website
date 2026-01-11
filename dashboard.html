@@ -639,6 +639,58 @@ async function startSubscription() {
             
             // Dodajemy ten kontener do głównego kontenera przycisków
             container.appendChild(subContainer);
+
+            // --- NOWOŚĆ: Obsługa powrotu ze Stripe (Modal Sukcesu Autopilota) ---
+        function checkUrlForActions() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+
+            if (action === 'autopilot_enabled') {
+                // 1. Znajdź modal i pokaż go
+                const modal = document.getElementById('success-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+
+                    // 2. Podmień treść modala na wersję "Autopilot"
+                    // (Zastępujemy standardowy tekst o zrzutce tekstem o subskrypcji)
+                    modal.querySelector('.card').innerHTML = `
+                        <div style="font-size: 4rem; margin-bottom: 10px;">✈️</div>
+                        <h2 style="color: white; font-size: 2rem; margin: 0;">AUTOPILOT WŁĄCZONY!</h2>
+                        <p style="color: #4ade80; margin-bottom: 30px; font-weight:bold;">Twoja subskrypcja jest aktywna.</p>
+
+                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; text-align: left;">
+                            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 10px;">
+                                ✅ <strong>Płatność przyjęta:</strong> Środki będą pobierane automatycznie co miesiąc.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 0;">
+                                🔑 <strong>Dostęp:</strong> Dopóki subskrypcja jest aktywna, 
+                                <span style="color: #a0134a; font-weight: bold;">każdego 5-go dnia miesiąca</span> 
+                                otrzymasz dane logowania do Helium 10 na swojego maila.
+                            </p>
+                        </div>
+
+                        <button onclick="closeModalCleanUrl()" class="btn btn-primary" style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%); font-size: 1.1rem; padding: 15px;">
+                            Wchodzę do Panelu 🚀
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        // Funkcja zamykająca modal i czyszcząca adres URL (żeby po odświeżeniu nie wyskakiwało znowu)
+        function closeModalCleanUrl() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            // Czyści "?action=..." z paska adresu bez przeładowania
+            window.history.replaceState({}, document.title, window.location.pathname);
+            // Odświeża dane w tle
+            loadDashboardData();
+        }
+
+        // URUCHAMIAMY SPRAWDZANIE PRZY STARCIE
+        checkUrlForActions();
     </script>
 <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
         <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4);">
