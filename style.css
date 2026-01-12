@@ -481,3 +481,127 @@ footer {
     .scroll-btn { display: none; }
     .proof-img { height: 350px; } /* Mniejsze zdjęcia na telefonie */
 }
+
+/* --- GŁÓWNY KONTENER NAWIGACJI --- */
+.navbar-container {
+    background-color: white;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky; /* Przykleja menu do góry ekranu */
+    top: 0;
+    z-index: 1000; /* Zawsze na wierzchu */
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.navbar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+/* Styl Logo */
+.logo-link {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo-img { height: 35px; }
+
+/* Linki (Wersja Desktop) */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #334155;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.nav-item:hover { color: #a0134a; }
+
+/* Wyróżniony link (Wspólny Dostęp) */
+.nav-item.highlight {
+    color: #a0134a;
+    font-weight: bold;
+}
+
+/* Przycisk Zaloguj */
+.btn-login {
+    text-decoration: none;
+    padding: 8px 20px;
+    border: 2px solid #a0134a;
+    border-radius: 6px;
+    color: #a0134a;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.btn-login:hover {
+    background: #a0134a;
+    color: white;
+}
+
+/* --- PRZYCISK HAMBURGERA (Domyślnie ukryty na PC) --- */
+.hamburger-btn {
+    display: none; 
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+}
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+    border-radius: 2px;
+}
+
+/* --- WIDOK MOBILNY (Telefony i Tablety) --- */
+@media (max-width: 768px) {
+    /* Pokaż przycisk hamburgera */
+    .hamburger-btn { display: flex; }
+
+    /* Ukryj menu i sformatuj jako listę pionową */
+    .nav-links {
+        display: none; /* Domyślnie ukryte */
+        position: absolute;
+        top: 70px; /* Zaraz pod paskiem */
+        left: 0;
+        width: 100%;
+        background-color: white;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #a0134a;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Klasa 'active' dodawana przez JS - pokazuje menu */
+    .nav-links.active { display: flex; }
+
+    /* Większe odstępy na telefonie */
+    .nav-item {
+        padding: 15px;
+        font-size: 1.1rem;
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .btn-login {
+        margin-top: 20px;
+        width: 80%;
+        text-align: center;
+    }
+}
