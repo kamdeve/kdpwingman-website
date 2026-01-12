@@ -4,13 +4,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KDP Wingman - Przenieś swoje KDP na wyższy poziom</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
+    
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --cherry: #a0134a;
+            --cherry-glow: rgba(160, 19, 74, 0.5);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- TŁO GLOW --- */
+        .background-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 20%, var(--cherry-glow) 0%, transparent 35%),
+                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.15) 0%, transparent 35%);
+            pointer-events: none;
+        }
+
+        /* --- NAVBAR (Twój obecny, lekko odświeżony) --- */
+        .navbar-container {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky; top: 0; z-index: 1000; width: 100%;
+        }
+        .navbar-content {
+            max-width: 1200px; margin: 0 auto; height: 70px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+        }
+        .logo-link {
+            text-decoration: none; font-weight: 800; font-size: 1.4rem; color: white;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-img { height: 35px; }
+        .nav-links { display: flex; align-items: center; gap: 25px; }
+        .nav-item { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: 0.3s; }
+        .nav-item:hover, .nav-item.highlight { color: var(--cherry); }
+        
+        .btn-login {
+            text-decoration: none; padding: 8px 24px;
+            border: 1px solid var(--cherry); border-radius: 50px;
+            color: white; font-weight: 600; transition: 0.3s;
+            background: rgba(160, 19, 74, 0.1);
+        }
+        .btn-login:hover { background: var(--cherry); box-shadow: 0 0 15px var(--cherry-glow); }
+
+        /* Hamburger */
+        .hamburger-btn { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .bar { width: 25px; height: 3px; background-color: white; border-radius: 2px; }
+
+        /* --- HERO SECTION --- */
+        .hero-section {
+            text-align: center; padding: 120px 20px 80px; max-width: 900px; margin: 0 auto;
+        }
+        .hero-title {
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
+        .cta-button {
+            display: inline-block; padding: 16px 40px; font-size: 1.2rem; font-weight: bold; color: white;
+            background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);
+            border-radius: 50px; text-decoration: none; transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(160, 19, 74, 0.4);
+        }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(160, 19, 74, 0.6); }
+
+        /* --- ZIG-ZAG STEPS (NOWA SEKCJA) --- */
+        .steps-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; }
+        .step-row {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 120px; gap: 60px;
+            opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out;
+        }
+        .step-row.visible { opacity: 1; transform: translateY(0); }
+        .step-row.reverse { flex-direction: row-reverse; }
+        
+        .step-content { flex: 1; }
+        .step-number { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--cherry); font-weight: bold; margin-bottom: 10px; display: block; }
+        .step-title { font-size: 2.2rem; font-weight: 700; margin-bottom: 20px; color: white; }
+        .step-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; }
+        
+        .step-visual { flex: 1.2; position: relative; }
+        
+        /* Glass Card */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--cherry); }
+        .step-img { width: 100%; border-radius: 12px; display: block; }
+
+        /* --- FEATURES SECTION (ZACHOWANA, ALE ODŚWIEŻONA) --- */
+        .features-section { padding: 80px 20px; background: rgba(0,0,0,0.2); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .feature-card {
+            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px;
+            transition: 0.3s;
+        }
+        .feature-card:hover { background: rgba(30, 41, 59, 0.9); border-color: var(--cherry); }
+        .feature-icon { font-size: 2rem; color: var(--cherry); margin-bottom: 20px; }
+        .feature-card h3 { margin-bottom: 10px; font-size: 1.3rem; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+        .feature-video { width: 100%; border-radius: 8px; margin-top: 20px; border: 1px solid #334155; }
+
+        /* --- FOOTER & REGISTER --- */
+        .register-section {
+            text-align: center; padding: 80px 20px; background: linear-gradient(180deg, transparent, #0f172a);
+        }
+        .register-form {
+            max-width: 400px; margin: 30px auto; display: flex; flex-direction: column; gap: 15px;
+        }
+        .register-form input {
+            padding: 15px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 1rem;
+        }
+        .register-form button {
+            padding: 15px; border-radius: 8px; border: none; background: var(--cherry); color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s;
+        }
+        .register-form button:hover { background: #d63384; }
+
+        footer { border-top: 1px solid #334155; padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .hamburger-btn { display: flex; }
+            .nav-links {
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: #0f172a; flex-direction: column; padding: 20px 0; border-bottom: 2px solid var(--cherry);
+            }
+            .nav-links.active { display: flex; }
+            .nav-item { padding: 10px; width: 100%; text-align: center; }
+            
+            .hero-title { font-size: 2.5rem; }
+            .step-row, .step-row.reverse { flex-direction: column; gap: 30px; margin-bottom: 80px; }
+            .step-content { text-align: center; }
+        }
+    </style>
 </head>
 <body>
+
+    <div class="background-glow"></div>
 
     <header class="navbar-container">
         <nav class="navbar-content">
@@ -26,143 +185,157 @@
             </button>
 
             <div class="nav-links" id="nav-menu">
+                <a href="#how-it-works" class="nav-item">Jak to działa</a>
                 <a href="#features" class="nav-item">Funkcje</a>
-                <a href="#register" class="nav-item">Rejestracja</a>
                 <a href="https://chrome.google.com/webstore/detail/kdp-wingman" target="_blank" class="nav-item">Rozszerzenie</a>
-                
                 <a href="group-buy.html" class="nav-item highlight">Wspólny Dostęp</a>
                 <a href="dashboard.html" class="btn-login">🔒 Zaloguj</a>
             </div>
         </nav>
     </header>
 
-    <main>
-        <section id="hero">
-            <div class="container hero-content">
-                <h1>Przenieś swoje KDP na wyższy poziom.</h1>
-                <p>KDP Wingman to niezbędne narzędzie, które przyspieszy Twoją pracę. Stworzone przez polskiego autora dla polskich autorów, którzy marzą o wolności finansowej i pracy z dowolnego miejsca na świecie.</p>
-                <a href="https://chrome.google.com/webstore/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" class="cta-button" target="_blank" rel="noopener noreferrer">Zatrudnij swojego Wingmana</a>
+    <section class="hero-section">
+        <h1 class="hero-title">Dołącz do zrzutki i korzystaj za ułamek ceny</h1>
+        <p class="hero-subtitle">
+            Profesjonalne narzędzia do Amazon KDP bez przepłacania. 
+            Zautomatyzowany system, transparentne zasady i społeczność, która wspiera Twój sukces.
+        </p>
+        <a href="group-buy.html" class="cta-button">Dołącz do grupy 🚀</a>
+    </section>
+
+    <div id="how-it-works" class="steps-container">
+
+        <div class="step-row">
+            <div class="step-content">
+                <span class="step-number">Krok 01</span>
+                <h2 class="step-title">Dołącz do obecnej edycji</h2>
+                <p class="step-desc">
+                    Wystarczy podać swój e-mail. Nasz system sprawdzi, czy masz już konto. 
+                    Jeśli nie - stworzysz je w 30 sekund. Prosty formularz to pierwszy krok do oszczędności.
+                </p>
             </div>
-        </section>
-
-        <section id="for-whom" class="container">
-             <h2>Dla kogo jest KDP Wingman?</h2>
-             <p class="section-subtitle">
-                Masz dość pracy od 8 do 16? Ja też. Stworzyłem KDP Wingman, bo wierzę, że dochód pasywny z Amazon KDP jest w zasięgu ręki. Nie obiecuję milionów, ale godne życie na własnych zasadach. To narzędzie jest dla takich jak my – ambitnych Polaków, którzy chcą oszczędzić na drogich subskrypcjach i wspólnie osiągnąć sukces.
-             </p>
-        </section>
-
-        <section id="features">
-            <div class="container">
-                <h2>Jedno narzędzie, wiele możliwości</h2>
-        
-                <div class="feature-row">
-                    <div class="feature-text">
-                        <h3>Analizator SERP (UI Wrapper)</h3>
-                        <p>Zbieraj kluczowe dane (ASIN, BSR, historia) bezpośrednio z wyników wyszukiwania, bez wchodzenia na każdą stronę produktu. Oszczędzaj dziesiątki minut na każdym researchu.</p>
-                        <ul>
-                            <li>Błyskawiczny dostęp do BSR</li>
-                            <li>Wygodny podgląd historii ceny i rankingu</li>
-                            <li>Działa na wszystkich rynkach Amazon</li>
-                        </ul>
-                    </div>
-                    <div class="feature-visual">
-                        <video autoplay loop muted playsinline>
-                            <source src="videos/ui-wrapper.mp4" type="video/mp4">
-                            Twoja przeglądarka nie obsługuje wideo.
-                        </video>
-                    </div>
+            <div class="step-visual">
+                <div class="glass-card">
+                    <img src="https://via.placeholder.com/600x400/1e293b/a0134a?text=Formularz+Zapisow" alt="Formularz" class="step-img">
                 </div>
-        
-                <div class="feature-row feature-row-reverse">
-                    <div class="feature-text">
-                        <h3>Generator Opisów AI</h3>
-                        <p>Twórz opisy produktów, które naprawdę sprzedają, korzystając z mocy zaawansowanej sztucznej inteligencji. Koniec z pustką w głowie i godzinami spędzonymi na pisaniu.</p>
-                         <ul>
-                            <li>Opisy tworzone na podstawie Twoich wytycznych</li>
-                            <li>Generuje główny opis, bullet points i meta-dane</li>
-                            <li>Obsługa wielu języków i stylów</li>
-                        </ul>
-                    </div>
-                    <div class="feature-visual">
-                        <video autoplay loop muted playsinline>
-                            <source src="videos/opis_ai.mp4" type="video/mp4">
-                            Twoja przeglądarka nie obsługuje wideo.
-                        </video>
-                    </div>
-                </div>
-        
-                 <div class="feature-row">
-                    <div class="feature-text">
-                        <h3>Symulator PPC</h3>
-                        <p>Planuj kampanie reklamowe i budżet bez zgadywania. Dowiedz się, czy Cię stać na dane słowo kluczowe i jaki może być potencjalny zwrot z inwestycji, zanim wydasz choćby złotówkę.</p>
-                         <ul>
-                            <li>Analiza progu rentowności (ACoS)</li>
-                            <li>Symulacja kosztów i zysków</li>
-                            <li>Lepsze decyzje reklamowe</li>
-                        </ul>
-                    </div>
-                    <div class="feature-visual">
-                        <video autoplay loop muted playsinline>
-                            <source src="videos/symulator_ppc.mp4" type="video/mp4">
-                            Twoja przeglądarka nie obsługuje wideo.
-                        </video>
-                    </div>
-                </div>
-
-                <div class="feature-row feature-row-reverse">
-                    <div class="feature-text">
-                        <h3>Kalkulatory KDP i Zysku</h3>
-                        <p>Koniec z ręcznym wklepywaniem danych i skomplikowanymi arkuszami. Nasz inteligentny kalkulator sam pobiera cenę, liczbę stron i wymiary książki, dając Ci natychmiastową analizę jej rentowności. Oszczędzaj czas i podejmuj decyzje w oparciu o twarde dane.</p>
-                        <ul>
-                            <li>Błyskawicznie obliczaj tantiemy (royalty)</li>
-                            <li>Automatyczne pobieranie danych z listingu</li>
-                            <li>Inteligentne wykrywanie formatu (Trim Size)</li>
-                        </ul>
-                    </div>
-                    <div class="feature-visual">
-                        <video autoplay loop muted playsinline>
-                            <source src="videos/kalkulator_kdp.mp4" type="video/mp4">
-                            Twoja przeglądarka nie obsługuje wideo.
-                        </video>
-                    </div>
-                </div>
-        
             </div>
-        </section>
+        </div>
 
-        <section id="how-it-works" class="container">
-            <h2>Gotów do startu? To proste!</h2>
-             <div class="steps-grid">
-                <div class="step">
-                    <span>1</span>
-                    <h3>Zarejestruj się</h3>
-                    <p>Załóż darmowe konto w 30 sekund, aby uzyskać dostęp do pełnej mocy Wingmana.</p>
+        <div class="step-row reverse">
+            <div class="step-content">
+                <span class="step-number">Krok 02</span>
+                <h2 class="step-title">Dokonaj wpłaty depozytu</h2>
+                <p class="step-desc">
+                    Bezpieczna płatność przez Stripe (Karta/BLIK). Wpłacasz 40 zł depozytu. 
+                    Twoje środki są bezpieczne i czekają na zamknięcie listy uczestników.
+                </p>
+            </div>
+            <div class="step-visual">
+                <div class="glass-card">
+                    <img src="https://via.placeholder.com/600x400/1e293b/a0134a?text=Platnosc+Stripe" alt="Stripe" class="step-img">
                 </div>
-                 <div class="step">
-                    <span>2</span>
-                    <h3>Pobierz Rozszerzenie</h3>
-                    <p>Dodaj KDP Wingman jednym kliknięciem do swojej przeglądarki Google Chrome.</p>
-                </div>
-                 <div class="step">
-                    <span>3</span>
-                    <h3>Zacznij Działać</h3>
-                    <p>Zaloguj się w rozszerzeniu i zacznij podejmować lepsze decyzje biznesowe na Amazon KDP.</p>
-                </div>
-             </div>
-        </section>
+            </div>
+        </div>
 
-        <section id="register" class="container">
-            <h2>Dołącz do społeczności Wingmana</h2>
-            <p class="section-subtitle">Zarejestruj się już dziś i zacznij swoją podróż ku niezależności.</p>
-            <form class="register-form">
-                <input type="email" placeholder="Twój adres e-mail" required>
-                <input type="password" placeholder="Stwórz hasło" required>
-                <input type="password" placeholder="Powtórz hasło" required>
-                <button type="submit">Stwórz darmowe konto</button>
-            </form>
-        </section>
-    </main>
+        <div class="step-row">
+            <div class="step-content">
+                <span class="step-number">Krok 03</span>
+                <h2 class="step-title">Zajmij miejsce i obserwuj spadek ceny</h2>
+                <p class="step-desc">
+                    Im więcej nas jest, tym mniej płacisz. Po wpłacie zobaczysz swój numer na liście 
+                    oraz aktualną prognozę ceny. To czysta matematyka!
+                </p>
+            </div>
+            <div class="step-visual">
+                <div class="glass-card">
+                    <img src="https://via.placeholder.com/600x400/1e293b/a0134a?text=Twoj+Numer+3" alt="Sukces" class="step-img">
+                </div>
+            </div>
+        </div>
+
+        <div class="step-row reverse">
+            <div class="step-content">
+                <span class="step-number">Krok 04</span>
+                <h2 class="step-title">Nadpłacone środki wracają do Ciebie</h2>
+                <p class="step-desc">
+                    Narzędzie kosztowało 15 zł, a wpłaciłeś 40 zł? Różnica (25 zł) automatycznie 
+                    wraca na Twój wirtualny portfel w Panelu. Możesz ją wykorzystać w następnym miesiącu.
+                </p>
+            </div>
+            <div class="step-visual">
+                <div class="glass-card">
+                    <img src="https://via.placeholder.com/600x400/1e293b/a0134a?text=Portfel:+25+PLN" alt="Portfel" class="step-img">
+                </div>
+            </div>
+        </div>
+
+        <div class="step-row">
+            <div class="step-content">
+                <span class="step-number">Krok 05</span>
+                <h2 class="step-title">Pełna wolność finansowa</h2>
+                <p class="step-desc">
+                    Zrezygnowałeś? Jednym kliknięciem wypłacasz środki z portfela na swoje konto bankowe. 
+                    Dołączasz kiedy chcesz, rezygnujesz kiedy chcesz.
+                </p>
+            </div>
+            <div class="step-visual">
+                <div class="glass-card">
+                    <img src="https://via.placeholder.com/600x400/1e293b/a0134a?text=Wyplata+Srodkow" alt="Wypłata" class="step-img">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Jedno narzędzie, <span style="color:var(--cherry)">wiele możliwości</span></h2>
+                <p>Oprócz wspólnego dostępu, otrzymujesz darmowe rozszerzenie Chrome.</p>
+            </div>
+    
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-search"></i></div>
+                    <h3>Analizator SERP</h3>
+                    <p>Zbieraj kluczowe dane (ASIN, BSR, historia) bezpośrednio z wyników wyszukiwania. Oszczędzaj dziesiątki minut na researchu.</p>
+                    <video autoplay loop muted playsinline class="feature-video">
+                        <source src="videos/ui-wrapper.mp4" type="video/mp4">
+                    </video>
+                </div>
+        
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                    <h3>Generator AI</h3>
+                    <p>Twórz opisy produktów, które sprzedają. Koniec z pustką w głowie i godzinami spędzonymi na pisaniu.</p>
+                    <video autoplay loop muted playsinline class="feature-video">
+                        <source src="videos/opis_ai.mp4" type="video/mp4">
+                    </video>
+                </div>
+        
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-calculator"></i></div>
+                    <h3>Kalkulatory KDP</h3>
+                    <p>Inteligentny kalkulator sam pobiera cenę i liczbę stron, dając Ci natychmiastową analizę rentowności.</p>
+                    <video autoplay loop muted playsinline class="feature-video">
+                        <source src="videos/kalkulator_kdp.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="register" class="register-section">
+        <h2 style="font-size:2rem; margin-bottom:10px; color:white;">Dołącz do społeczności Wingmana</h2>
+        <p style="color:var(--text-muted);">Zarejestruj się już dziś i zacznij swoją podróż ku niezależności.</p>
+        
+        <form class="register-form">
+            <input type="email" placeholder="Twój adres e-mail" required>
+            <input type="password" placeholder="Stwórz hasło" required>
+            <input type="password" placeholder="Powtórz hasło" required>
+            <button type="submit">Stwórz darmowe konto</button>
+        </form>
+    </section>
 
     <footer>
         <div class="container">
@@ -174,11 +347,26 @@
     </footer>
 
     <script>
+        // 1. Menu Mobilne
+        function toggleMobileMenu() {
+            const menu = document.getElementById('nav-menu');
+            menu.classList.toggle('active');
+        }
+
+        // 2. Animacja pojawiania się (Scroll)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.2 });
+        document.querySelectorAll('.step-row').forEach((el) => observer.observe(el));
+
+        // 3. Logika Rejestracji (ZACHOWANA Z ORYGINAŁU)
         const registerForm = document.querySelector('.register-form');
-    
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
-    
             const email = registerForm.querySelector('input[type="email"]').value;
             const password = registerForm.querySelector('input[type="password"]').value;
             const passwordConfirm = registerForm.querySelectorAll('input[type="password"]')[1].value;
@@ -189,48 +377,25 @@
             }
     
             try {
-                const response = await fetch('https://kdpwingman-backend-production.up.railway.app/register', {
+                const response = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password }),
                 });
     
                 const data = await response.json();
     
-                if (!response.ok) {
-                    throw new Error(data.message || 'Wystąpił nieznany błąd.');
-                }
+                if (!response.ok) throw new Error(data.message || 'Wystąpił nieznany błąd.');
     
-                alert('Konto utworzone! Sprawdź skrzynkę e-mail i kliknij link aktywacyjny, aby dokończyć rejestrację.');
-                registerForm.reset(); 
+                alert('Konto utworzone! Możesz się teraz zalogować.');
+                window.location.href = "dashboard.html";
     
             } catch (error) {
                 console.error('Błąd rejestracji:', error);
                 alert(`Błąd: ${error.message}`);
             }
         });
-
-function toggleMobileMenu() {
-        const menu = document.getElementById('nav-menu');
-        // Przełącza klasę 'active', co powoduje pokazanie/ukrycie menu w CSS
-        menu.classList.toggle('active');
-    }
-
     </script>
-
-<script>
-        // Obsługa menu mobilnego
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navMenu = document.querySelector('nav ul');
-
-        menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-    </script>
-
-
 
 </body>
 </html>
