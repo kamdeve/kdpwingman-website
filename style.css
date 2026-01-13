@@ -605,3 +605,58 @@ footer {
         text-align: center;
     }
 }
+
+/* --- IKONA YOUTUBE --- */
+.youtube-icon {
+    font-size: 1.6rem;    /* Duża, wyraźna ikona */
+    color: white !important; /* Wymuszamy biel na start */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;   /* Potrzebne do pozycjonowania dymka */
+    transition: all 0.3s ease;
+}
+
+/* Efekt po najechaniu (Hover) */
+.youtube-icon:hover {
+    color: #a0134a !important; /* Twój wiśniowy kolor */
+    text-shadow: 0 0 20px rgba(160, 19, 74, 0.8); /* Neonowa poświata */
+    transform: scale(1.15); /* Lekkie powiększenie */
+}
+
+/* --- DYMEK (TOOLTIP) Z OPISEM --- */
+.youtube-icon::after {
+    content: attr(data-tooltip); /* Pobiera tekst z HTML */
+    position: absolute;
+    top: 150%; /* Dymek pod ikoną */
+    left: 50%;
+    transform: translateX(-50%); /* Centrowanie */
+    
+    background: rgba(15, 23, 42, 0.95); /* Ciemne tło */
+    color: #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: normal;
+    white-space: nowrap; /* Tekst w jednej linii */
+    border: 1px solid #a0134a; /* Wiśniowa ramka dymka */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    
+    opacity: 0;           /* Domyślnie ukryty */
+    visibility: hidden;
+    pointer-events: none; /* Żeby nie przeszkadzał w klikaniu */
+    transition: all 0.3s ease;
+}
+
+/* Pokazanie dymka po najechaniu */
+.youtube-icon:hover::after {
+    opacity: 1;
+    visibility: visible;
+    top: 130%; /* Lekki ruch do góry przy pojawianiu się */
+}
+
+/* Na telefonie ukrywamy dymek (bo nie ma myszki), ale ikona zostaje */
+@media (max-width: 768px) {
+    .youtube-icon::after { display: none; }
+    .youtube-icon { margin-top: 10px; margin-bottom: 10px; } /* Odstępy w menu mobilnym */
+}
