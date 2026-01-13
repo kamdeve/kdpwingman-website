@@ -161,7 +161,17 @@
         .section-header { text-align: center; margin-bottom: 60px; }
         .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
         
-        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        /* ZMIANA: Grid ustawiony tak, by mieścił 2 karty obok siebie na desktopie */
+.feature-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Szersze karty, układ 2x2 */
+    gap: 40px; 
+}
+
+/* Na telefonach wracamy do jednej kolumny */
+@media (max-width: 768px) {
+    .feature-grid { grid-template-columns: 1fr; }
+}
         .feature-card {
             background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px;
             transition: 0.3s;
@@ -326,17 +336,12 @@
     </div>
 
     <section id="features" class="features-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Jedno narzędzie, <span style="color:var(--cherry)">wiele możliwości</span></h2>
-                <p>Oprócz wspólnego dostępu, otrzymujesz darmowe rozszerzenie Chrome.</p>
-            </div>
-    
-            <div class="feature-grid">
+        <div class="feature-grid">
+                
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-search"></i></div>
-                    <h3>Analizator SERP</h3>
-                    <p>Zbieraj kluczowe dane (ASIN, BSR, historia) bezpośrednio z wyników wyszukiwania. Oszczędzaj dziesiątki minut na researchu.</p>
+                    <h3>Historia BSR</h3>
+                    <p>Zbieraj kluczowe dane (ASIN, BSR, historia) bezpośrednio z wyników wyszukiwania. Oszczędzaj dziesiątki minut na każdym researchu.</p>
                     <video autoplay loop muted playsinline class="feature-video">
                         <source src="videos/ui-wrapper.mp4" type="video/mp4">
                     </video>
@@ -345,7 +350,7 @@
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-magic"></i></div>
                     <h3>Generator AI</h3>
-                    <p>Twórz opisy produktów, które sprzedają. Koniec z pustką w głowie i godzinami spędzonymi na pisaniu.</p>
+                    <p>Twórz opisy produktów, które naprawdę sprzedają. Zapomnij o pustce w głowie – sztuczna inteligencja napisze tekst za Ciebie.</p>
                     <video autoplay loop muted playsinline class="feature-video">
                         <source src="videos/opis_ai.mp4" type="video/mp4">
                     </video>
@@ -354,13 +359,22 @@
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-calculator"></i></div>
                     <h3>Kalkulatory KDP</h3>
-                    <p>Inteligentny kalkulator sam pobiera cenę i liczbę stron, dając Ci natychmiastową analizę rentowności.</p>
+                    <p>Inteligentny kalkulator sam pobiera cenę i liczbę stron, dając Ci natychmiastową analizę rentowności. Twarde dane zamiast zgadywania.</p>
                     <video autoplay loop muted playsinline class="feature-video">
                         <source src="videos/kalkulator_kdp.mp4" type="video/mp4">
                     </video>
                 </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+                    <h3>Auto MKL i Symulator PPC</h3>
+                    <p>Twórz Master Keyword List w sekundy, zamiast godzin w Excelu. Sprawdź rentowność niszy i koszty reklamy, zanim wydasz choćby złotówkę.</p>
+                    <video autoplay loop muted playsinline class="feature-video">
+                        <source src="videos/symulator_ppc.mp4" type="video/mp4">
+                    </video>
+                </div>
+
             </div>
-        </div>
     </section>
 
     <section id="register" class="register-section">
