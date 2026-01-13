@@ -106,16 +106,37 @@
         
         /* Glass Card */
         .glass-card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s;
-        }
-        .glass-card:hover { transform: translateY(-5px); border-color: var(--cherry); }
-        .step-img { width: 100%; border-radius: 12px; display: block; }
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+    
+    /* NOWE: Centrowanie zawartości */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 450px; /* Ustawiamy stałą wysokość karty, żeby wszystkie były równe */
+}
+
+.glass-card:hover { 
+    transform: translateY(-5px); 
+    border-color: var(--cherry); 
+}
+
+/* Samo zdjęcie */
+.step-img {
+    max-width: 100%; /* Nie szersze niż kontener */
+    max-height: 100%; /* Nie wyższe niż kontener (450px) */
+    width: auto;      /* Szerokość dobierz automatycznie */
+    height: auto;     /* Wysokość dobierz automatycznie */
+    border-radius: 12px;
+    display: block;
+    object-fit: contain; /* Ważne: Skaluj zdjęcie tak, żeby całe się zmieściło */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Lekki cień dla samego zdjęcia */
+}
 
         /* --- FEATURES SECTION (ZACHOWANA, ALE ODŚWIEŻONA) --- */
         .features-section { padding: 80px 20px; background: rgba(0,0,0,0.2); }
