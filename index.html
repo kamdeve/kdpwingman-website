@@ -110,15 +110,20 @@
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(12px);
     border-radius: 20px;
-    padding: 15px;
+    padding: 20px; /* Troszkę większy margines wewnątrz */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
     
-    /* NOWE: Centrowanie zawartości */
+    /* KLUCZOWE ZMIANY: */
+    width: 100%;            /* Karta zajmuje 100% dostępnej szerokości kolumny */
+    max-width: 100%;        /* Nie może być szersza niż ekran */
+    height: 450px;          /* Stała wysokość na komputerze */
+    overflow: hidden;       /* ✂️ OBCINA wszystko co wystaje (klucz do naprawy telefonu) */
+    
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 450px; /* Ustawiamy stałą wysokość karty, żeby wszystkie były równe */
+    box-sizing: border-box; /* Padding nie powiększa pudełka */
 }
 
 .glass-card:hover { 
@@ -126,16 +131,28 @@
     border-color: var(--cherry); 
 }
 
-/* Samo zdjęcie */
+/* --- POPRAWIONE ZDJĘCIE --- */
 .step-img {
-    max-width: 100%; /* Nie szersze niż kontener */
-    max-height: 100%; /* Nie wyższe niż kontener (450px) */
-    width: auto;      /* Szerokość dobierz automatycznie */
-    height: auto;     /* Wysokość dobierz automatycznie */
+    width: 100%;            /* Próbuj zająć całą szerokość... */
+    height: 100%;           /* ...i całą wysokość */
+    object-fit: contain;    /* ...ALE zachowaj proporcje i zmieść się w środku (nie ucinaj, nie rozciągaj) */
     border-radius: 12px;
     display: block;
-    object-fit: contain; /* Ważne: Skaluj zdjęcie tak, żeby całe się zmieściło */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Lekki cień dla samego zdjęcia */
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); /* Cień rzucany przez sam obiekt na zdjęciu */
+}
+
+/* --- POPRAWKA NA TELEFON (Żeby nie przesuwało strony) --- */
+@media (max-width: 768px) {
+    .glass-card {
+        height: 300px; /* Na telefonie karta jest niższa */
+        margin-bottom: 20px;
+    }
+    
+    .step-visual {
+        width: 100%;       /* Kontener zdjęcia nie może być szerszy niż ekran */
+        padding: 0 10px;   /* Margines bezpieczeństwa */
+        box-sizing: border-box;
+    }
 }
 
         /* --- FEATURES SECTION (ZACHOWANA, ALE ODŚWIEŻONA) --- */
