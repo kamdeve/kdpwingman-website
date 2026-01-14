@@ -147,15 +147,23 @@
 
 /* --- LIGHTBOX (Pełny widok) --- */
 #lightbox { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.95); z-index: 9999; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.95); 
+    z-index: 9999; 
     display: none; 
-    /* Zmiana: Flexbox ustawiony na start, żeby można było scrollować od góry */
+    
+    /* Ustawienie na start (góra), żeby scroll działał poprawnie */
     align-items: flex-start; 
     justify-content: center;
-    overflow-y: auto; /* Włącza przewijanie długich zdjęć */
-    padding: 50px 20px; /* Odstęp od góry i dołu */
-    backdrop-filter: blur(10px); 
+    
+    /* Włącz przewijanie, gdy zdjęcie jest dłuższe niż ekran */
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch; /* Płynne przewijanie na iPhone */
+    backdrop-filter: blur(5px); 
 }
 
 /* Zdjęcie w Lightboxie - musi być długie */
@@ -191,7 +199,18 @@
         }
         
         #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
-        #lightbox img { max-height: 90vh; max-width: 90vw; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        #lightbox img { 
+    width: 100%;           /* Na telefonie zajmij całą szerokość */
+    max-width: 600px;      /* Na komputerze nie szalej, wyglądaj jak telefon */
+    height: auto;          /* KLUCZOWE: Zachowaj naturalną długość (nie ściskaj!) */
+    max-height: none;      /* KLUCZOWE: Usuwamy blokadę wysokości ekranu */
+    
+    border-radius: 12px; 
+    box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+    margin-top: 60px;      /* Odstęp od góry (żeby nie weszło pod X) */
+    margin-bottom: 60px;   /* Odstęp od dołu (żeby dało się przewinąć do końca) */
+    object-fit: contain;
+}
         #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; }
     </style>
 </head>
