@@ -5,118 +5,69 @@
     <title>Panel Klienta - KDP Wingman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* --- NOWOCZESNY STYL (Dark Premium) --- */
-        :root {
-            --bg-dark: #020617;
-            --card-bg: rgba(30, 41, 59, 0.6); /* Półprzezroczyste tło kart */
-            --cherry: #a0134a;
-            --cherry-glow: rgba(160, 19, 74, 0.5);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --success: #10b981;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* TŁO GLOW (To samo co na głównej) */
-        .background-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 20%, var(--cherry-glow) 0%, transparent 35%),
-                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.15) 0%, transparent 35%);
-            pointer-events: none;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 2rem;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 50;
-        }
-        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; }
-        .logo span { color: var(--cherry); }
-        .logout-btn {
-            color: var(--text-muted); text-decoration: none; font-weight: 500; transition: 0.3s;
-            border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 50px;
-        }
-        .logout-btn:hover { color: white; border-color: var(--cherry); background: rgba(160, 19, 74, 0.1); }
-
-        /* KONTENER */
-        .dashboard-container {
-            max-width: 1200px; margin: 40px auto; padding: 0 20px;
-            display: grid; grid-template-columns: 1fr 350px; gap: 30px;
-        }
-
-        /* SZKLANE KARTY */
-        .glass-panel {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
-        }
-
-        h2, h3 { margin-top: 0; font-weight: 700; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .badge { 
-            padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        /* ZMIANA KOLORU NA WIŚNIOWY (Wingman Cherry) */
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #a0134a; --accent-hover: #800f3b; --success: #00C851; }
         
-        /* LICZNIK I NUMER */
-        .big-number { font-size: 3.5rem; font-weight: 800; color: white; line-height: 1; margin: 10px 0; }
-        .sub-text { color: var(--text-muted); font-size: 0.9rem; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
         
-        /* PORTFEL */
-        .wallet-amount { font-size: 2.5rem; font-weight: 800; color: #34d399; margin: 10px 0; text-shadow: 0 0 20px rgba(52, 211, 153, 0.3); }
-        
-        /* FORMULARZE I INPUTY */
-        input, select {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border);
-            border-radius: 8px; color: white; font-family: inherit;
-        }
-        input:focus { outline: none; border-color: var(--cherry); box-shadow: 0 0 10px rgba(160, 19, 74, 0.3); }
+        /* Navbar */
+        .navbar { background: var(--card); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--accent); }
+        .logout { color: #94a3b8; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
+        .logout:hover { color: #ef4444; }
 
-        /* PRZYCISKI */
-        .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 10px;
-            font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-        }
-        .btn-primary { 
-            background: linear-gradient(135deg, #a0134a 0%, #db2777 100%); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(160, 19, 74, 0.4);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(160, 19, 74, 0.6); }
-        
-        .btn-outline {
-            background: transparent; border: 2px solid #ef4444; color: #ef4444;
-        }
-        .btn-outline:hover { background: rgba(239, 68, 68, 0.1); }
+        /* Layout */
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        @media(max-width: 900px) { .container { grid-template-columns: 1fr; } }
 
-        /* RESPONSYWNOŚĆ */
-        @media (max-width: 900px) {
-            .dashboard-container { grid-template-columns: 1fr; }
-        }
+        /* Karty */
+        .card { background: var(--card); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #334155; margin-bottom: 30px; }
+        .card h3 { margin-top: 0; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        /* Elementy formularza */
+        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
+        input:focus { border-color: var(--accent); outline: none; }
+        
+        .btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; }
+        .btn-primary { background: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        /* Portfel i Zakładki */
+        .balance { font-size: 2.5rem; font-weight: 700; color: var(--success); margin: 10px 0; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #0f172a; padding: 5px; border-radius: 8px; }
+        .tab-label { flex: 1; text-align: center; cursor: pointer; padding: 8px; border-radius: 6px; font-size: 0.85rem; color: #94a3b8; transition: 0.2s; }
+        .tab-label:hover { background: rgba(255,255,255,0.05); }
+        input[type="radio"] { display: none; }
+        input[type="radio"]:checked + .tab-label { background: var(--accent); color: white; font-weight: bold; }
+
+        /* Historia */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .history-table td { padding: 12px 0; border-bottom: 1px solid #334155; color: #cbd5e1; }
+        .history-table tr:last-child td { border-bottom: none; }
+        .date-col { color: #64748b; font-size: 0.8rem; }
+
+        /* Status Zrzutki */
+        .app-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid transparent; transition: 0.3s; }
+        .app-item:hover { border-color: var(--accent); background: rgba(160, 19, 74, 0.1); }
+        .app-icon { width: 45px; height: 45px; background: #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .status-active { background: var(--success); color: black; }
+        .status-wait { background: #ffc107; color: black; }
+
+        .hidden { display: none !important; }
+        #login-view { display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-box { width: 100%; max-width: 400px; text-align: center; }
+
+        /* Nowy Panel Statystyk w Dashboardzie */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .stat-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: white; }
+        .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+        .countdown-box { background: #1e293b; border: 1px solid #a0134a; color: #a0134a; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; font-family: monospace; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <div class="background-glow"></div>
 
     <div id="login-view">
         <div class="card login-box">
@@ -628,7 +579,12 @@ async function startSubscription() {
             }
         }
         
-       
+        function closeModal() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            location.reload(); // Odśwież stronę, aby zobaczyć zielony status
+        }
 
         document.getElementById('logout-btn').addEventListener('click', function() {
         localStorage.removeItem('wingman_user'); // Usuń sesję
@@ -735,40 +691,6 @@ async function startSubscription() {
 
         // URUCHAMIAMY SPRAWDZANIE PRZY STARCIE
         checkUrlForActions();
-
-// --- FIX: OBSŁUGA OKNA SUKCESU ---
-    window.addEventListener('load', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Sprawdzamy czy w adresie jest "?success=true" LUB "?action=autopilot_enabled"
-        if (urlParams.get('success') || urlParams.get('action') === 'autopilot_enabled') {
-            
-            // Pokaż modal
-            const modal = document.getElementById('success-modal');
-            if(modal) {
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-            }
-
-            // WYCZYŚĆ ADRES URL (To zapobiega pętli!)
-            // Usuwamy parametry "?success=..." bez przeładowania strony
-            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.replaceState({ path: newUrl }, '', newUrl);
-        }
-    });
-
-    // 2. Funkcja zamykania (Podpięta pod przycisk "Lecimy po sukces")
-    function closeModal() {
-        const modal = document.getElementById('success-modal');
-        if (modal) {
-            modal.style.display = 'none'; // Po prostu ukryj
-        }
-        // Opcjonalnie: odśwież dane na stronie (ale nie całą stronę), żeby zniknął przycisk dopłaty
-        if(typeof loadDashboardData === 'function') {
-            loadDashboardData();
-        }
-    }
-
     </script>
 <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
         <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4);">
