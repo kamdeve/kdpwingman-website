@@ -628,12 +628,7 @@ async function startSubscription() {
             }
         }
         
-        function closeModal() {
-            const modal = document.getElementById('success-modal');
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
-            location.reload(); // Odśwież stronę, aby zobaczyć zielony status
-        }
+       
 
         document.getElementById('logout-btn').addEventListener('click', function() {
         localStorage.removeItem('wingman_user'); // Usuń sesję
@@ -743,30 +738,34 @@ async function startSubscription() {
 
 // --- FIX: OBSŁUGA OKNA SUKCESU ---
     window.addEventListener('load', () => {
-        // 1. Sprawdź, czy w adresie jest "?success=true"
         const urlParams = new URLSearchParams(window.location.search);
         
-        if (urlParams.get('success')) {
-            // Jeśli jest, to znaczy że wrócił ze Stripe.
-            // Usuń "success=true" z paska adresu, żeby po odświeżeniu okno nie wracało
+        // Sprawdzamy czy w adresie jest "?success=true" LUB "?action=autopilot_enabled"
+        if (urlParams.get('success') || urlParams.get('action') === 'autopilot_enabled') {
+            
+            // Pokaż modal
+            const modal = document.getElementById('success-modal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+
+            // WYCZYŚĆ ADRES URL (To zapobiega pętli!)
+            // Usuwamy parametry "?success=..." bez przeładowania strony
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             window.history.replaceState({ path: newUrl }, '', newUrl);
-            
-            // Tutaj możesz dodać logikę pokazania modala, jeśli go masz w HTML
-            // Ale skoro on Cię denerwuje i się nie zamyka, to upewnijmy się, że zniknie:
-            const successModal = document.getElementById('successModal'); // Upewnij się, że Twój modal ma to ID
-            if(successModal) {
-                // Jeśli chcesz go pokazać RAZ:
-                successModal.style.display = 'flex';
-            }
         }
     });
 
-    // Funkcja do zamykania przyciskiem "Lecimy po sukces"
-    function closeSuccessModal() {
-        const modal = document.getElementById('successModal') || document.querySelector('.modal-overlay'); // Szukamy modala
+    // 2. Funkcja zamykania (Podpięta pod przycisk "Lecimy po sukces")
+    function closeModal() {
+        const modal = document.getElementById('success-modal');
         if (modal) {
-            modal.style.display = 'none';
+            modal.style.display = 'none'; // Po prostu ukryj
+        }
+        // Opcjonalnie: odśwież dane na stronie (ale nie całą stronę), żeby zniknął przycisk dopłaty
+        if(typeof loadDashboardData === 'function') {
+            loadDashboardData();
         }
     }
 
