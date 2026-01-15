@@ -740,6 +740,36 @@ async function startSubscription() {
 
         // URUCHAMIAMY SPRAWDZANIE PRZY STARCIE
         checkUrlForActions();
+
+// --- FIX: OBSŁUGA OKNA SUKCESU ---
+    window.addEventListener('load', () => {
+        // 1. Sprawdź, czy w adresie jest "?success=true"
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.get('success')) {
+            // Jeśli jest, to znaczy że wrócił ze Stripe.
+            // Usuń "success=true" z paska adresu, żeby po odświeżeniu okno nie wracało
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+            
+            // Tutaj możesz dodać logikę pokazania modala, jeśli go masz w HTML
+            // Ale skoro on Cię denerwuje i się nie zamyka, to upewnijmy się, że zniknie:
+            const successModal = document.getElementById('successModal'); // Upewnij się, że Twój modal ma to ID
+            if(successModal) {
+                // Jeśli chcesz go pokazać RAZ:
+                successModal.style.display = 'flex';
+            }
+        }
+    });
+
+    // Funkcja do zamykania przyciskiem "Lecimy po sukces"
+    function closeSuccessModal() {
+        const modal = document.getElementById('successModal') || document.querySelector('.modal-overlay'); // Szukamy modala
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
     </script>
 <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
         <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4);">
