@@ -189,164 +189,116 @@
         }
 
         function renderTables(data) {
-        // --- 1. OBECNI UCZESTNICY (Zaktualizowane o przycisk USUWANIA) ---
-        const tUser = document.getElementById('users-table').querySelector('tbody');
-        
-        if (data.participants.length === 0) {
-            tUser.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-gray-500">Brak uczestników w tym miesiącu.</td></tr>';
-        } else {
-            tUser.innerHTML = data.participants.map(p => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3 font-bold text-blue-600">${p.month_target}</td>
-                    <td class="p-3">${p.email}</td>
-                    <td class="p-3 text-green-600 font-bold">${p.amount_paid} zł</td>
-                    <td class="p-3 text-gray-500 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
-                    
-                    <td class="p-3 text-center">
-                        ${p.is_subscriber 
-                            ? '<span class="tag" style="background:#e0f2f1; color:#00695c;">✈️ Autopilot</span>' 
-                            : '<span style="color:#ccc;">Jednorazowy</span>'}
-                    </td>
-
-                    <td class="p-3 text-center flex items-center justify-center gap-2">
-                        <input type="number" id="refund-input-${p.user_id}" value="${p.amount_paid}" 
-                               style="width: 60px; padding: 4px; border: 1px solid #ccc; text-align: center;" 
-                               title="Kwota zwrotu">
-                        
-                        <button onclick="removeParticipant(${p.user_id}, '${p.month_target}', '${p.email}')" 
-                                class="btn btn-red" style="font-size:0.7rem;">
-                            ❌ Usuń
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-            // --- 5. HISTORIA SUBSKRYPCJI (Z obsługą statusów) ---
-        const subsBody = document.getElementById('subs-table').querySelector('tbody');
-        if(subsBody) {
-            if(data.subscribers && data.subscribers.length > 0) {
-                subsBody.innerHTML = data.subscribers.map(s => {
-                    const isActive = s.is_subscriber;
-                    
-                    // Formatowanie dat (jeśli istnieją)
-                    const startStr = s.sub_started_at ? new Date(s.sub_started_at).toLocaleDateString() : '-';
-                    const endStr = s.sub_ended_at ? new Date(s.sub_ended_at).toLocaleDateString() : '-';
-
-                    const statusBadge = isActive 
-                        ? '<span class="tag" style="background:#e0f2f1; color:#00695c;">✅ AKTYWNY</span>' 
-                        : '<span class="tag" style="background:#ffebee; color:#c62828;">❌ ANULOWANY</span>';
-                    
-                    // Wyświetlanie odpowiedniej daty
-                    const dateInfo = isActive 
-                        ? `<span style="font-size:0.75rem; color:#64748b;">Od: ${startStr}</span>`
-                        : `<span style="font-size:0.75rem; color:#64748b;">Od: ${startStr} <br> Do: ${endStr}</span>`;
-
-                    return `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">
-                            <span style="font-weight:bold; color: #334155;">${s.email}</span><br>
-                            ${statusBadge}
-                        </td>
-                        <td class="p-3">
-                            ${dateInfo}
-                        </td>
-                        <td class="p-3 text-right font-bold text-gray-600">${s.wallet_balance.toFixed(2)} zł</td>
-                    </tr>
-                    `;
-                }).join('');
+            // --- 1. OBECNI UCZESTNICY ---
+            const tUser = document.getElementById('users-table').querySelector('tbody');
+            
+            if (data.participants.length === 0) {
+                tUser.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-gray-500">Brak uczestników w tym miesiącu.</td></tr>';
             } else {
-                subsBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500">Brak historii.</td></tr>';
-            }
-        }
-        }
-
-        // --- 2. UCZESTNICY Z POPRZEDNIEGO MIESIĄCA (NOWOŚĆ) ---
-        // (Upewnij się, że dodałeś odpowiedni HTML dla tej tabeli, jak w instrukcji wyżej)
-        const pastTableBody = document.getElementById('past-users-table-body');
-        if(pastTableBody) {
-             if(!data.pastParticipants || data.pastParticipants.length === 0) {
-                pastTableBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">Brak danych z poprzedniego miesiąca.</td></tr>';
-             } else {
-                pastTableBody.innerHTML = data.pastParticipants.map(p => `
-                    <tr class="border-b hover:bg-gray-50 bg-gray-50">
-                        <td class="p-3 text-gray-500">${p.month_target}</td>
-                        <td class="p-3 text-gray-600">${p.email}</td>
-                        <td class="p-3 text-gray-600">${p.amount_paid} zł</td>
-                        <td class="p-3 text-gray-400 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
+                tUser.innerHTML = data.participants.map(p => `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-bold text-blue-600">${p.month_target}</td>
+                        <td class="p-3">${p.email}</td>
+                        <td class="p-3 text-green-600 font-bold">${p.amount_paid} zł</td>
+                        <td class="p-3 text-gray-500 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
+                        <td class="p-3 text-center flex items-center justify-center gap-2">
+                            <input type="number" id="refund-input-${p.user_id}" value="${p.amount_paid}" 
+                                   style="width: 60px; padding: 4px; border: 1px solid #ccc; text-align: center;" 
+                                   title="Kwota zwrotu">
+                            <button onclick="removeParticipant(${p.user_id}, '${p.month_target}', '${p.email}')" 
+                                    class="btn btn-red" style="font-size:0.7rem;">
+                                ❌ Usuń
+                            </button>
+                        </td>
                     </tr>
                 `).join('');
-             }
-        }
-
-        // --- 3. OCZEKUJĄCE WYPŁATY (Twoja wersja ze screena - bez zmian) ---
-        // Szukamy tabeli po ID 'withdraw-table' (tak masz na screenie) lub 'withdrawals-table'
-        const withdrawTableEl = document.getElementById('withdraw-table') || document.getElementById('withdrawals-table');
-        
-        if (withdrawTableEl) {
-            const tWith = withdrawTableEl.querySelector('tbody');
-            tWith.innerHTML = data.withdrawals.length ? data.withdrawals.map(w => `
-                <tr style="background: #fff3cd;">
-                    <td><strong>${w.email}</strong><br><span style="font-size:0.8rem; color:#666;">Data: ${new Date(w.created_at).toLocaleString()}</span></td>
-                    <td style="color:red; font-weight:bold;">-${w.amount} zł</td>
-                    <td>
-                        <button class="btn btn-blue" style="margin-right:5px;" onclick="navigator.clipboard.writeText('${w.account_number}')">Kopiuj</button>
-                        <button class="btn btn-red" onclick="confirmWithdraw(${w.id}, '${w.email}', ${w.amount})">Zrealizuj</button>
-                        <br><span style="font-size:0.7rem; font-family:monospace;">${w.account_number}</span>
-                    </td>
-                </tr>`).join('') : '<tr><td colspan="3">Brak zleceń.</td></tr>';
-        }
-
-        // --- 4. HISTORIA WYPŁAT (Twoja wersja ze screena - bez zmian) ---
-        const historyTableEl = document.getElementById('history-table');
-        if (historyTableEl) {
-            const tHist = historyTableEl.querySelector('tbody');
-            tHist.innerHTML = data.history && data.history.length ? data.history.map(h => `
-                <tr class="history-row">
-                    <td>${new Date(h.created_at).toLocaleDateString()}</td>
-                    <td><strong>${h.completed_at ? new Date(h.completed_at).toLocaleString() : '---'}</strong></td>
-                    <td>${h.email}<br><span style="font-size:0.8rem;">${h.account_number}</span></td>
-                    <td>-${h.amount} zł</td>
-                </tr>`).join('') : '<tr><td colspan="4">Pusta historia.</td></tr>';
-        }
-    }
-
-        async function confirmWithdraw(id, email, amount) {
-            if(!confirm(`Czy zrealizowałeś przelew ${amount} zł dla ${email}?`)) return;
-            const res = await fetch(`${API}/api/admin/confirm-withdraw`, {
-                method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ secret: KEY, withdrawId: id })
-            });
-            loadData();
-        }
-
-        async function settle() {
-            if(!confirm("Rozliczyć?")) return;
-            const res = await fetch(`${API}/api/admin/settle`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ secret: KEY }) });
-            const d = await res.json(); alert(d.message || d.error); loadData();
-        }
-
-        async function removeParticipant(userId, month, email) {
-        // Pobierz wartość z pola input obok przycisku
-        const inputEl = document.getElementById(`refund-input-${userId}`);
-        const customAmount = inputEl ? inputEl.value : null;
-
-        if(!confirm(`⚠️ CZY NA PEWNO?\n\nUsuwasz: ${email}\nZwrot do portfela: ${customAmount} zł\n\nKliknij OK, aby potwierdzić.`)) return;
-
-        try {
-            const res = await fetch(`${API}/api/admin/remove-participant`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                // Wysyłamy 'customRefund'
-                body: JSON.stringify({ secret: KEY, userId, month, customRefund: customAmount })
-            });
-            const data = await res.json();
-            
-            if(data.success) {
-                alert("✅ SUKCES: " + data.message);
-                loadData(); // Odśwież tabelę
-            } else {
-                alert("Błąd: " + data.error);
             }
-        } catch(e) { alert("Błąd połączenia: " + e.message); }
-    }
+
+            // --- 2. HISTORIA SUBSKRYPCJI (Naprawione i wyjęte z pętli wyżej) ---
+            const subsBody = document.getElementById('subs-table').querySelector('tbody');
+            if(subsBody) {
+                if(data.subscribers && data.subscribers.length > 0) {
+                    subsBody.innerHTML = data.subscribers.map(s => {
+                        const isActive = s.is_subscriber;
+                        
+                        // Formatowanie dat
+                        const startStr = s.sub_started_at ? new Date(s.sub_started_at).toLocaleDateString() : '-';
+                        const endStr = s.sub_ended_at ? new Date(s.sub_ended_at).toLocaleDateString() : '-';
+
+                        const statusBadge = isActive 
+                            ? '<span class="tag" style="background:#e0f2f1; color:#00695c;">✅ AKTYWNY</span>' 
+                            : '<span class="tag" style="background:#ffebee; color:#c62828;">❌ ANULOWANY</span>';
+                        
+                        const dateInfo = isActive 
+                            ? `<span style="font-size:0.75rem; color:#64748b;">Od: ${startStr}</span>`
+                            : `<span style="font-size:0.75rem; color:#64748b;">Od: ${startStr} <br> Do: ${endStr}</span>`;
+
+                        return `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-3">
+                                <span style="font-weight:bold; color: #334155;">${s.email}</span><br>
+                                ${statusBadge}
+                            </td>
+                            <td class="p-3">
+                                ${dateInfo}
+                            </td>
+                            <td class="p-3 text-right font-bold text-gray-600">${s.wallet_balance ? parseFloat(s.wallet_balance).toFixed(2) : '0.00'} zł</td>
+                        </tr>
+                        `;
+                    }).join('');
+                } else {
+                    subsBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500">Brak historii subskrypcji.</td></tr>';
+                }
+            }
+
+            // --- 3. UCZESTNICY Z POPRZEDNIEGO MIESIĄCA ---
+            const pastTableBody = document.getElementById('past-users-table-body');
+            if(pastTableBody) {
+                 if(!data.pastParticipants || data.pastParticipants.length === 0) {
+                    pastTableBody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-gray-500">Brak danych z poprzedniego miesiąca.</td></tr>';
+                 } else {
+                    pastTableBody.innerHTML = data.pastParticipants.map(p => `
+                        <tr class="border-b hover:bg-gray-50 bg-gray-50">
+                            <td class="p-3 text-gray-500">${p.month_target}</td>
+                            <td class="p-3 text-gray-600">${p.email}</td>
+                            <td class="p-3 text-gray-600">${p.amount_paid} zł</td>
+                            <td class="p-3 text-gray-400 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
+                            <td class="p-3 text-center">-</td>
+                            <td class="p-3 text-center">-</td>
+                        </tr>
+                    `).join('');
+                 }
+            }
+
+            // --- 4. OCZEKUJĄCE WYPŁATY ---
+            const withdrawTableEl = document.getElementById('withdraw-table');
+            if (withdrawTableEl) {
+                const tWith = withdrawTableEl.querySelector('tbody');
+                tWith.innerHTML = data.withdrawals.length ? data.withdrawals.map(w => `
+                    <tr style="background: #fff3cd;">
+                        <td><strong>${w.email}</strong><br><span style="font-size:0.8rem; color:#666;">Data: ${new Date(w.created_at).toLocaleString()}</span></td>
+                        <td style="color:red; font-weight:bold;">-${w.amount} zł</td>
+                        <td>
+                            <button class="btn btn-blue" style="margin-right:5px;" onclick="navigator.clipboard.writeText('${w.account_number}')">Kopiuj</button>
+                            <button class="btn btn-red" onclick="confirmWithdraw(${w.id}, '${w.email}', ${w.amount})">Zrealizuj</button>
+                            <br><span style="font-size:0.7rem; font-family:monospace;">${w.account_number}</span>
+                        </td>
+                    </tr>`).join('') : '<tr><td colspan="3">Brak zleceń.</td></tr>';
+            }
+
+            // --- 5. HISTORIA WYPŁAT ---
+            const historyTableEl = document.getElementById('history-table');
+            if (historyTableEl) {
+                const tHist = historyTableEl.querySelector('tbody');
+                tHist.innerHTML = data.history && data.history.length ? data.history.map(h => `
+                    <tr class="history-row">
+                        <td>${new Date(h.created_at).toLocaleDateString()}</td>
+                        <td><strong>${h.completed_at ? new Date(h.completed_at).toLocaleString() : '---'}</strong></td>
+                        <td>${h.email}<br><span style="font-size:0.8rem;">${h.account_number}</span></td>
+                        <td>-${h.amount} zł</td>
+                    </tr>`).join('') : '<tr><td colspan="4">Pusta historia.</td></tr>';
+            }
+        }
 
     </script>
 </body>
