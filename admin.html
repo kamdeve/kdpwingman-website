@@ -14,6 +14,7 @@
         .btn-green { background: #28a745; }
         .btn-blue { background: #007bff; }
         .btn-red { background: #dc3545; }
+        .btn-gray { background: #6c757d; cursor: not-allowed; }
         .tag { background: #ffeb3b; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
         
         /* Styl dla historii */
@@ -39,7 +40,7 @@
                 <h3>🤖 Automatyczne Rozliczenie Miesiąca</h3>
                 <div class="preview-box" id="preview">Ładowanie...</div>
                 <br>
-                <button class="btn btn-green" onclick="settle()">🚀 Uruchom Procedurę Rozliczenia</button>
+                <button id="settle-btn" class="btn btn-green" onclick="settle()">🚀 Uruchom Procedurę Rozliczenia</button>
             </div>
 
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm">
@@ -89,14 +90,14 @@
 
             
             <h3 style="margin-top: 40px; color: #a0134a;">✈️ Piloci Autopilota (Subskrybenci)</h3>
-<div class="bg-white rounded shadow overflow-hidden">
-    <table id="subs-table" class="min-w-full">
-        <thead class="bg-pink-50 text-gray-600 uppercase text-xs">
-            <tr><th>Email</th><th>Daty</th><th>Saldo Portfela</th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+            <div class="bg-white rounded shadow overflow-hidden">
+                <table id="subs-table" class="min-w-full">
+                    <thead class="bg-pink-50 text-gray-600 uppercase text-xs">
+                        <tr><th>Email</th><th>Daty</th><th>Saldo Portfela</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
 
 
             <h3 style="margin-top: 40px; color: #64748b;">🕰️ Uczestnicy z Poprzedniego Miesiąca</h3>
@@ -142,42 +143,35 @@
                 
                 renderTables(data);
                 updatePreview();
-                const settleBtn = document.querySelector('button[onclick="settleMonth()"]');
-            
-            // Jeśli przycisk istnieje w HTML, zaktualizuj go
-            if(settleBtn) {
-                if (data.isSettled) {
-                    // Jeśli miesiąc zamknięty -> Zablokuj przycisk
-                    settleBtn.disabled = true;
-                    settleBtn.innerText = "✅ MIESIĄC ROZLICZONY";
-                    // Szary kolor
-                    settleBtn.className = "w-full bg-gray-500 cursor-not-allowed text-white font-bold py-3 rounded shadow";
-                } else {
-                    // Jeśli miesiąc otwarty -> Odblokuj
-                    settleBtn.disabled = false;
-                    settleBtn.innerText = "🚀 Uruchom Procedurę Rozliczenia";
-                    // Zielony kolor
-                    settleBtn.className = "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded shadow transition";
+                
+                // --- FIX: Obsługa przycisku rozliczania ---
+                const settleBtn = document.getElementById('settle-btn');
+                if(settleBtn) {
+                    if (data.isSettled) {
+                        settleBtn.disabled = true;
+                        settleBtn.innerText = "✅ MIESIĄC ROZLICZONY";
+                        settleBtn.className = "btn btn-gray";
+                    } else {
+                        settleBtn.disabled = false;
+                        settleBtn.innerText = "🚀 Uruchom Procedurę Rozliczenia";
+                        settleBtn.className = "btn btn-green";
+                    }
                 }
-            }
 
-            const settleBody = document.getElementById('settlements-table-body');
-            if(settleBody && data.settlements) {
-                settleBody.innerHTML = data.settlements.map(s => `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="py-2 px-3 font-bold text-blue-600">${s.month_target}</td>
-                        <td class="py-2 px-3">${new Date(s.processed_at).toLocaleString()}</td>
-                        <td class="py-2 px-3 text-green-600 font-bold">-${s.total_refunded} zł/os.</td>
-                    </tr>
-                `).join('');
-            }
+                // Logi rozliczeń
+                const settleBody = document.getElementById('settlements-table-body');
+                if(settleBody && data.settlements) {
+                    settleBody.innerHTML = data.settlements.map(s => `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-2 px-3 font-bold text-blue-600">${s.month_target}</td>
+                            <td class="py-2 px-3">${new Date(s.processed_at).toLocaleString()}</td>
+                            <td class="py-2 px-3 text-green-600 font-bold">-${s.total_refunded} zł/os.</td>
+                        </tr>
+                    `).join('');
+                }
 
-            } catch(e) { alert("Błąd połączenia"); }
-
-            
+            } catch(e) { console.error(e); alert("Błąd połączenia"); }
         }
-
-        
 
         function updatePreview() {
             if(USER_COUNT === 0) return document.getElementById('preview').innerHTML = "Brak uczestników.";
@@ -214,17 +208,14 @@
                 `).join('');
             }
 
-            // --- 2. HISTORIA SUBSKRYPCJI (Naprawione i wyjęte z pętli wyżej) ---
+            // --- 2. HISTORIA SUBSKRYPCJI ---
             const subsBody = document.getElementById('subs-table').querySelector('tbody');
             if(subsBody) {
                 if(data.subscribers && data.subscribers.length > 0) {
                     subsBody.innerHTML = data.subscribers.map(s => {
                         const isActive = s.is_subscriber;
-                        
-                        // Formatowanie dat
                         const startStr = s.sub_started_at ? new Date(s.sub_started_at).toLocaleDateString() : '-';
                         const endStr = s.sub_ended_at ? new Date(s.sub_ended_at).toLocaleDateString() : '-';
-
                         const statusBadge = isActive 
                             ? '<span class="tag" style="background:#e0f2f1; color:#00695c;">✅ AKTYWNY</span>' 
                             : '<span class="tag" style="background:#ffebee; color:#c62828;">❌ ANULOWANY</span>';
@@ -239,9 +230,7 @@
                                 <span style="font-weight:bold; color: #334155;">${s.email}</span><br>
                                 ${statusBadge}
                             </td>
-                            <td class="p-3">
-                                ${dateInfo}
-                            </td>
+                            <td class="p-3">${dateInfo}</td>
                             <td class="p-3 text-right font-bold text-gray-600">${s.wallet_balance ? parseFloat(s.wallet_balance).toFixed(2) : '0.00'} zł</td>
                         </tr>
                         `;
@@ -298,6 +287,44 @@
                         <td>-${h.amount} zł</td>
                     </tr>`).join('') : '<tr><td colspan="4">Pusta historia.</td></tr>';
             }
+        }
+
+        async function confirmWithdraw(id, email, amount) {
+            if(!confirm(`Czy zrealizowałeś przelew ${amount} zł dla ${email}?`)) return;
+            const res = await fetch(`${API}/api/admin/confirm-withdraw`, {
+                method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ secret: KEY, withdrawId: id })
+            });
+            loadData();
+        }
+
+        async function settle() {
+            if(!confirm("⚠️ UWAGA: Uruchamiasz procedurę rozliczenia.\n\nCzy na pewno chcesz to zrobić?")) return;
+            const res = await fetch(`${API}/api/admin/settle`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ secret: KEY }) });
+            const d = await res.json(); alert(d.message || d.error); loadData();
+        }
+
+        async function removeParticipant(userId, month, email) {
+            // FIX: Poprawione pobieranie elementu input
+            const inputEl = document.getElementById(`refund-input-${userId}`);
+            const customAmount = inputEl ? inputEl.value : null;
+
+            if(!confirm(`⚠️ USUWASZ UCZESTNIKA!\n\nEmail: ${email}\nZwrot do portfela: ${customAmount} zł\n\nCzy potwierdzasz?`)) return;
+
+            try {
+                const res = await fetch(`${API}/api/admin/remove-participant`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ secret: KEY, userId, month, customRefund: customAmount })
+                });
+                const data = await res.json();
+                
+                if(data.success) {
+                    alert("✅ SUKCES: " + data.message);
+                    loadData(); 
+                } else {
+                    alert("Błąd: " + data.error);
+                }
+            } catch(e) { alert("Błąd połączenia: " + e.message); }
         }
 
     </script>
