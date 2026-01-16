@@ -220,18 +220,31 @@
                     </td>
                 </tr>
             `).join('');
-            // --- 5. SUBSKRYBENCI (WKLEJ TO NA SAMYM DOLE) ---
+            // --- 5. HISTORIA SUBSKRYPCJI (Z obsługą statusów) ---
         const subsBody = document.getElementById('subs-table').querySelector('tbody');
-        if(subsBody) { // Dodatkowy if, żeby nie wywaliło błędu jak nie znajdzie tabeli
+        if(subsBody) {
             if(data.subscribers && data.subscribers.length > 0) {
-                subsBody.innerHTML = data.subscribers.map(s => `
-                    <tr class="border-b">
-                        <td class="p-3 font-bold text-pink-600">✈️ ${s.email}</td>
-                        <td class="p-3">${s.wallet_balance} zł</td>
+                subsBody.innerHTML = data.subscribers.map(s => {
+                    // Sprawdzamy status: Aktywny czy Anulowany?
+                    // is_subscriber to BOOLEAN z bazy danych
+                    const isActive = s.is_subscriber; 
+                    
+                    const statusBadge = isActive 
+                        ? '<span class="tag" style="background:#e0f2f1; color:#00695c;">✅ AKTYWNY</span>' 
+                        : '<span class="tag" style="background:#ffebee; color:#c62828;">❌ ANULOWANY</span>';
+                    
+                    return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3">
+                            <span style="font-weight:bold; color: #334155;">${s.email}</span><br>
+                            ${statusBadge}
+                        </td>
+                        <td class="p-3 font-bold text-gray-600">${s.wallet_balance} zł</td>
                     </tr>
-                `).join('');
+                    `;
+                }).join('');
             } else {
-                subsBody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-gray-500">Brak subskrybentów.</td></tr>';
+                subsBody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-gray-500">Brak historii subskrypcji.</td></tr>';
             }
         }
         }
