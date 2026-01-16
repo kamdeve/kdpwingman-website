@@ -4,123 +4,210 @@
     <meta charset="UTF-8">
     <title>Panel Klienta - KDP Wingman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* ZMIANA KOLORU NA WIŚNIOWY (Wingman Cherry) */
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #a0134a; --accent-hover: #800f3b; --success: #00C851; }
-        
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
-        
-        /* Navbar */
-        .navbar { background: var(--card); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--accent); }
-        .logout { color: #94a3b8; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
-        .logout:hover { color: #ef4444; }
+        /* --- NOWOCZESNY STYL (Premium Glass) --- */
+        :root {
+            --bg-dark: #0f172a; /* Głęboki granat */
+            --glass-bg: rgba(30, 41, 59, 0.7); /* Półprzezroczyste tło kart */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --cherry-gradient: linear-gradient(135deg, #a0134a 0%, #db2777 100%);
+            --cherry: #a0134a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
 
-        /* Layout */
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        @media(max-width: 900px) { .container { grid-template-columns: 1fr; } }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-        /* Karty */
-        .card { background: var(--card); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #334155; margin-bottom: 30px; }
-        .card h3 { margin-top: 0; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
+        /* --- TŁO GLOW (Poświata) --- */
+        .background-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(160, 19, 74, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 50;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .logo span { color: #db2777; } /* Jaśniejszy róż dla kontrastu */
         
-        /* Elementy formularza */
-        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
-        input:focus { border-color: var(--accent); outline: none; }
+        .logout-btn {
+            color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: 0.3s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .logout-btn:hover { color: white; }
+
+        /* --- UKŁAD (LAYOUT) --- */
+        .container {
+            max-width: 1200px; margin: 40px auto; padding: 0 20px;
+            display: grid; grid-template-columns: 1fr 350px; gap: 30px;
+        }
         
-        .btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; }
-        .btn-primary { background: var(--accent); }
-        .btn-primary:hover { background: var(--accent-hover); }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
 
-        /* Portfel i Zakładki */
-        .balance { font-size: 2.5rem; font-weight: 700; color: var(--success); margin: 10px 0; }
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #0f172a; padding: 5px; border-radius: 8px; }
-        .tab-label { flex: 1; text-align: center; cursor: pointer; padding: 8px; border-radius: 6px; font-size: 0.85rem; color: #94a3b8; transition: 0.2s; }
-        .tab-label:hover { background: rgba(255,255,255,0.05); }
-        input[type="radio"] { display: none; }
-        input[type="radio"]:checked + .tab-label { background: var(--accent); color: white; font-weight: bold; }
+        /* --- KARTY (GLASSMORPHISM) --- */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-        /* Historia */
-        .history-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .history-table td { padding: 12px 0; border-bottom: 1px solid #334155; color: #cbd5e1; }
+        h3 { margin-top: 0; font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        
+        /* --- ELEMENTY STATUSU --- */
+        .app-item {
+            display: flex; align-items: center; gap: 15px; margin-top: 20px;
+            padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border);
+        }
+        .app-icon {
+            width: 50px; height: 50px; background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        }
+        .status-wait { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+        .status-active { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        /* --- FORMULARZE I PRZYCISKI --- */
+        input {
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border);
+            border-radius: 8px; color: white; font-family: inherit; font-size: 0.95rem;
+            box-sizing: border-box; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--cherry); box-shadow: 0 0 15px rgba(160, 19, 74, 0.2); }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: 0.3s; text-align: center; font-size: 1rem;
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--cherry-gradient);
+            color: white; box-shadow: 0 4px 15px rgba(160, 19, 74, 0.4);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(160, 19, 74, 0.6); }
+
+        /* --- PORTFEL I ZAKŁADKI --- */
+        .balance { font-size: 2.8rem; font-weight: 800; color: var(--success); margin: 10px 0; text-shadow: 0 0 30px rgba(16, 185, 129, 0.2); }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tabs label { flex: 1; cursor: pointer; }
+        .tabs input { display: none; }
+        .tab-label {
+            display: block; text-align: center; padding: 10px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid transparent; color: var(--text-muted); transition: 0.3s; font-size: 0.9rem;
+        }
+        .tabs input:checked + .tab-label {
+            background: rgba(160, 19, 74, 0.2); border-color: var(--cherry); color: white;
+        }
+
+        /* --- HISTORIA TABELA --- */
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.95rem; }
         .history-table tr:last-child td { border-bottom: none; }
-        .date-col { color: #64748b; font-size: 0.8rem; }
+        .date-col { font-size: 0.8rem; color: var(--text-muted); display: block; }
 
-        /* Status Zrzutki */
-        .app-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid transparent; transition: 0.3s; }
-        .app-item:hover { border-color: var(--accent); background: rgba(160, 19, 74, 0.1); }
-        .app-icon { width: 45px; height: 45px; background: #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-        .status-active { background: var(--success); color: black; }
-        .status-wait { background: #ffc107; color: black; }
-
+        /* --- UTILS --- */
         .hidden { display: none !important; }
-        #login-view { display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        /* LOGIN BOX (Wyśrodkowany) */
+        #login-view {
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
         .login-box { width: 100%; max-width: 400px; text-align: center; }
 
-        /* Nowy Panel Statystyk w Dashboardzie */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .stat-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
-        .stat-value { font-size: 1.5rem; font-weight: bold; color: white; }
-        .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
-        .countdown-box { background: #1e293b; border: 1px solid #a0134a; color: #a0134a; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; font-family: monospace; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
+    <div class="background-glow"></div>
+
     <div id="login-view">
         <div class="card login-box">
-            <h2 style="color: white;">KDP <span>Wingman</span></h2>
-            <p style="color: #94a3b8;">Zaloguj się do panelu</p>
+            <h2 style="color: white; font-size: 2rem; margin-bottom: 10px;">KDP <span>Wingman</span></h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
+            
             <input type="email" id="email" placeholder="E-mail">
             <input type="password" id="pass" placeholder="Hasło">
             
             <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
             
-            <p style="margin-top: 15px; font-size: 0.85rem;">
-                <a href="#" onclick="forgotPass()" style="color: #94a3b8; text-decoration: underline;">Nie pamiętasz hasła?</a>
+            <p style="margin-top: 20px; font-size: 0.85rem;">
+                <a href="#" onclick="forgotPass()" style="color: var(--text-muted); text-decoration: underline;">Nie pamiętasz hasła?</a>
             </p>
-
-            <p id="login-msg" style="color:#ef4444; margin-top:10px; font-size:0.9rem;"></p>
+            <p id="login-msg" style="color: var(--danger); margin-top:10px; font-size:0.9rem;"></p>
         </div>
     </div>
 
     <div id="dash-view" class="hidden">
+        
         <div class="navbar">
-            <a href="index.html" class="logo">KDP <span>Wingman</span></a>
-            <span class="logout" id="logout-btn">Wyloguj</span>
+            <a href="index.html" class="logo">
+                <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
+            </a>
+            <div class="logout-btn" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Wyloguj
+            </div>
         </div>
 
         <div class="container">
             
             <div>
                 <div class="card">
-                    <h3>🚀 Status w tym miesiącu</h3>
+                    <h3><i class="fas fa-rocket"></i> Status w tym miesiącu</h3>
+                    
                     <div class="app-item">
                         <div class="app-icon">💎</div>
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 1rem;">Helium 10 Platinum</div>
-                            <div id="current-month-label" style="font-size: 0.8rem; color: #94a3b8;">...</div>
+                            <div style="font-weight: bold; font-size: 1rem; color: white;">Helium 10 Platinum</div>
+                            <div id="current-month-label" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
                         </div>
                         <div id="status-badge" class="status-badge status-wait">OCZEKIWANIE</div>
                     </div>
 
-                    <div id="access-info" class="hidden" style="margin-top: 20px; padding: 15px; background: rgba(0, 200, 81, 0.1); border: 1px solid var(--success); border-radius: 8px;">
-                        <strong style="color: var(--success)">✅ Dostęp aktywny!</strong><br>
-                        <span style="font-size: 0.9rem; color: #cbd5e1;">Dane logowania otrzymasz na maila 5-go dnia miesiąca.</span>
-                    </div>
+                    <div id="access-info" class="hidden" style="margin-top: 20px;">
+                        </div>
 
-                    <div id="join-btn-container" style="margin-top: 20px;">
-                        <a href="group-buy.html" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">Dołącz teraz (40 zł)</a>
-                    </div>
+                    <div id="join-btn-container" style="margin-top: 25px;">
+                        </div>
                 </div>
 
                 <div class="card">
-                    <h3>📜 Historia Twoich Zrzutek</h3>
+                    <h3><i class="fas fa-history"></i> Historia Zrzutek</h3>
                     <table class="history-table">
                         <tbody id="history-list">
-                            <tr><td colspan="2" style="text-align:center;">Ładowanie...</td></tr>
+                            <tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Ładowanie...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -128,18 +215,18 @@
 
             <div>
                 <div class="card">
-                    <h3>💰 Twój Portfel (Zwroty)</h3>
+                    <h3><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
                     <div class="balance" id="balance">0.00 zł</div>
-                    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;">
                         Gdy koszt narzędzia wyjdzie mniejszy niż 40 zł, różnica wróci tutaj automatycznie.
                     </p>
                     
-                    <hr style="border-color: #334155; margin-bottom: 20px;">
+                    <div style="height: 1px; background: var(--glass-border); margin-bottom: 25px;"></div>
 
-                    <label style="font-size: 0.9rem; color: white;">Kwota do wypłaty</label>
+                    <label style="font-size: 0.9rem; color: white; display:block; margin-bottom:10px;">Kwota do wypłaty</label>
                     <input type="number" id="withdraw-amount" placeholder="np. 10.00">
 
-                    <p style="margin: 15px 0 5px 0; font-size: 0.9rem; color: white;">Metoda zwrotu:</p>
+                    <p style="margin: 15px 0 10px 0; font-size: 0.9rem; color: white;">Metoda zwrotu:</p>
                     <div class="tabs">
                         <label>
                             <input type="radio" name="method" value="pl" checked onchange="switchTab('pl')">
@@ -169,10 +256,39 @@
                         <input type="text" id="other-data" placeholder="IBAN lub PayPal e-mail">
                     </div>
 
-                    <button class="btn btn-primary" onclick="withdraw()">Zleć wypłatę</button>
+                    <button class="btn btn-primary" onclick="withdraw()" style="margin-top: 10px;">
+                        <i class="fas fa-paper-plane"></i> Zleć wypłatę
+                    </button>
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+        <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4); background: #0f172a;">
+            <div style="font-size: 4rem; margin-bottom: 10px;">🎉</div>
+            <h2 style="color: white; font-size: 2rem; margin: 0;">GRATULACJE!</h2>
+            <p style="color: #cbd5e1; margin-bottom: 30px;">Dołączyłeś do zrzutki.</p>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--glass-border);">
+                <p style="text-transform: uppercase; color: #64748b; font-size: 0.8rem; letter-spacing: 1px;">Twój numer na liście</p>
+                <div id="modal-number" style="font-size: 4rem; font-weight: bold; color: white;">#0</div>
+                <div style="width: 100%; height: 2px; background: #334155; margin: 15px 0;"></div>
+                <p style="color: #94a3b8; font-size: 0.9rem;">
+                    Dzięki Tobie cena spadła do: <br>
+                    <strong style="color: #4ade80; font-size: 1.2rem;">ok. <span id="modal-price">...</span> PLN</strong>
+                </p>
+            </div>
+
+            <div style="margin: 20px 0; font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
+                <p>💰 <strong>Co z resztą pieniędzy?</strong></p>
+                <p>Różnica między wpłatą a końcową ceną wróci automatycznie na Twój wirtualny portfel po zamknięciu listy.</p>
+            </div>
+
+            <button onclick="closeModal()" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px;">
+                Lecimy po sukces! 🚀
+            </button>
         </div>
     </div>
 
@@ -211,7 +327,7 @@
             } catch(e) { document.getElementById('login-msg').innerText = "Błędne dane"; }
         }
 
-        // --- 2. FUNKCJA INICJUJĄCA (Sprawdza czy już zalogowano) ---
+        // --- 2. FUNKCJA INICJUJĄCA ---
         function initDashboard() {
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('dash-view').classList.remove('hidden');
@@ -219,15 +335,7 @@
             loadHistory();
         }
 
-        function logout() { 
-            localStorage.removeItem('wingman_user'); // Usuwamy zapisany email
-            userEmail = ""; 
-            // Wymuszamy przeładowanie strony, co przy braku localStorage wyrzuci do ekranu logowania
-            window.location.href = "dashboard.html"; 
-        }
-
-        // --- 3. AUTOMATYCZNY START (Na dole skryptu) ---
-        // Sprawdź przy wejściu na stronę, czy jest zapisany user
+        // --- 3. AUTOMATYCZNY START ---
         const savedUser = localStorage.getItem('wingman_user');
         if(savedUser) {
             userEmail = savedUser;
@@ -249,12 +357,13 @@
             const container = document.getElementById('join-btn-container');
             const accessInfo = document.getElementById('access-info');
 
-            // --- PRZYGOTOWANIE SEKCJI AUTOPILOTA (Decyzja: Włącz czy Anuluj?) ---
+            // --- PRZYGOTOWANIE SEKCJI AUTOPILOTA ---
+            // Używam stylów inline, aby pasowały do nowego motywu bez zmieniania logiki JS
             let subHtml = "";
             if (data.is_subscriber) {
-                // JEŚLI JEST SUBSKRYBENTEM -> CZERWONY PRZYCISK ANULOWANIA
+                // JEŚLI JEST SUBSKRYBENTEM
                 subHtml = `
-                    <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;">
+                    <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
                         <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px solid #059669;">
                             <h4 style="margin: 0; color: #10b981;">✈️ Autopilot Aktywny</h4>
                             <p style="font-size: 0.8rem; color: #94a3b8; margin: 10px 0;">
@@ -268,9 +377,9 @@
                     </div>
                 `;
             } else {
-                // JEŚLI NIE JEST -> ZIELONY PRZYCISK WŁĄCZENIA
+                // JEŚLI NIE JEST
                 subHtml = `
-                    <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;">
+                    <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
                         <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
                             Nie chcesz klikać co miesiąc?
                         </p>
@@ -281,7 +390,7 @@
                 `;
             }
 
-            // --- SCENARIUSZ 1: UCZESTNICZYSZ (Pełne statystyki) ---
+            // --- SCENARIUSZ 1: UCZESTNICZYSZ ---
             if (data.has_joined) {
                 document.getElementById('status-badge').innerText = "UCZESTNICZYSZ";
                 document.getElementById('status-badge').className = "status-badge status-active";
@@ -290,16 +399,11 @@
                 accessInfo.classList.remove('hidden');
 
                 if (data.stats) {
-                    accessInfo.style.background = "none";
-                    accessInfo.style.border = "none";
-                    accessInfo.style.padding = "0";
-                    
-                    // --- TUTAJ BYŁ BŁĄD: Wstawiamy teraz zmienną ${subHtml} zamiast sztywnego kodu ---
                     accessInfo.innerHTML = `
-                        <div id="dash-countdown" class="countdown-box">Ładowanie...</div>
+                        <div id="dash-countdown" style="font-size:1.5rem; font-weight:800; text-align:center; color:#db2777; margin-bottom:20px; text-shadow:0 0 20px rgba(219, 39, 119, 0.4);">Ładowanie...</div>
 
-                        <div style="background: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
+                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
                                 <div style="text-align:left;">
                                     <span style="color:#94a3b8; font-size:0.8rem; text-transform:uppercase;">Twój Numer</span>
                                     <div style="font-size:1.8rem; font-weight:bold; color:white;">#${data.stats.my_number}</div>
@@ -335,8 +439,6 @@
 
                         ${subHtml} 
                     `;
-                    // ^^^ TERAZ JEST POPRAWNIE: Używamy zmiennej subHtml, która zawiera odpowiedni przycisk
-                    
                     startDashCountdown();
                 } else {
                      accessInfo.innerHTML = '<strong style="color: var(--success)">✅ Dostęp aktywny!</strong>' + subHtml;
@@ -344,7 +446,7 @@
 
             } 
             
-            // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ PEŁNĄ KWOTĘ (>= 40 zł) ---
+            // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ ŚRODKI ---
             else if (data.wallet_balance >= 40) {
                  container.classList.remove('hidden'); 
                  container.innerHTML = `
@@ -451,25 +553,28 @@
             }
 
             // --- 4. AKTYWACJA PRZYCISKU ANULOWANIA (Jeśli istnieje) ---
-            const cancelBtn = document.getElementById('cancel-sub-btn');
-            if(cancelBtn) {
-                cancelBtn.onclick = async function() {
-                    if(!confirm("Czy na pewno chcesz wyłączyć Autopilota? W przyszłym miesiącu będziesz musiał dołączyć ręcznie.")) return;
-                    this.innerText = "Anulowanie...";
-                    try {
-                        const res = await fetch(`${API}/api/cancel-subscription`, {
-                            method: 'POST', headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ email: userEmail })
-                        });
-                        const d = await res.json();
-                        alert(d.message);
-                        loadDashboardData(); // Odśwież widok
-                    } catch(e) { alert("Błąd połączenia"); }
-                };
-            }
+            // Używamy setTimeout, aby upewnić się, że element istnieje w DOM po wstrzyknięciu HTML
+            setTimeout(() => {
+                const cancelBtn = document.getElementById('cancel-sub-btn');
+                if(cancelBtn) {
+                    cancelBtn.onclick = async function() {
+                        if(!confirm("Czy na pewno chcesz wyłączyć Autopilota? W przyszłym miesiącu będziesz musiał dołączyć ręcznie.")) return;
+                        this.innerText = "Anulowanie...";
+                        try {
+                            const res = await fetch(`${API}/api/cancel-subscription`, {
+                                method: 'POST', headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({ email: userEmail })
+                            });
+                            const d = await res.json();
+                            alert(d.message);
+                            loadDashboardData(); // Odśwież widok
+                        } catch(e) { alert("Błąd połączenia"); }
+                    };
+                }
+            }, 100);
         }
 
-        // --- FUNKCJA ODLICZANIA (Wklej to pod funkcją loadDashboardData) ---
+        // --- FUNKCJA ODLICZANIA ---
         function startDashCountdown() {
             const el = document.getElementById('dash-countdown');
             if(!el) return;
@@ -487,7 +592,7 @@
                 el.innerText = `Koniec za: ${days}d ${hours}h ${minutes}m`;
             }
             update();
-            setInterval(update, 60000); // Odświeżaj co minutę
+            setInterval(update, 60000); 
         }
 
         async function loadHistory() {
@@ -512,7 +617,7 @@
                         </tr>
                     `).join('');
                 } else {
-                    list.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#64748b;">Brak historii wpłat.</td></tr>';
+                    list.innerHTML = '<tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Brak historii wpłat.</td></tr>';
                 }
             } catch(e) { console.log(e); }
         }
@@ -542,10 +647,14 @@
         function forgotPass() {
             alert("🔒 Procedura Resetowania Hasła\n\nSystem automatycznego resetowania jest w trakcie wdrażania.\n\nAby odzyskać dostęp, napisz do nas na:\n📧 kamil.sznicer@o2.pl lub na Facebook\n\n(Pisz z adresu e-mail przypisanego do konta). Zresetujemy Twoje hasło ręcznie w ciągu 24h.");
         }
+        
+        // Obsługa wylogowania
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('wingman_user');
+            window.location.href = "index.html";
+        });
 
-        function logout() { location.reload(); }
-
-async function startSubscription() {
+        async function startSubscription() {
             const btn = document.getElementById('sub-btn');
             if(btn) {
                 btn.disabled = true;
@@ -561,7 +670,7 @@ async function startSubscription() {
                 const d = await res.json();
                 
                 if(d.url) {
-                    window.location.href = d.url; // Przekierowanie do płatności
+                    window.location.href = d.url; 
                 } else {
                     alert("Błąd tworzenia subskrypcji: " + (d.error || "Nieznany błąd"));
                     if(btn) {
@@ -583,83 +692,27 @@ async function startSubscription() {
             const modal = document.getElementById('success-modal');
             modal.classList.add('hidden');
             modal.style.display = 'none';
-            location.reload(); // Odśwież stronę, aby zobaczyć zielony status
+            // Odśwież dane bez przeładowania całej strony
+            loadDashboardData();
         }
 
-        document.getElementById('logout-btn').addEventListener('click', function() {
-        localStorage.removeItem('wingman_user'); // Usuń sesję
-        window.location.href = "index.html"; // Wyrzuć na stronę główną (nie dashboard!)
-    });
-
-    // --- OBSŁUGA SEKCJI AUTOPILOTA (SUBSKRYPCJI) ---
-            const subContainer = document.createElement('div');
-            subContainer.style.marginTop = "20px";
-            subContainer.style.borderTop = "1px solid #334155";
-            subContainer.style.paddingTop = "20px";
-
-            if (data.is_subscriber) {
-                // JEŚLI JEST SUBSKRYBENTEM -> PRZYCISK ANULOWANIA
-                subContainer.innerHTML = `
-                    <p style="color: #4ade80; font-size: 0.85rem; margin-bottom: 10px;">
-                        ✈️ Twój Autopilot jest włączony.
-                    </p>
-                    <button id="cancel-sub-btn" class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; font-size: 0.9rem;">
-                        Anuluj Subskrypcję
-                    </button>
-                `;
-                
-                // Obsługa kliknięcia Anuluj
-                setTimeout(() => {
-                    document.getElementById('cancel-sub-btn').onclick = async function() {
-                        if(!confirm("Czy na pewno chcesz wyłączyć Autopilota? W przyszłym miesiącu będziesz musiał dołączyć ręcznie.")) return;
-                        this.innerText = "Anulowanie...";
-                        try {
-                            const res = await fetch(`${API}/api/cancel-subscription`, {
-                                method: 'POST', headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({ email: userEmail })
-                            });
-                            const d = await res.json();
-                            alert(d.message);
-                            loadDashboardData(); // Odśwież widok
-                        } catch(e) { alert("Błąd połączenia"); }
-                    };
-                }, 100);
-
-            } else {
-                // JEŚLI NIE JEST -> PRZYCISK WŁĄCZENIA
-                subContainer.innerHTML = `
-                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
-                        Chcesz mieć spokój? Włącz Autopilota ✈️
-                    </p>
-                    <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
-                        Włącz Subskrypcję (40 zł / mc)
-                    </button>
-                `;
-            }
-            
-            // Dodajemy ten kontener do głównego kontenera przycisków
-            container.appendChild(subContainer);
-
-            // --- NOWOŚĆ: Obsługa powrotu ze Stripe (Modal Sukcesu Autopilota) ---
+        // --- OBSŁUGA OKNA SUKCESU AUTOPILOTA ---
         function checkUrlForActions() {
             const urlParams = new URLSearchParams(window.location.search);
             const action = urlParams.get('action');
 
             if (action === 'autopilot_enabled') {
-                // 1. Znajdź modal i pokaż go
                 const modal = document.getElementById('success-modal');
                 if (modal) {
                     modal.classList.remove('hidden');
                     modal.style.display = 'flex';
 
-                    // 2. Podmień treść modala na wersję "Autopilot"
-                    // (Zastępujemy standardowy tekst o zrzutce tekstem o subskrypcji)
                     modal.querySelector('.card').innerHTML = `
                         <div style="font-size: 4rem; margin-bottom: 10px;">✈️</div>
                         <h2 style="color: white; font-size: 2rem; margin: 0;">AUTOPILOT WŁĄCZONY!</h2>
                         <p style="color: #4ade80; margin-bottom: 30px; font-weight:bold;">Twoja subskrypcja jest aktywna.</p>
 
-                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; text-align: left;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--glass-border); text-align: left;">
                             <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 10px;">
                                 ✅ <strong>Płatność przyjęta:</strong> Środki będą pobierane automatycznie co miesiąc.
                             </p>
@@ -670,53 +723,45 @@ async function startSubscription() {
                             </p>
                         </div>
 
-                        <button onclick="closeModalCleanUrl()" class="btn btn-primary" style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%); font-size: 1.1rem; padding: 15px;">
+                        <button onclick="closeModalCleanUrl()" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px;">
                             Wchodzę do Panelu 🚀
                         </button>
                     `;
                 }
             }
+            
+            // Obsługa standardowego sukcesu (zrzutka jednorazowa)
+            if (urlParams.get('success')) {
+                 const modal = document.getElementById('success-modal');
+                 if(modal) {
+                     modal.classList.remove('hidden');
+                     modal.style.display = 'flex';
+                     // Dane (numer i cena) zostaną uzupełnione przez funkcję auto-join lub pobranie statusu
+                     // Tutaj pobieramy aktualny status, żeby uzupełnić modal
+                     fetch(`${API}/api/group-buy/status`)
+                        .then(r => r.json())
+                        .then(statusData => {
+                             // Jeśli backend nie zwraca mojego numeru w tym endpoincie, 
+                             // to numer i tak zostanie pobrany przy "loadDashboardData" jeśli user dołączył.
+                             // Tutaj tylko upewniamy się, że cena jest aktualna.
+                             const priceSpan = document.getElementById('modal-price');
+                             if(priceSpan) priceSpan.innerText = statusData.pricePLN;
+                        });
+                 }
+                 // Wyczyść URL
+                 window.history.replaceState({}, document.title, window.location.pathname);
+            }
         }
 
-        // Funkcja zamykająca modal i czyszcząca adres URL (żeby po odświeżeniu nie wyskakiwało znowu)
         function closeModalCleanUrl() {
             const modal = document.getElementById('success-modal');
             modal.classList.add('hidden');
             modal.style.display = 'none';
-            // Czyści "?action=..." z paska adresu bez przeładowania
             window.history.replaceState({}, document.title, window.location.pathname);
-            // Odświeża dane w tle
             loadDashboardData();
         }
 
-        // URUCHAMIAMY SPRAWDZANIE PRZY STARCIE
         checkUrlForActions();
     </script>
-<div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4);">
-            <div style="font-size: 4rem; margin-bottom: 10px;">🎉</div>
-            <h2 style="color: white; font-size: 2rem; margin: 0;">GRATULACJE!</h2>
-            <p style="color: #cbd5e1; margin-bottom: 30px;">Dołączyłeś do zrzutki.</p>
-
-            <div style="background: #0f172a; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155;">
-                <p style="text-transform: uppercase; color: #64748b; font-size: 0.8rem; letter-spacing: 1px;">Twój numer na liście</p>
-                <div id="modal-number" style="font-size: 4rem; font-weight: bold; color: white;">#0</div>
-                <div style="width: 100%; height: 2px; background: #334155; margin: 15px 0;"></div>
-                <p style="color: #94a3b8; font-size: 0.9rem;">
-                    Dzięki Tobie cena spadła do: <br>
-                    <strong style="color: #4ade80; font-size: 1.2rem;">ok. <span id="modal-price">...</span> PLN</strong>
-                </p>
-            </div>
-
-
-            <div style="margin: 20px 0; font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
-                <p>💰 <strong>Co z resztą pieniędzy?</strong></p>
-                <p>Różnica między wpłatą a końcową ceną wróci automatycznie na Twój wirtualny portfel po zamknięciu listy.</p>
-            </div>
-
-            <button onclick="closeModal()" class="btn btn-primary" style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%); font-size: 1.1rem; padding: 15px;">Lecimy po sukces! 🚀</button>
-        </div>
-    </div>
-
 </body>
 </html>
