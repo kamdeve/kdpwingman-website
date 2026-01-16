@@ -92,7 +92,7 @@
 <div class="bg-white rounded shadow overflow-hidden">
     <table id="subs-table" class="min-w-full">
         <thead class="bg-pink-50 text-gray-600 uppercase text-xs">
-            <tr><th>Email</th><th>Saldo Portfela</th></tr>
+            <tr><th>Email</th><th>Daty</th><th>Saldo Portfela</th></tr>
         </thead>
         <tbody></tbody>
     </table>
@@ -225,26 +225,36 @@
         if(subsBody) {
             if(data.subscribers && data.subscribers.length > 0) {
                 subsBody.innerHTML = data.subscribers.map(s => {
-                    // Sprawdzamy status: Aktywny czy Anulowany?
-                    // is_subscriber to BOOLEAN z bazy danych
-                    const isActive = s.is_subscriber; 
+                    const isActive = s.is_subscriber;
                     
+                    // Formatowanie dat (jeśli istnieją)
+                    const startStr = s.sub_started_at ? new Date(s.sub_started_at).toLocaleDateString() : '-';
+                    const endStr = s.sub_ended_at ? new Date(s.sub_ended_at).toLocaleDateString() : '-';
+
                     const statusBadge = isActive 
                         ? '<span class="tag" style="background:#e0f2f1; color:#00695c;">✅ AKTYWNY</span>' 
                         : '<span class="tag" style="background:#ffebee; color:#c62828;">❌ ANULOWANY</span>';
                     
+                    // Wyświetlanie odpowiedniej daty
+                    const dateInfo = isActive 
+                        ? `<span style="font-size:0.75rem; color:#64748b;">Od: ${startStr}</span>`
+                        : `<span style="font-size:0.75rem; color:#64748b;">Od: ${startStr} <br> Do: ${endStr}</span>`;
+
                     return `
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-3">
                             <span style="font-weight:bold; color: #334155;">${s.email}</span><br>
                             ${statusBadge}
                         </td>
-                        <td class="p-3 font-bold text-gray-600">${s.wallet_balance} zł</td>
+                        <td class="p-3">
+                            ${dateInfo}
+                        </td>
+                        <td class="p-3 text-right font-bold text-gray-600">${s.wallet_balance.toFixed(2)} zł</td>
                     </tr>
                     `;
                 }).join('');
             } else {
-                subsBody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-gray-500">Brak historii subskrypcji.</td></tr>';
+                subsBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500">Brak historii.</td></tr>';
             }
         }
         }
