@@ -156,17 +156,30 @@
     <div id="login-view">
         <div class="card login-box">
             <h2 style="color: white; font-size: 2rem; margin-bottom: 10px;">KDP <span>Wingman</span></h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
             
-            <input type="email" id="email" placeholder="E-mail">
-            <input type="password" id="pass" placeholder="Hasło">
-            
-            <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
-            
-            <p style="margin-top: 20px; font-size: 0.85rem;">
-                <a href="#" onclick="forgotPass()" style="color: var(--text-muted); text-decoration: underline;">Nie pamiętasz hasła?</a>
-            </p>
-            <p id="login-msg" style="color: var(--danger); margin-top:10px; font-size:0.9rem;"></p>
+            <div id="login-form-content">
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
+                <input type="email" id="email" placeholder="E-mail">
+                <input type="password" id="pass" placeholder="Hasło">
+                
+                <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
+                
+                <p style="margin-top: 20px; font-size: 0.85rem;">
+                    <a href="#" onclick="forgotPass()" style="color: var(--text-muted); text-decoration: underline;">Nie pamiętasz hasła?</a>
+                </p>
+                <p id="login-msg" style="color: var(--danger); margin-top:10px; font-size:0.9rem;"></p>
+            </div>
+
+            <div id="reset-password-content" class="hidden">
+                <p style="color: var(--text-muted); margin-bottom: 25px;">Podaj adres e-mail, na który założono konto. Wyślemy Ci link do zmiany hasła.</p>
+                <input type="email" id="reset-email" placeholder="Twój adres e-mail">
+                
+                <button class="btn btn-primary" onclick="sendResetLink()" style="margin-bottom: 10px;">Wyślij link</button>
+                <button class="btn" onclick="cancelForgotPass()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted);">Wróć do logowania</button>
+                
+                <p id="reset-msg" style="margin-top:15px; font-size:0.9rem;"></p>
+            </div>
+
         </div>
     </div>
 
@@ -645,7 +658,35 @@
         }
 
         function forgotPass() {
-            alert("🔒 Procedura Resetowania Hasła\n\nSystem automatycznego resetowania jest w trakcie wdrażania.\n\nAby odzyskać dostęp, napisz do nas na:\n📧 kamil.sznicer@o2.pl lub na Facebook\n\n(Pisz z adresu e-mail przypisanego do konta). Zresetujemy Twoje hasło ręcznie w ciągu 24h.");
+            document.getElementById('login-form-content').classList.add('hidden');
+            document.getElementById('reset-password-content').classList.remove('hidden');
+        }
+
+        function cancelForgotPass() {
+            document.getElementById('reset-password-content').classList.add('hidden');
+            document.getElementById('login-form-content').classList.remove('hidden');
+            document.getElementById('reset-msg').innerText = "";
+            document.getElementById('reset-email').value = "";
+        }
+
+        async function sendResetLink() {
+            const email = document.getElementById('reset-email').value;
+            const msgEl = document.getElementById('reset-msg');
+            
+            if(!email) {
+                msgEl.innerText = "Podaj adres e-mail!";
+                msgEl.style.color = "var(--danger)";
+                return;
+            }
+            
+            msgEl.innerText = "Przetwarzanie...";
+            msgEl.style.color = "white";
+            
+            // Tutaj w następnym kroku podepniemy wysyłkę do backendu
+            setTimeout(() => {
+                msgEl.innerText = "Wygląd działa! Zaraz podłączymy wysyłkę maili.";
+                msgEl.style.color = "var(--success)";
+            }, 1000);
         }
         
         // Obsługa wylogowania
