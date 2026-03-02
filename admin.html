@@ -43,6 +43,23 @@
                 <button id="settle-btn" class="btn btn-green" onclick="settle()">🚀 Uruchom Procedurę Rozliczenia</button>
             </div>
 
+<div class="card" style="margin-top: 30px; margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #a0134a;">
+    <h3 style="margin-top: 0; color: #a0134a;">🚀 Wyślij loginy do Helium 10</h3>
+    <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 20px;">
+        Wpisz dane do Helium 10. Po kliknięciu, system wyśle maile do <strong>wszystkich osób na liście poniżej</strong> (Obecni Uczestnicy).
+    </p>
+
+    <input type="text" id="helium-login" placeholder="Login (e-mail) do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    
+    <input type="text" id="helium-password" placeholder="Hasło do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    
+    <button onclick="sendHeliumCredentials()" id="send-cred-btn" class="btn btn-blue" style="width: 100%; padding: 12px; background: #a0134a; font-weight: bold; font-size: 1rem;">
+        Wyślij loginy do grupy z tego miesiąca
+    </button>
+    <p id="send-cred-msg" style="margin-top: 15px; font-size: 0.9rem; text-align: center; font-weight: bold;"></p>
+</div>
+
+
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm">
                 <h4 style="margin-top: 20px; font-weight: bold; color: #475569;">📜 Archiwum Rozliczeń:</h4>
                 <table class="min-w-full mt-2 bg-white rounded overflow-hidden shadow-sm" style="font-size: 0.85rem;">
@@ -123,6 +140,7 @@
         let KEY = "";
         let USER_COUNT = 0;
         let CURRENT_RATE = 0;
+        let CURRENT_EMAILS = [];
 
         function login() { KEY = document.getElementById('pass').value; loadData(); }
 
@@ -140,6 +158,8 @@
                 document.getElementById('count').innerText = USER_COUNT;
                 document.getElementById('rate').innerText = CURRENT_RATE + " PLN";
                 document.getElementById('pool').innerText = (USER_COUNT * 40).toFixed(2) + " zł";
+                
+                CURRENT_EMAILS = data.participants ? data.participants.map(p => p.email) : [];
                 
                 renderTables(data);
                 updatePreview();
@@ -326,6 +346,61 @@
                 }
             } catch(e) { alert("Błąd połączenia: " + e.message); }
         }
+
+
+async function sendHeliumCredentials() {
+    const login = document.getElementById('helium-login').value;
+    const pass = document.getElementById('helium-password').value;
+    const msgEl = document.getElementById('send-cred-msg');
+    const btn = document.getElementById('send-cred-btn');
+
+    if (!login || !pass) {
+        msgEl.innerText = "Uzupełnij login i hasło!";
+        msgEl.style.color = "#dc3545"; // Czerwony
+        return;
+    }
+
+    if (CURRENT_EMAILS.length === 0) {
+        msgEl.innerText = "Brak uczestników do wysyłki w tym miesiącu!";
+        msgEl.style.color = "#dc3545";
+        return;
+    }
+
+    if (!confirm(`Czy na pewno wysłać loginy do ${CURRENT_EMAILS.length} uczestników na ten miesiąc?`)) return;
+
+    btn.disabled = true;
+    msgEl.innerText = "Wysyłanie maili (to może potrwać kilka sekund)...";
+    msgEl.style.color = "#6c757d";
+
+    try {
+        const res = await fetch(`${API}/api/admin/send-credentials`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                heliumLogin: login, 
+                heliumPassword: pass,
+                secret: KEY, // <- System użyje hasła, którym już się zalogowałeś!
+                emails: CURRENT_EMAILS // <- Przesyłamy gotową listę maili z tabeli
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msgEl.innerText = "✅ " + data.message;
+            msgEl.style.color = "#28a745"; // Zielony
+            document.getElementById('helium-password').value = ""; // Czyści hasło po wysyłce
+        } else {
+            msgEl.innerText = "Błąd: " + data.error;
+            msgEl.style.color = "#dc3545";
+        }
+    } catch (e) {
+        msgEl.innerText = "Błąd połączenia z serwerem.";
+        msgEl.style.color = "#dc3545";
+    } finally {
+        btn.disabled = false;
+    }
+}
 
     </script>
 </body>
