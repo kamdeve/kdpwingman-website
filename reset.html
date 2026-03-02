@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Zresetuj Hasło - KDP Wingman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Podstawowe style skopiowane z Twojego dashboard.html dla spójności */
+        :root {
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --cherry: #a0134a;
+            --cherry-gradient: linear-gradient(135deg, #a0134a 0%, #db2777 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif;
+            margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+
+        .background-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(160, 19, 74, 0.15) 0%, transparent 60%);
+        }
+
+        .card {
+            background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 40px 30px; width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        input {
+            width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border); border-radius: 8px; color: white;
+            font-family: inherit; font-size: 0.95rem; box-sizing: border-box; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--cherry); box-shadow: 0 0 15px rgba(160, 19, 74, 0.2); }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 600;
+            cursor: pointer; transition: 0.3s; font-size: 1rem; color: white;
+            background: var(--cherry-gradient);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(160, 19, 74, 0.4); }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <div class="card">
+        <h2 style="margin-top: 0; margin-bottom: 10px; font-size: 1.8rem;">Nowe <span>Hasło</span></h2>
+        
+        <div id="reset-form-container">
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">Wpisz swoje nowe hasło poniżej.</p>
+            
+            <input type="password" id="new-pass" placeholder="Nowe hasło">
+            <input type="password" id="new-pass-confirm" placeholder="Powtórz nowe hasło">
+            
+            <button class="btn" onclick="saveNewPassword()">Zapisz hasło</button>
+            <p id="msg" style="margin-top: 15px; font-size: 0.9rem;"></p>
+        </div>
+
+        <div id="success-container" class="hidden">
+            <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+            <p style="color: var(--success); font-weight: bold; margin-bottom: 20px;">Hasło zostało zmienione!</p>
+            <a href="dashboard.html" class="btn" style="text-decoration: none; display: inline-block; box-sizing: border-box;">Przejdź do logowania</a>
+        </div>
+    </div>
+
+    <script>
+        // Pamiętaj o podmianie adresu API, jeśli używasz innego w projekcie
+        const API = "https://kdpwingmanv2backend-production.up.railway.app";
+        
+        // Wyciągamy token (tajny kod) z linku URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            document.getElementById('reset-form-container').innerHTML = 
+                "<p style='color: var(--danger); font-weight: bold;'>Błąd: Brakujący lub nieprawidłowy link.</p>";
+        }
+
+        async function saveNewPassword() {
+            const pass1 = document.getElementById('new-pass').value;
+            const pass2 = document.getElementById('new-pass-confirm').value;
+            const msgEl = document.getElementById('msg');
+
+            if (!pass1 || !pass2) {
+                msgEl.innerText = "Uzupełnij oba pola!";
+                msgEl.style.color = "var(--danger)";
+                return;
+            }
+
+            if (pass1 !== pass2) {
+                msgEl.innerText = "Hasła nie są identyczne!";
+                msgEl.style.color = "var(--danger)";
+                return;
+            }
+
+            msgEl.innerText = "Zapisywanie...";
+            msgEl.style.color = "var(--text-muted)";
+
+            try {
+                const res = await fetch(`${API}/api/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token, newPassword: pass1 })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById('reset-form-container').classList.add('hidden');
+                    document.getElementById('success-container').classList.remove('hidden');
+                } else {
+                    msgEl.innerText = data.error || "Wystąpił błąd.";
+                    msgEl.style.color = "var(--danger)";
+                }
+            } catch (e) {
+                msgEl.innerText = "Błąd połączenia z serwerem.";
+                msgEl.style.color = "var(--danger)";
+            }
+        }
+    </script>
+</body>
+</html>
