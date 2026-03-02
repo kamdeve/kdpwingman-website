@@ -679,14 +679,30 @@
                 return;
             }
             
-            msgEl.innerText = "Przetwarzanie...";
+            msgEl.innerText = "Wysyłanie...";
             msgEl.style.color = "white";
             
-            // Tutaj w następnym kroku podepniemy wysyłkę do backendu
-            setTimeout(() => {
-                msgEl.innerText = "Wygląd działa! Zaraz podłączymy wysyłkę maili.";
-                msgEl.style.color = "var(--success)";
-            }, 1000);
+            try {
+                // Zapytanie do naszego nowego endpointu w index.js
+                const res = await fetch(`${API}/api/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    msgEl.innerText = "✅ Link wysłany! Sprawdź swoją skrzynkę (oraz folder SPAM).";
+                    msgEl.style.color = "var(--success)";
+                } else {
+                    msgEl.innerText = data.error || "Wystąpił błąd.";
+                    msgEl.style.color = "var(--danger)";
+                }
+            } catch (err) {
+                msgEl.innerText = "Błąd połączenia z serwerem.";
+                msgEl.style.color = "var(--danger)";
+            }
         }
         
         // Obsługa wylogowania
