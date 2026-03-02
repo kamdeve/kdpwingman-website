@@ -160,7 +160,10 @@
             <div id="login-form-content">
                 <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
                 <input type="email" id="email" placeholder="E-mail">
-                <input type="password" id="pass" placeholder="Hasło">
+                <div style="position: relative; margin-bottom: 15px;">
+    <input type="password" id="pass" placeholder="Hasło" style="margin-bottom: 0; padding-right: 40px;">
+    <i class="fas fa-eye" id="toggle-pass" onclick="toggleVisibility('pass', 'toggle-pass')" style="position: absolute; right: 15px; top: 16px; color: var(--text-muted); cursor: pointer;"></i>
+</div>
                 
                 <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
                 
@@ -820,5 +823,23 @@
 
         checkUrlForActions();
     </script>
+
+    <script>
+    function toggleVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+            icon.style.color = "white"; // Podświetla ikonkę po kliknięciu
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+            icon.style.color = "var(--text-muted)";
+        }
+    }
+</script>
 </body>
 </html>
