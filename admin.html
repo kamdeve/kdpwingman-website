@@ -50,12 +50,14 @@
     </p>
 
     <input type="text" id="helium-login" placeholder="Login (e-mail) do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-    
-    <input type="text" id="helium-password" placeholder="Hasło do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-    
-    <button onclick="sendHeliumCredentials()" id="send-cred-btn" class="btn btn-blue" style="width: 100%; padding: 12px; background: #a0134a; font-weight: bold; font-size: 1rem;">
-        Wyślij loginy do grupy z tego miesiąca
-    </button>
+<input type="text" id="helium-password" placeholder="Hasło do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+
+<input type="text" id="email-login" placeholder="E-mail do logowania (np. Gmail)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+<input type="text" id="email-password" placeholder="Hasło do e-maila" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+
+<button onclick="sendHeliumCredentials()" id="send-cred-btn" class="btn btn-blue" style="width: 100%; padding: 12px; background: #a0134a; font-weight: bold; font-size: 1rem;">
+    Wyślij loginy do grupy z tego miesiąca
+</button>
     <p id="send-cred-msg" style="margin-top: 15px; font-size: 0.9rem; text-align: center; font-weight: bold;"></p>
 </div>
 
@@ -351,12 +353,14 @@
 async function sendHeliumCredentials() {
     const login = document.getElementById('helium-login').value;
     const pass = document.getElementById('helium-password').value;
+    const mailLogin = document.getElementById('email-login').value; // Nowe
+    const mailPass = document.getElementById('email-password').value;
     const msgEl = document.getElementById('send-cred-msg');
     const btn = document.getElementById('send-cred-btn');
 
-    if (!login || !pass) {
-        msgEl.innerText = "Uzupełnij login i hasło!";
-        msgEl.style.color = "#dc3545"; // Czerwony
+    if (!login || !pass || !mailLogin || !mailPass) {
+        msgEl.innerText = "Uzupełnij wszystkie dane logowania!";
+        msgEl.style.color = "#dc3545";
         return;
     }
 
@@ -379,6 +383,8 @@ async function sendHeliumCredentials() {
             body: JSON.stringify({ 
                 heliumLogin: login, 
                 heliumPassword: pass,
+                emailLogin: mailLogin,   // Nowe
+                emailPassword: mailPass, // Nowe
                 secret: KEY, // <- System użyje hasła, którym już się zalogowałeś!
                 emails: CURRENT_EMAILS // <- Przesyłamy gotową listę maili z tabeli
             })
