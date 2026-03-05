@@ -161,7 +161,10 @@
                 document.getElementById('rate').innerText = CURRENT_RATE + " PLN";
                 document.getElementById('pool').innerText = (USER_COUNT * 40).toFixed(2) + " zł";
                 
-                CURRENT_EMAILS = data.participants ? data.participants.map(p => p.email) : [];
+                const current = data.participants ? data.participants.map(p => p.email) : [];
+const past = data.pastParticipants ? data.pastParticipants.map(p => p.email) : [];
+// Łączymy obie listy w jedną
+CURRENT_EMAILS = [...new Set([...current, ...past])];
                 
                 renderTables(data);
                 updatePreview();
