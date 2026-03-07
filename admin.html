@@ -161,10 +161,22 @@
                 document.getElementById('rate').innerText = CURRENT_RATE + " PLN";
                 document.getElementById('pool').innerText = (USER_COUNT * 40).toFixed(2) + " zł";
                 
-                const current = data.participants ? data.participants.map(p => p.email) : [];
-const past = data.pastParticipants ? data.pastParticipants.map(p => p.email) : [];
-// Łączymy obie listy w jedną
+                const now = new Date();
+const currentMonthStr = now.toISOString().slice(0, 7); 
+
+// 2. Pobieramy e-maile tylko z obecnego miesiąca (nawet jeśli są już w archiwum)
+const current = data.participants 
+    ? data.participants.filter(p => p.month_target === currentMonthStr).map(p => p.email) 
+    : [];
+
+const past = data.pastParticipants 
+    ? data.pastParticipants.filter(p => p.month_target === currentMonthStr).map(p => p.email) 
+    : [];
+
+// 3. Łączymy listy (usuwając ewentualne duplikaty)
 CURRENT_EMAILS = [...new Set([...current, ...past])];
+
+console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`);
                 
                 renderTables(data);
                 updatePreview();
