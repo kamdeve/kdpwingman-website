@@ -61,6 +61,18 @@
     <p id="send-cred-msg" style="margin-top: 15px; font-size: 0.9rem; text-align: center; font-weight: bold;"></p>
 </div>
 
+<div class="card" style="margin-top: 20px; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3b82f6;">
+    <h3 style="margin-top: 0; color: #1e40af;">📢 Przypomnienie o nowej składce</h3>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">
+        Kliknij, aby system wysłał automatyczne przypomnienie do <strong>wszystkich zarejestrowanych użytkowników</strong> o zbliżającym się terminie wpłat na kolejny miesiąc.
+    </p>
+    
+    <button onclick="sendGlobalReminder()" id="reminder-btn" class="btn" style="width: 100%; padding: 12px; background: #3b82f6; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">
+        Wyślij systemowe przypomnienie (E-mail)
+    </button>
+    <p id="reminder-msg" style="margin-top: 10px; font-size: 0.85rem; text-align: center; font-weight: bold;"></p>
+</div>
+
 
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm">
                 <h4 style="margin-top: 20px; font-weight: bold; color: #475569;">📜 Archiwum Rozliczeń:</h4>
@@ -418,6 +430,32 @@ async function sendHeliumCredentials() {
     } catch (e) {
         msgEl.innerText = "Błąd połączenia z serwerem.";
         msgEl.style.color = "#dc3545";
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function sendGlobalReminder() {
+    const msgEl = document.getElementById('reminder-msg');
+    const btn = document.getElementById('reminder-btn');
+
+    if (!confirm("Czy na pewno wysłać przypomnienie do WSZYSTKICH zarejestrowanych użytkowników?")) return;
+
+    btn.disabled = true;
+    msgEl.innerText = "Trwa wysyłka przypomnień...";
+    msgEl.style.color = "#64748b";
+
+    try {
+        const res = await fetch(`${API}/api/admin/send-reminder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret: KEY })
+        });
+        const data = await res.json();
+        msgEl.innerText = res.ok ? "✅ " + data.message : "Błąd: " + data.error;
+        msgEl.style.color = res.ok ? "green" : "red";
+    } catch (e) {
+        msgEl.innerText = "Błąd połączenia.";
     } finally {
         btn.disabled = false;
     }
