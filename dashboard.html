@@ -229,6 +229,31 @@
                 </div>
             </div>
 
+<div class="card" style="margin-top: 25px; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155;">
+    <h3 style="margin-top: 0; color: #f8fafc; display: flex; align-items: center; gap: 10px;">
+        📜 Szczegółowa Historia Portfela
+    </h3>
+    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">
+        Tu sprawdzisz każdą wpłatę, depozyt oraz zwrot nadpłaty po rozliczeniu grupy.
+    </p>
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #cbd5e1;">
+            <thead>
+                <tr style="border-bottom: 2px solid #334155; text-align: left; color: #94a3b8;">
+                    <th style="padding: 12px 10px;">Data</th>
+                    <th style="padding: 12px 10px;">Kwota</th>
+                    <th style="padding: 12px 10px;">Szczegóły transakcji</th>
+                    <th style="padding: 12px 10px;">Stan portfela</th>
+                </tr>
+            </thead>
+            <tbody id="wallet-history-body">
+                <tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;">Ładowanie Twojej historii...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
             <div>
                 <div class="card">
                     <h3><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
@@ -812,6 +837,65 @@
                  window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
+
+        async function loadDetailedWalletHistory() {
+    const historyBody = document.getElementById('wallet-history-body');
+    
+    // Pobieramy e-mail zalogowanego użytkownika (masz go już w zmiennej na stronie)
+    const userEmail = localStorage.getItem('userEmail'); 
+
+    try {
+        const res = await fetch(`${API}/api/user/wallet-history`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error || !data.transactions || data.transactions.length === 0) {
+            historyBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Brak zarejestrowanych transakcji w historii.</td></tr>`;
+            return;
+        }
+
+        historyBody.innerHTML = ''; // Czyścimy komunikat ładowania
+
+        data.transactions.forEach(t => {
+            const date = new Date(t.created_at).toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            // Stylizacja kolorów dla kwot
+            const isPositive = parseFloat(t.amount) > 0;
+            const amountColor = isPositive ? '#10b981' : '#f43f5e';
+            const amountSign = isPositive ? '+' : '';
+
+            const row = document.createElement('tr');
+            row.style.borderBottom = "1px solid #334155";
+            row.innerHTML = `
+                <td style="padding: 15px 10px; color: #94a3b8;">${date}</td>
+                <td style="padding: 15px 10px; font-weight: bold; color: ${amountColor};">
+                    ${amountSign}${parseFloat(t.amount).toFixed(2)} zł
+                </td>
+                <td style="padding: 15px 10px;">
+                    <div style="font-weight: bold; color: #f1f5f9;">${t.transaction_type}</div>
+                    <div style="font-size: 0.75rem; color: #64748b;">${t.description}</div>
+                </td>
+                <td style="padding: 15px 10px; font-weight: bold; color: #cbd5e1;">
+                    ${parseFloat(t.balance_after).toFixed(2)} zł
+                </td>
+            `;
+            historyBody.appendChild(row);
+        });
+
+    } catch (e) {
+        console.error("Błąd ładowania historii portfela:", e);
+        historyBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #f43f5e;">Błąd połączenia z serwerem.</td></tr>`;
+    }
+}
+
+// Wywołaj funkcję przy starcie strony (obok innych funkcji ładujących)
+document.addEventListener('DOMContentLoaded', () => {
+    loadDetailedWalletHistory();
+});
 
         function closeModalCleanUrl() {
             const modal = document.getElementById('success-modal');
