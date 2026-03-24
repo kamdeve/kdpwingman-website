@@ -147,6 +147,13 @@
         }
         .login-box { width: 100%; max-width: 400px; text-align: center; }
 
+        /* Poprawka czytelności historii portfela */
+#wallet-history-body td {
+    padding: 18px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtelna linia podziału */
+}
+
     </style>
 </head>
 <body>
@@ -161,9 +168,9 @@
                 <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
                 <input type="email" id="email" placeholder="E-mail">
                 <div style="position: relative; margin-bottom: 15px;">
-    <input type="password" id="pass" placeholder="Hasło" style="margin-bottom: 0; padding-right: 40px;">
-    <i class="fas fa-eye" id="toggle-pass" onclick="toggleVisibility('pass', 'toggle-pass')" style="position: absolute; right: 15px; top: 16px; color: var(--text-muted); cursor: pointer;"></i>
-</div>
+                    <input type="password" id="pass" placeholder="Hasło" style="margin-bottom: 0; padding-right: 40px;">
+                    <i class="fas fa-eye" id="toggle-pass" onclick="toggleVisibility('pass', 'toggle-pass')" style="position: absolute; right: 15px; top: 16px; color: var(--text-muted); cursor: pointer;"></i>
+                </div>
                 
                 <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
                 
@@ -182,7 +189,6 @@
                 
                 <p id="reset-msg" style="margin-top:15px; font-size:0.9rem;"></p>
             </div>
-
         </div>
     </div>
 
@@ -212,11 +218,8 @@
                         <div id="status-badge" class="status-badge status-wait">OCZEKIWANIE</div>
                     </div>
 
-                    <div id="access-info" class="hidden" style="margin-top: 20px;">
-                        </div>
-
-                    <div id="join-btn-container" style="margin-top: 25px;">
-                        </div>
+                    <div id="access-info" class="hidden" style="margin-top: 20px;"></div>
+                    <div id="join-btn-container" style="margin-top: 25px;"></div>
                 </div>
 
                 <div class="card">
@@ -227,34 +230,32 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-<div class="card" style="margin-top: 25px; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155;">
-    <h3 style="margin-top: 0; color: #f8fafc; display: flex; align-items: center; gap: 10px;">
-        📜 Szczegółowa Historia Portfela
-    </h3>
-    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">
-        Tu sprawdzisz każdą wpłatę, depozyt oraz zwrot nadpłaty po rozliczeniu grupy.
-    </p>
-    
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #cbd5e1;">
-            <thead>
-                <tr style="border-bottom: 2px solid #334155; text-align: left; color: #94a3b8;">
-                    <th style="padding: 12px 10px;">Data</th>
-                    <th style="padding: 12px 10px;">Kwota</th>
-                    <th style="padding: 12px 10px;">Szczegóły transakcji</th>
-                    <th style="padding: 12px 10px;">Stan portfela</th>
-                </tr>
-            </thead>
-            <tbody id="wallet-history-body">
-                <tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;">Ładowanie Twojej historii...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-            <div>
+                <div class="card" style="margin-top: 25px; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155;">
+                    <h3 style="margin-top: 0; color: #f8fafc; display: flex; align-items: center; gap: 10px;">
+                        📜 Szczegółowa Historia Portfela
+                    </h3>
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">
+                        Tu sprawdzisz każdą wpłatę, depozyt oraz zwrot nadpłaty po rozliczeniu grupy.
+                    </p>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #cbd5e1;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #334155; text-align: left; color: #94a3b8;">
+                                    <th style="padding: 12px 10px;">Data</th>
+                                    <th style="padding: 12px 10px;">Kwota</th>
+                                    <th style="padding: 12px 10px;">Szczegóły transakcji</th>
+                                    <th style="padding: 12px 10px;">Stan portfela</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wallet-history-body">
+                                <tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;">Ładowanie Twojej historii...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <div>
                 <div class="card">
                     <h3><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
                     <div class="balance" id="balance">0.00 zł</div>
@@ -301,12 +302,7 @@
                         <i class="fas fa-paper-plane"></i> Zleć wypłatę
                     </button>
                 </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+            </div> </div> </div> <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
         <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4); background: #0f172a;">
             <div style="font-size: 4rem; margin-bottom: 10px;">🎉</div>
             <h2 style="color: white; font-size: 2rem; margin: 0;">GRATULACJE!</h2>
