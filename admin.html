@@ -72,6 +72,9 @@
     </button>
     <p id="reminder-msg" style="margin-top: 10px; font-size: 0.85rem; text-align: center; font-weight: bold;"></p>
 </div>
+<button onclick="sendTestPln()" class="btn" style="margin-top: 10px; background: #10b981; color: white;">
+    🛠️ Wyślij testowe 1.00 zł (Weryfikacja Historii)
+</button>
 
 
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm">
@@ -459,6 +462,25 @@ async function sendGlobalReminder() {
     } finally {
         btn.disabled = false;
     }
+}
+
+async function sendTestPln() {
+    const email = prompt("Podaj e-mail do testowego doładowania (+1 zł):", "kamil.sznicer@o2.pl");
+    if(!email) return;
+
+    try {
+        const res = await fetch(`${API}/api/admin/test-topup`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ secret: KEY, email: email })
+        });
+        const data = await res.json();
+        if(data.success) {
+            alert(`✅ Sukces! Portfel zasilony. Nowy stan: ${data.newBalance} zł.\n\nSprawdź teraz Dashboard!`);
+        } else {
+            alert("❌ Błąd: " + data.error);
+        }
+    } catch(e) { alert("Błąd połączenia."); }
 }
 
     </script>
