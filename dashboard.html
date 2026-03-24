@@ -842,7 +842,7 @@
     const historyBody = document.getElementById('wallet-history-body');
     
     // Pobieramy e-mail zalogowanego użytkownika (masz go już w zmiennej na stronie)
-    const userEmail = localStorage.getItem('userEmail'); 
+    const userEmail = localStorage.getItem('wingman_user'); 
 
     try {
         const res = await fetch(`${API}/api/user/wallet-history`, {
