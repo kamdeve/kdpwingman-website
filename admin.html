@@ -174,7 +174,7 @@
                 CURRENT_RATE = data.currentRate || 3.95;
                 document.getElementById('count').innerText = USER_COUNT;
                 document.getElementById('rate').innerText = CURRENT_RATE + " PLN";
-                document.getElementById('pool').innerText = (USER_COUNT * 40).toFixed(2) + " zł";
+                document.getElementById('pool').innerText = (USER_COUNT * 75).toFixed(2) + " zł";
                 
                 const now = new Date();
 const currentMonthStr = now.toISOString().slice(0, 7); 
@@ -227,10 +227,10 @@ console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`
 
         function updatePreview() {
             if(USER_COUNT === 0) return document.getElementById('preview').innerHTML = "Brak uczestników.";
-            const costPLN = 80 * CURRENT_RATE;
+            const costPLN = 287.20 * CURRENT_RATE;
             const perPerson = costPLN / USER_COUNT;
-            const refund = 40 - (perPerson + 10);
-            let html = `Faktura: $80 * ${CURRENT_RATE} = <strong>${costPLN.toFixed(2)} PLN</strong><br>Zwrot: <strong style="color:${refund<0?'red':'green'}">${refund.toFixed(2)} zł</strong>`;
+            const refund = 75 - (perPerson + 0);
+            let html = `Faktura: $287.20 * ${CURRENT_RATE} = <strong>${costPLN.toFixed(2)} PLN</strong><br>Zwrot: <strong style="color:${refund<0?'red':'green'}">${refund.toFixed(2)} zł</strong>`;
             document.getElementById('preview').innerHTML = html;
         }
 

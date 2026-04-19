@@ -247,8 +247,8 @@
             
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Wspólny Dostęp <span style="color: #a0134a;">Premium</span></h1>
             <p class="text-gray-300 mb-8 text-lg max-w-2xl mx-auto">
-                Dołącz do grupy i korzystaj z Helium 10 Platinum za ułamek ceny. 
-                Koszt całkowity ($91) jest dzielony na wszystkich.
+                Dołącz do grupy i korzystaj z Helium 10 Diamond za ułamek ceny. 
+                Koszt całkowity ($287.20) jest dzielony na wszystkich.
             </p>
 
             <div class="mb-12 inline-block bg-gray-800 px-8 py-4 rounded-full border border-gray-700 shadow-xl">
@@ -267,7 +267,7 @@
                     </div>
                     
                     <p class="text-xs text-gray-400">
-                        <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>10 osób</strong><br>
+                        <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>15 osób</strong><br>
                         <span class="text-gray-500">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
                     </p>
                 </div>
@@ -275,13 +275,13 @@
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
                     <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">TERAZ</div>
                     <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
-                    <div id="current-price-usd" class="text-5xl font-bold text-white mb-1">$80.00</div>
-                    <div id="current-price-pln" class="text-xl font-medium" style="color: #4ade80;">ok. 320 PLN</div>
+                    <div id="current-price-usd" class="text-5xl font-bold text-white mb-1">$287.20</div>
+                    <div id="current-price-pln" class="text-xl font-medium" style="color: #4ade80;">ok. 1065 PLN</div>
                     
                     <div class="mt-4 p-2 bg-gray-900/50 rounded border border-gray-600 text-left">
                         <p class="text-xs text-gray-300">
                             <i class="fas fa-history text-yellow-400"></i> <strong>Historycznie:</strong><br>
-                            Cena końcowa zazwyczaj spada poniżej <strong>20 PLN</strong>.
+                            Cena końcowa zazwyczaj spada poniżej <strong>75 PLN</strong>.
                         </p>
                     </div>
                 </div>
@@ -310,7 +310,7 @@
                             <i class="fas fa-lock"></i> </div>
                         <h3 class="text-xl font-bold text-white mb-2 relative z-10">Wpłacasz Depozyt</h3>
                         <p class="text-gray-400 text-sm relative z-10">
-                            Wpłacasz bezpieczny depozyt 40 zł. To Twoja rezerwacja miejsca w grupie.
+                            Wpłacasz bezpieczny depozyt 75 zł. To Twoja rezerwacja miejsca w grupie.
                         </p>
                     </div>
 
@@ -602,8 +602,8 @@
             }
 
             // 3. MA KONTO, ALE NIE ZAPŁACIŁ -> Płatność / Dopłata
-            if (statusData.wallet_balance < 40) {
-                const missingAmount = (40 - statusData.wallet_balance).toFixed(2);
+            if (statusData.wallet_balance < 75) {
+                const missingAmount = (75 - statusData.wallet_balance).toFixed(2);
                 let payAmount = parseFloat(missingAmount);
                 if(payAmount < 5) payAmount = 5.00; // Minimum Stripe
 
