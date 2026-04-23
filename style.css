@@ -660,3 +660,67 @@ footer {
     .youtube-icon::after { display: none; }
     .youtube-icon { margin-top: 10px; margin-bottom: 10px; } /* Odstępy w menu mobilnym */
 }
+
+/* --- SYSTEM ODZNAK I REPUTACJI (style.css) --- */
+.status-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.tier-card-new {
+    background: linear-gradient(135deg, rgba(160, 19, 74, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid #a0134a;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 8px 32px rgba(160, 19, 74, 0.15);
+}
+
+.reputation-card {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.badge-icon {
+    font-size: 2.2rem;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.tier-label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.tier-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: white;
+}
+
+.help-pill {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    padding: 2px 10px;
+    border-radius: 50px;
+    font-weight: 700;
+}
+
+/* Responsywność dla urządzeń mobilnych */
+@media (max-width: 600px) {
+    .status-container { grid-template-columns: 1fr; }
+}
