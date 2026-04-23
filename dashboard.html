@@ -380,52 +380,86 @@
         }
 
         async function loadDashboardData() {
-            // 1. Pobieranie danych z backendu
-            const res = await fetch(`${API}/api/user/status`, {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ email: userEmail })
-            });
-            const data = await res.json();
-            
-            // 2. Aktualizacja podstawowych informacji
-            document.getElementById('balance').innerText = data.wallet_balance.toFixed(2) + " zł";
-            document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
+    // 1. Pobieranie danych z backendu
+    const res = await fetch(`${API}/api/user/status`, {
+        method: 'POST', 
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email: userEmail })
+    });
+    
+    // BEZPIECZNIK: Jeśli serwer zwróci błąd, przerywamy funkcję, by nie wywalić strony
+    if (!res.ok) {
+        console.error("Błąd pobierania statusu");
+        return; 
+    }
 
-            const container = document.getElementById('join-btn-container');
-            const accessInfo = document.getElementById('access-info');
+    const data = await res.json();
+    
+    // 2. Aktualizacja podstawowych informacji (Saldo i Edycja)
+    const balanceEl = document.getElementById('balance');
+    if (balanceEl && data.wallet_balance !== undefined) {
+        balanceEl.innerText = data.wallet_balance.toFixed(2) + " zł";
+    }
+    document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
-            // --- PRZYGOTOWANIE SEKCJI AUTOPILOTA ---
-            // Używam stylów inline, aby pasowały do nowego motywu bez zmieniania logiki JS
-            let subHtml = "";
-            if (data.is_subscriber) {
-                // JEŚLI JEST SUBSKRYBENTEM
-                subHtml = `
-                    <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
-                        <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px solid #059669;">
-                            <h4 style="margin: 0; color: #10b981;">✈️ Autopilot Aktywny</h4>
-                            <p style="font-size: 0.8rem; color: #94a3b8; margin: 10px 0;">
-                                Co miesiąc pobieramy <strong>75 zł</strong> z Twojej karty.<br>
-                                Ewentualne nadpłaty wracają na Twój portfel i możesz je wypłacić.
-                            </p>
-                            <button id="cancel-sub-btn" class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; width: auto; font-size: 0.85rem; padding: 8px 20px; margin-top:5px;">
-                                Anuluj Subskrypcję
-                            </button>
-                        </div>
+    // --- NOWOŚĆ: WSTRZYKIWANIE ODZNAK LOJALNOŚCIOWYCH ---
+    const loyaltyRow = document.getElementById('loyalty-status-row');
+    if (loyaltyRow && data.buyerTier) {
+        loyaltyRow.innerHTML = `
+            <div class="tier-card-new">
+                <div class="badge-icon">${data.buyerTier.icon}</div>
+                <div>
+                    <div class="tier-label">Ranga Wydawcy</div>
+                    <div class="tier-name">${data.buyerTier.name}</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;">
+                        Udział w ${data.buyCount} edycjach
                     </div>
-                `;
-            } else {
-                // JEŚLI NIE JEST
-                subHtml = `
-                    <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
-                        <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">
-                            Nie chcesz klikać co miesiąc?
-                        </p>
-                        <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
-                            ✈️ Włącz Autopilota (75 zł / mc)
-                        </button>
+                </div>
+            </div>
+
+            <div class="reputation-card">
+                <div class="badge-icon">🤝</div>
+                <div>
+                    <div class="tier-label">Reputacja Forum</div>
+                    <div class="tier-name">${data.forumRank}</div>
+                    <div class="help-pill">
+                        <i class="fas fa-thumbs-up"></i> ${data.reputationPoints} pkt
                     </div>
-                `;
-            }
+                </div>
+            </div>
+        `;
+    }
+
+    const container = document.getElementById('join-btn-container');
+    const accessInfo = document.getElementById('access-info');
+
+    // --- SEKCJA AUTOPILOTA (Plan Diamond: 75 zł) ---
+    let subHtml = "";
+    if (data.is_subscriber) {
+        subHtml = `
+            <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+                <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px solid #059669;">
+                    <h4 style="margin: 0; color: #10b981;">✈️ Autopilot Aktywny</h4>
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin: 10px 0;">
+                        Co miesiąc pobieramy <strong>75 zł</strong> z Twojej karty.<br>
+                        Ewentualne nadpłaty wracają na Twój portfel i możesz je wypłacić.
+                    </p>
+                    <button id="cancel-sub-btn" class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; width: auto; font-size: 0.85rem; padding: 8px 20px; margin-top:5px;">
+                        Anuluj Subskrypcję
+                    </button>
+                </div>
+            </div>
+        `;
+    } else {
+        subHtml = `
+            <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">Nie chcesz klikać co miesiąc?</p>
+                <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
+                    ✈️ Włącz Autopilota (75 zł / mc)
+                </button>
+            </div>
+        `;
+    }
 
             // --- SCENARIUSZ 1: UCZESTNICZYSZ ---
             if (data.has_joined) {
