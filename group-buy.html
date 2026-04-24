@@ -223,6 +223,23 @@
 .nav-link:hover {
     color: var(--cherry);
 }
+
+.btn-forum {
+    border: 1px solid var(--cherry);
+    padding: 8px 18px;
+    border-radius: 50px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.3s;
+    background: rgba(160, 19, 74, 0.1);
+    margin-right: 15px;
+}
+.btn-forum:hover {
+    background: var(--cherry);
+    box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
+}
    </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -247,7 +264,9 @@
                 <a href="index.html#features" class="nav-item">Funkcje</a>
                 <a href="https://chrome.google.com/webstore/detail/kdp-wingman" target="_blank" class="nav-item">Rozszerzenie</a>
                 <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item" style="color:white;"><i class="fab fa-youtube text-xl hover:text-pink-600 transition"></i></a>
-                <a href="forum.html" class="nav-item">Forum</a>
+                <a href="forum.html" class="btn-forum">
+    <i class="fas fa-comments"></i> Forum
+</a>
                 <a href="dashboard.html" class="btn-login">🔒 Zaloguj</a>
             </div>
         </nav>
