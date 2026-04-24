@@ -242,6 +242,23 @@
             if (res.ok) loadForum();
         }
 
+        async function showProfile(authorEmail) {
+    const res = await fetch(`${API}/api/user/public-profile`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email: authorEmail })
+    });
+    const data = await res.json();
+    
+    // Prosty alert na początek, później zrobimy z tego ładny modal
+    alert(`
+        Profil: ${authorEmail.split('@')[0]}
+        Ranga: ${data.tier}
+        Reputacja: ${data.rep} pkt
+        W edycjach od: ${new Date(data.joined).toLocaleDateString()}
+    `);
+}
+
         // Start
         loadForum();
     </script>
