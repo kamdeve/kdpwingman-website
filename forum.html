@@ -1,0 +1,16 @@
+<div class="container" style="grid-template-columns: 1fr;"> <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2 style="margin:0;">👥 Centrum Społeczności Wingman</h2>
+            <button class="btn btn-primary" style="width: auto;" onclick="openPostModal()">+ Zadaj Pytanie</button>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="help-pill" onclick="filterForum('all')">Wszystkie</button>
+            <button class="help-pill" onclick="filterForum('Research')">🔍 Research</button>
+            <button class="help-pill" onclick="filterForum('Design')">🎨 Design</button>
+        </div>
+
+        <div id="forum-feed">
+            </div>
+    </div>
+</div>

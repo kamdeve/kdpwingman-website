@@ -213,6 +213,17 @@
             .step-row, .step-row.reverse { flex-direction: column; gap: 30px; margin-bottom: 80px; }
             .step-content { text-align: center; }
         }
+        .nav-link {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s;
+    font-family: 'Inter', sans-serif; /* Wymuszenie poprawnej czcionki */
+}
+.nav-link:hover {
+    color: var(--cherry);
+}
     </style>
 </head>
 <body>
@@ -240,7 +251,7 @@
                 <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item youtube-icon" data-tooltip="Jak korzystać z wtyczki?">
                     <i class="fab fa-youtube"></i>
                 </a>
-                <a href="/dashboard.html#forum-section" class="nav-link">Forum</a>
+                <a href="forum.html" class="nav-item">Forum</a>
                 <a href="dashboard.html" class="btn-login">🔒 Zaloguj</a>
             </div>
         </nav>
