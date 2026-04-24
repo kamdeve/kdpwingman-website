@@ -1,16 +1,249 @@
-<div class="container" style="grid-template-columns: 1fr;"> <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h2 style="margin:0;">👥 Centrum Społeczności Wingman</h2>
-            <button class="btn btn-primary" style="width: auto;" onclick="openPostModal()">+ Zadaj Pytanie</button>
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="help-pill" onclick="filterForum('all')">Wszystkie</button>
-            <button class="help-pill" onclick="filterForum('Research')">🔍 Research</button>
-            <button class="help-pill" onclick="filterForum('Design')">🎨 Design</button>
-        </div>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Centrum Społeczności - KDP Wingman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- STYLE WSPÓLNE (Premium Glass) --- */
+        :root {
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --cherry: #a0134a;
+            --cherry-gradient: linear-gradient(135deg, #a0134a 0%, #db2777 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+        }
 
-        <div id="forum-feed">
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .background-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(160, 19, 74, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .logo span { color: #db2777; }
+        
+        .nav-links { display: flex; gap: 25px; align-items: center; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: white; }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- FILTRY I PRZYCISKI --- */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .filter-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: var(--text-muted); padding: 8px 16px; border-radius: 50px;
+            cursor: pointer; transition: 0.3s; font-size: 0.85rem;
+        }
+        .filter-btn.active { background: var(--cherry); color: white; border-color: var(--cherry); }
+
+        .btn-primary {
+            background: var(--cherry-gradient); color: white; border: none;
+            padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;
+            transition: 0.3s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(160, 19, 74, 0.4); }
+
+        /* --- POSTY --- */
+        .post-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: 0.3s;
+        }
+        .post-card:hover { border-color: rgba(255,255,255,0.2); }
+
+        .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .tag { font-size: 0.65rem; background: var(--cherry); padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .author { font-size: 0.85rem; color: var(--text-muted); }
+        .content { color: #cbd5e1; line-height: 1.6; white-space: pre-wrap; }
+
+        .like-btn {
+            background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #38bdf8; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-weight: bold;
+        }
+
+        /* --- MODAL --- */
+        .modal {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(8px);
+        }
+
+        textarea, select {
+            width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border);
+            border-radius:8px; color:white; padding:12px; margin-bottom:15px; font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-chart-line" style="color: var(--cherry);"></i> KDP <span>Wingman</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Główna</a>
+            <a href="group-buy.html" class="nav-link">Zrzutka</a>
+            <a href="forum.html" class="nav-link active">Forum</a>
+            <a href="dashboard.html" class="nav-link">Mój Panel</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="margin:0;">👥 Społeczność Wingman</h2>
+                <button class="btn-primary" onclick="document.getElementById('post-modal').style.display='flex'">
+                    <i class="fas fa-plus"></i> Zadaj Pytanie
+                </button>
             </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterPosts('all', this)">Wszystkie</button>
+                <button class="filter-btn" onclick="filterPosts('Research', this)">🔍 Research</button>
+                <button class="filter-btn" onclick="filterPosts('Design', this)">🎨 Design</button>
+                <button class="filter-btn" onclick="filterPosts('Reklamy', this)">📈 Reklamy</button>
+                <button class="filter-btn" onclick="filterPosts('Techniczne', this)">⚙️ Techniczne</button>
+            </div>
+
+            <div id="forum-feed">
+                <p style="text-align: center; color: var(--text-muted); padding: 40px;">Ładowanie dyskusji...</p>
+            </div>
+        </div>
     </div>
-</div>
+
+    <div id="post-modal" class="modal">
+        <div class="card" style="width: 90%; max-width: 500px; border: 1px solid var(--cherry);">
+            <h3 style="color:white; margin-bottom: 20px;">Nowy temat na forum</h3>
+            
+            <select id="forum-topic">
+                <option value="Research">🔍 Research & Nisze</option>
+                <option value="Design">🎨 Design & Ilustracje</option>
+                <option value="Reklamy">📈 Reklamy KDP</option>
+                <option value="Techniczne">⚙️ Sprawy techniczne</option>
+            </select>
+
+            <textarea id="forum-content" placeholder="Opisz swój problem lub podziel się wiedzą..." style="height: 150px; resize: none;"></textarea>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn-primary" onclick="submitPost()">Opublikuj 🚀</button>
+                <button class="filter-btn" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "https://kdpwingmanv2backend-production.up.railway.app";
+        const userEmail = localStorage.getItem('wingman_user');
+        let allPosts = [];
+
+        async function loadForum() {
+            try {
+                const res = await fetch(`${API}/api/forum/posts`);
+                allPosts = await res.json();
+                renderPosts(allPosts);
+            } catch (e) {
+                console.error("Błąd ładowania:", e);
+                document.getElementById('forum-feed').innerHTML = "Błąd połączenia z bazą.";
+            }
+        }
+
+        function renderPosts(posts) {
+            const feed = document.getElementById('forum-feed');
+            if (posts.length === 0) {
+                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">Brak tematów w tej kategorii. Bądź pierwszy!</p>`;
+                return;
+            }
+
+            feed.innerHTML = posts.map(p => `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="tag">${p.topic}</span>
+                            <span class="author">${p.email.split('@')[0]}</span>
+                        </div>
+                        <button onclick="likePost(${p.id})" class="like-btn">👍 ${p.likes}</button>
+                    </div>
+                    <div class="content">${p.content}</div>
+                </div>
+            `).join('');
+        }
+
+        function filterPosts(category, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (category === 'all') renderPosts(allPosts);
+            else renderPosts(allPosts.filter(p => p.topic === category));
+        }
+
+        async function submitPost() {
+            if (!userEmail) return alert("Zaloguj się, aby pisać!");
+            const topic = document.getElementById('forum-topic').value;
+            const content = document.getElementById('forum-content').value;
+            
+            if (content.length < 5) return alert("Wpisz treść!");
+
+            const res = await fetch(`${API}/api/forum/post`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, topic, content })
+            });
+
+            if (res.ok) {
+                document.getElementById('post-modal').style.display = 'none';
+                document.getElementById('forum-content').value = '';
+                loadForum();
+            }
+        }
+
+        async function likePost(id) {
+            if (!userEmail) return alert("Zaloguj się, aby lajkować!");
+            const res = await fetch(`${API}/api/forum/like`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, postId: id })
+            });
+            if (res.ok) loadForum();
+        }
+
+        // Start
+        loadForum();
+    </script>
+</body>
+</html>
