@@ -262,6 +262,10 @@
             <a href="index.html" class="logo">
                 <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
             </a>
+<a href="#forum-section" class="logout-btn" style="text-decoration:none; margin-right: 25px;">
+    <i class="fas fa-comments"></i> Forum
+</a>
+
             <div class="logout-btn" id="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> Wyloguj
             </div>
@@ -321,8 +325,21 @@
                         </table>
                     </div>
                 </div>
-            </div> <div>
-                <div class="card">
+
+                <div id="forum-section" class="card" style="margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin:0;"><i class="fas fa-comments"></i> Centrum Społeczności Wingman</h3>
+                        <button class="btn btn-primary" style="width: auto; padding: 10px 20px;" onclick="document.getElementById('post-modal').style.display='flex'">
+                            + Zadaj Pytanie
+                        </button>
+                    </div>
+
+                    <div id="forum-feed" style="display: flex; flex-direction: column; gap: 15px;">
+                        <p style="text-align: center; color: var(--text-muted); padding: 20px;">Ładowanie dyskusji...</p>
+                    </div>
+                </div>
+
+            </div> <div> <div class="card">
                     <h3><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
                     <div class="balance" id="balance">0.00 zł</div>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;">
@@ -709,6 +726,8 @@
                     };
                 }
             }, 100);
+            loadForum();
+
         }
 
         // --- FUNKCJA ODLICZANIA ---
@@ -731,6 +750,78 @@
             update();
             setInterval(update, 60000); 
         }
+
+
+async function loadForum() {
+    try {
+        const res = await fetch(`${API}/api/forum/posts`);
+        const posts = await res.json();
+        const feed = document.getElementById('forum-feed');
+        
+        if (posts.length === 0) {
+            feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">Brak pytań. Bądź pierwszy!</p>`;
+            return;
+        }
+
+        feed.innerHTML = posts.map(p => `
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 0.7rem; background: var(--cherry); color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase;">
+                            ${p.topic}
+                        </span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">
+                            ${p.email.split('@')[0]} 
+                            <span style="margin-left: 5px; opacity: 0.6;">• ${new Date(p.created_at).toLocaleDateString()}</span>
+                        </span>
+                    </div>
+                    <button onclick="likePost(${p.id})" class="help-pill" style="cursor: pointer; border: none; transition: 0.3s;">
+                        👍 ${p.likes}
+                    </button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 1rem; line-height: 1.6; white-space: pre-wrap;">${p.content}</div>
+            </div>
+        `).join('');
+    } catch (e) { console.error("Błąd ładowania forum:", e); }
+}
+
+async function submitPost() {
+    const topic = document.getElementById('forum-topic').value;
+    const content = document.getElementById('forum-content').value;
+    
+    if(!content || content.length < 5) return alert("Napisz coś więcej!");
+
+    const res = await fetch(`${API}/api/forum/post`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, topic, content })
+    });
+
+    if(res.ok) {
+        document.getElementById('post-modal').style.display = 'none';
+        document.getElementById('forum-content').value = '';
+        loadForum(); // Odśwież listę
+        loadDashboardData(); // Odśwież punkty reputacji w odznakach!
+    }
+}
+
+async function likePost(id) {
+    const res = await fetch(`${API}/api/forum/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, postId: id })
+    });
+    
+    if(res.ok) {
+        loadForum();
+        loadDashboardData(); // Odśwież punkty lajków w badge'u
+    } else {
+        const err = await res.json();
+        alert(err.error || "Nie można polubić");
+    }
+}
+
+
 
         async function loadHistory() {
             try {
@@ -1021,5 +1112,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 </script>
+<div id="post-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; backdrop-filter: blur(8px);">
+    <div class="card" style="width: 90%; max-width: 500px; border: 1px solid var(--cherry); background: #0f172a;">
+        <h3 style="color:white; margin-bottom: 20px;">Nowy temat na forum</h3>
+        <select id="forum-topic" style="width:100%; padding:12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius:8px; color:white; margin-bottom: 15px;">
+            <option value="Research">🔍 Research & Nisze</option>
+            <option value="Design">🎨 Design & Ilustracje</option>
+            <option value="Reklamy">📈 Reklamy KDP (AMS)</option>
+            <option value="Techniczne">⚙️ Sprawy techniczne</option>
+        </select>
+        <textarea id="forum-content" placeholder="Opisz swój problem..." style="width:100%; height:150px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:10px; color:white; padding:15px; margin-bottom:20px; font-family: inherit; resize: none;"></textarea>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" onclick="submitPost()">Opublikuj 🚀</button>
+            <button class="btn" style="background:transparent; border: 1px solid var(--glass-border); color: var(--text-muted);" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
