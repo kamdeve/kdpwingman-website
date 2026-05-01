@@ -297,20 +297,10 @@
         <div id="progress-bar-visual" class="bg-gradient-to-r from-pink-600 to-green-500 h-full transition-all duration-1000" style="width: 5%"></div>
     </div>
     
-    <!-- TWOJA ORYGINALNA INFORMACJA O GWARANCJI -->
-    <p class="text-xs text-gray-400 mb-6">
+    <p class="text-xs text-gray-400 mb-2">
         <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>15 osób</strong><br>
         <span class="text-gray-500">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
     </p>
-
-    <!-- PROGI CENOWE (Cele cenowe) -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 0.75rem; text-align: left; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <div style="color: #94a3b8;">15 os: <span style="color: white;">71 zł</span></div>
-        <div style="color: #94a3b8;">20 os: <span style="color: white;">53 zł</span></div>
-        <div style="color: #10b981; font-weight: bold;">25 os: 42 zł 🔥</div>
-        <div style="color: #94a3b8;">30 os: <span style="color: white;">35 zł</span></div>
-    </div>
-    <p style="font-size: 0.65rem; color: #64748b; margin-top: 10px;">*Każda kolejna osoba obniża cenę dla wszystkich!</p>
 </div>
                 
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
@@ -327,6 +317,13 @@
                     </div>
                 </div>
             </div>
+
+<div class="max-w-4xl mx-auto mb-12 p-8 bg-gray-800/40 border border-gray-700 rounded-3xl">
+    <h3 class="text-xl font-bold mb-6 text-center">🎯 Cele cenowe edycji (Helium 10 Diamond)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="goals-container">
+        <!-- Tutaj skrypt automatycznie wstawi paski postępu -->
+    </div>
+</div>
 
             <div class="max-w-2xl mx-auto mb-16 p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-300">
                 <p class="mb-3 flex items-center justify-center gap-2">
@@ -700,11 +697,9 @@
     const joinBtn = document.querySelector('#signupForm button');
     const countdownBox = document.getElementById('countdown').parentElement;
 
-    // 2. Blokada wizualna (jeśli serwer mówi, że zamknięte)
     if (statusData.isLocked) {
         document.getElementById('countdown').innerText = "PRZERWA TECHNICZNA";
-        // Żółty styl (tło i czarny tekst)
-        countdownBox.style.background = "#ffbb33";
+        countdownBox.style.background = "#ffbb33"; // Przywracamy żółty kolor
         document.getElementById('countdown').style.color = "#000";
         if(joinBtn) {
             joinBtn.disabled = true;
@@ -714,9 +709,10 @@
         return;
     }
 
+    // Reset stylu gdy otwarta
+    countdownBox.style.background = ""; 
+    document.getElementById('countdown').style.color = "";
 
-    
-    // 3. Jeśli otwarte -> licznik do końca miesiąca
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const diff = lastDay - now;
@@ -724,7 +720,7 @@
     if(joinBtn && joinBtn.disabled) {
         joinBtn.disabled = false;
         joinBtn.innerText = "Sprawdź status / Dołącz";
-        joinBtn.style.background = ""; // Wraca Twój różowy gradient
+        joinBtn.style.background = "";
     }
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -741,51 +737,59 @@
     fetch(`${API_URL}/api/group-buy/status`)
         .then(res => res.json())
         .then(data => {
+            // 1. Definicja wszystkich potencjalnych elementów (z Twojego pliku)
             const countEl = document.getElementById('participant-count'); 
             const priceUsdEl = document.getElementById('current-price-usd');
             const pricePlnEl = document.getElementById('current-price-pln');
             const userCountEl = document.getElementById('userCount'); 
             const priceElOld = document.getElementById('pricePerPerson'); 
-            const goals = [15, 20, 25, 30];
-const prices = { 15: 71, 20: 53, 25: 42, 30: 35 };
-const container = document.getElementById('goals-container');
-container.innerHTML = "";
+            const currentCountLabel = document.getElementById('current-count');
 
-goals.forEach(goal => {
-    const needed = goal - data.users;
-    const progress = Math.min(100, (data.users / goal) * 100);
-    const isReached = data.users >= goal;
-    
-    container.innerHTML += `
-        <div class="bg-gray-900/50 p-4 rounded-xl border ${isReached ? 'border-green-500/50' : 'border-gray-700'}">
-            <div class="flex justify-between mb-2 text-sm">
-                <span class="${isReached ? 'text-green-400 font-bold' : 'text-gray-300'}">Cel: ${goal} osób</span>
-                <span class="font-bold text-white">${prices[goal]} zł</span>
-            </div>
-            <div class="w-full bg-gray-800 h-3 rounded-full overflow-hidden">
-                <div class="h-full ${isReached ? 'bg-green-500' : 'bg-pink-600'}" style="width: ${progress}%"></div>
-            </div>
-            <p class="text-[10px] mt-2 ${isReached ? 'text-green-400' : 'text-gray-500'}">
-                ${isReached ? '✅ Osiągnięto!' : 'Brakuje jeszcze ' + needed + ' osób'}
-            </p>
-        </div>
-    `;
-});
-
-            if(document.getElementById('current-count')) document.getElementById('current-count').innerText = data.users;
+            // 2. Aktualizacja tekstów (tylko jeśli istnieją w HTML)
             if(countEl) countEl.innerText = data.users;
             if(userCountEl) userCountEl.innerText = data.users;
+            if(currentCountLabel) currentCountLabel.innerText = data.users;
             
             if(priceUsdEl) priceUsdEl.innerText = `$${data.priceUSD}`;
             if(pricePlnEl) pricePlnEl.innerText = `ok. ${data.pricePLN} PLN`;
             if(priceElOld) priceElOld.innerText = data.priceUSD + " $";
+
+            // 3. Generowanie 4 pasków postępu dla celów (15, 20, 25, 30 osób)
+            const goals = [15, 20, 25, 30];
+            const prices = { 15: 71, 20: 53, 25: 42, 30: 35 };
+            const container = document.getElementById('goals-container');
             
-             const visualBar = document.getElementById('progress-bar-visual');
-             if(visualBar) {
-                 let percent = Math.max(5, (data.users / 10) * 100); 
-                 if(percent > 100) percent = 100;
-                 visualBar.style.width = percent + "%";
-             }
+            if(container) {
+                container.innerHTML = ""; // Czyścimy stare paski
+                goals.forEach(goal => {
+                    const progress = Math.min(100, (data.users / goal) * 100);
+                    const isReached = data.users >= goal;
+                    const needed = goal - data.users;
+                    
+                    container.innerHTML += `
+                        <div class="bg-gray-900/50 p-4 rounded-xl border ${isReached ? 'border-green-500/50' : 'border-gray-700'}">
+                            <div class="flex justify-between mb-2 text-sm">
+                                <span class="${isReached ? 'text-green-400 font-bold' : 'text-gray-300'}">Cel: ${goal} osób</span>
+                                <span class="font-bold text-white">${prices[goal]} zł</span>
+                            </div>
+                            <div class="w-full bg-gray-800 h-3 rounded-full overflow-hidden">
+                                <div class="h-full ${isReached ? 'bg-green-500' : 'bg-pink-600'}" style="width: ${progress}%"></div>
+                            </div>
+                            <p class="text-[10px] mt-2 ${isReached ? 'text-green-400' : 'text-gray-500'}">
+                                ${isReached ? '✅ Osiągnięto!' : 'Brakuje jeszcze ' + needed + ' osób'}
+                            </p>
+                        </div>
+                    `;
+                });
+            }
+
+            // 4. Główny pasek progresu w dużej karcie (dzielimy przez 25 osób jako cel "Diamond")
+            const visualBar = document.getElementById('progress-bar-visual');
+            if(visualBar) {
+                let percent = Math.max(5, (data.users / 25) * 100); 
+                if(percent > 100) percent = 100;
+                visualBar.style.width = percent + "%";
+            }
         })
         .catch(err => console.error("Błąd licznika:", err));
 
