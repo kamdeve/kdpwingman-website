@@ -240,6 +240,11 @@
     background: var(--cherry);
     box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
 }
+.btn-pink-active {
+    background: linear-gradient(90deg, #a0134a 0%, #d63384 100%) !important;
+    color: white !important;
+}
+
    </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -702,12 +707,20 @@
         countdownBox.style.background = "#ffbb33"; // Przywracamy żółty kolor
         document.getElementById('countdown').style.color = "#000";
         if(joinBtn) {
-            joinBtn.disabled = true;
-            joinBtn.innerText = "Startujemy 5-go!";
-            joinBtn.style.background = "#444";
-        }
-        return;
+        joinBtn.disabled = true;
+        joinBtn.innerText = "Startujemy 5-go!";
+        joinBtn.classList.remove('btn-pink-active'); // Usuń różowy gdy przerwa
+        joinBtn.style.background = "#444"; // Szary kolor przerwy
     }
+    return;
+}
+
+
+if(joinBtn) {
+    joinBtn.disabled = false;
+    joinBtn.classList.add('btn-pink-active'); // Zawsze przywracaj różowy
+    joinBtn.style.background = ""; // Czyści szary kolor przerwy
+}
 
     // Reset stylu gdy otwarta
     countdownBox.style.background = ""; 
