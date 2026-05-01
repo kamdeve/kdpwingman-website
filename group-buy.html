@@ -289,18 +289,29 @@
             <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700 relative">
-                    <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Zgłoszonych osób</p>
-                    <div id="participant-count" class="text-6xl font-bold text-white">0</div>
-                    
-                    <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4 mb-2">
-                        <div id="progress-bar-visual" class="bg-blue-600 h-2.5 rounded-full" style="width: 5%"></div>
-                    </div>
-                    
-                    <p class="text-xs text-gray-400">
-                        <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>15 osób</strong><br>
-                        <span class="text-gray-500">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
-                    </p>
-                </div>
+    <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Uczestnicy edycji</p>
+    <div id="participant-count" class="text-6xl font-bold text-white">0</div>
+    
+    <!-- Pasek Progresu (dynamiczny) -->
+    <div class="w-full bg-gray-700 rounded-full h-4 mt-6 mb-4 overflow-hidden border border-gray-600">
+        <div id="progress-bar-visual" class="bg-gradient-to-r from-pink-600 to-green-500 h-full transition-all duration-1000" style="width: 5%"></div>
+    </div>
+    
+    <!-- TWOJA ORYGINALNA INFORMACJA O GWARANCJI -->
+    <p class="text-xs text-gray-400 mb-6">
+        <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>15 osób</strong><br>
+        <span class="text-gray-500">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
+    </p>
+
+    <!-- PROGI CENOWE (Cele cenowe) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 0.75rem; text-align: left; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+        <div style="color: #94a3b8;">15 os: <span style="color: white;">71 zł</span></div>
+        <div style="color: #94a3b8;">20 os: <span style="color: white;">53 zł</span></div>
+        <div style="color: #10b981; font-weight: bold;">25 os: 42 zł 🔥</div>
+        <div style="color: #94a3b8;">30 os: <span style="color: white;">35 zł</span></div>
+    </div>
+    <p style="font-size: 0.65rem; color: #64748b; margin-top: 10px;">*Każda kolejna osoba obniża cenę dla wszystkich!</p>
+</div>
                 
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
                     <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">TERAZ</div>
@@ -697,49 +708,39 @@
     }
 
     // --- LICZNIK CZASU (POPRAWIONY) ---
-    function updateCountdown() {
-        const now = new Date();
-        const currentDay = now.getDate();
-        const joinBtn = document.querySelector('#signupForm button'); // Uchwyt do przycisku
-        
-        // --- SCENARIUSZ PRZERWY (Dni 1-4) ---
-        if (currentDay >= 1 && currentDay <= 4) {
-            document.getElementById('countdown').innerText = "PRZERWA TECHNICZNA";
-            document.getElementById('countdown').style.color = "#ffbb33"; // Pomarańczowy
-            
-            // Wyłączamy przycisk
-            if(joinBtn) {
-                joinBtn.disabled = true;
-                joinBtn.innerText = "Startujemy 5-go!";
-                joinBtn.style.background = "#555";
-                joinBtn.style.cursor = "not-allowed";
-            }
-            
-            // Informacja tekstowa dla usera
-            const infoBox = document.querySelector('.max-w-2xl'); // Ramka z info
-            if(infoBox) infoBox.innerHTML = `<p class="text-center text-yellow-400 font-bold">📢 Trwa rozliczanie poprzedniej edycji.<br>Zapisy na nowy miesiąc ruszają 5-go o północy.</p>`;
-            return;
+    async function updateCountdown() {
+    // 1. Pytamy serwer czy zrzutka jest otwarta (z uwzględnieniem Twoich zmian w Adminie)
+    const statusRes = await fetch(`${API_URL}/api/group-buy/status`);
+    const statusData = await statusRes.json();
+    const joinBtn = document.querySelector('#signupForm button');
+
+    // 2. Blokada wizualna (jeśli serwer mówi, że zamknięte)
+    if (statusData.isLocked) {
+        document.getElementById('countdown').innerText = "PRZERWA TECHNICZNA";
+        if(joinBtn) {
+            joinBtn.disabled = true;
+            joinBtn.innerText = "Startujemy 5-go!";
+            joinBtn.style.background = "#555";
         }
-
-        // --- SCENARIUSZ ZAPISÓW (Dni 5-31) ---
-        // Celujemy w OSTATNI dzień tego miesiąca, godzina 23:59:59
-        const lastDayOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-        
-        const diff = lastDayOfThisMonth - now;
-
-        // Jeśli przycisk był wyłączony, włącz go z powrotem
-        if(joinBtn && joinBtn.disabled && joinBtn.innerText === "Startujemy 5-go!") {
-             joinBtn.disabled = false;
-             joinBtn.innerText = "Sprawdź status / Dołącz";
-             joinBtn.style.background = ""; // Reset koloru
-             joinBtn.style.cursor = "pointer";
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
+        return;
     }
+
+    // 3. Jeśli otwarte -> licznik do końca miesiąca
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const diff = lastDay - now;
+
+    if(joinBtn && joinBtn.disabled) {
+        joinBtn.disabled = false;
+        joinBtn.innerText = "Sprawdź status / Dołącz";
+        joinBtn.style.background = ""; // Wraca Twój różowy gradient
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
+}
     
     // Uruchom od razu, nie czekaj 1 sekundy
     updateCountdown(); 

@@ -24,29 +24,7 @@
 </head>
 <body>
 
-<div class="admin-card">
-    <h3>⚙️ Zarządzanie fazą zrzutki</h3>
-    <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button class="btn" onclick="setMode('auto')" style="background: #334155;">Tryb AUTO (Blokada 1-4 dzień)</button>
-        <button class="btn" onclick="setMode('manual')" style="background: var(--cherry);">Tryb MANUAL (Zawsze otwarta)</button>
-    </div>
-    <div id="manual-controls" style="margin-top: 15px; display: none;">
-        <button class="btn" onclick="setStatus('open')" style="background: var(--success);">Otwórz wpłaty</button>
-        <button class="btn" onclick="setStatus('closed')" style="background: #ef4444;">Zamknij zrzutkę (Koniec edycji)</button>
-    </div>
-</div>
 
-<script>
-async function setMode(mode) {
-    await fetch('/api/admin/settings', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ key: 'group_buy_mode', value: mode })
-    });
-    document.getElementById('manual-controls').style.display = (mode === 'manual') ? 'block' : 'none';
-    alert('Tryb zmieniony na ' + mode);
-}
-</script>
 
 
     <div class="container">
@@ -55,6 +33,50 @@ async function setMode(mode) {
             <input type="password" id="pass" placeholder="Hasło..."> <button onclick="login()" class="btn btn-blue">Login</button>
         </div>
         
+<div class="settle-box" style="background: #fff; border-left: 5px solid #a0134a; margin-bottom: 30px;">
+    <h3 style="margin-top: 0;">⚙️ Zarządzanie fazą zrzutki</h3>
+    <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">
+        Zmień tryb na <strong>Manualny</strong>, aby odblokować wpłaty niezależnie od dnia miesiąca.
+    </p>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" onclick="setMode('auto')" style="background: #334155;">Tryb AUTO (Blokada 1-4 dzień)</button>
+        <!-- Poprawiony kolor przycisku Manual -->
+        <button class="btn" onclick="setMode('manual')" style="background: #a0134a; font-weight: bold;">Tryb MANUAL (Zawsze otwarta)</button>
+    </div>
+    
+    <!-- Kontrolki statusu (tylko dla trybu manualnego) -->
+    <div id="manual-controls" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; display: none;">
+        <button class="btn btn-green" onclick="setStatus('open')">✅ Otwórz wpłaty teraz</button>
+        <button class="btn btn-red" onclick="setStatus('closed')">❌ Zamknij wpłaty</button>
+    </div>
+</div>
+
+<script>
+// Poprawiona funkcja setMode - wysyła teraz klucz admina (KEY)
+async function setMode(mode) {
+    const res = await fetch(`${API}/api/admin/settings`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ key: 'group_buy_mode', value: mode, secret: KEY })
+    });
+    if(res.ok) {
+        document.getElementById('manual-controls').style.display = (mode === 'manual') ? 'block' : 'none';
+        alert('Tryb zmieniony na: ' + mode.toUpperCase());
+    } else {
+        alert('Błąd autoryzacji lub bazy!');
+    }
+}
+
+async function setStatus(status) {
+    const res = await fetch(`${API}/api/admin/settings`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ key: 'manual_status', value: status, secret: KEY })
+    });
+    if(res.ok) alert('Status wpłat: ' + status.toUpperCase());
+}
+</script>
+
         <div id="panel" style="display:none; margin-top: 20px;">
             <div style="display:flex; justify-content:space-between; background:#f8f9fa; padding:15px; border-radius:8px;">
                 <div>Uczestników: <strong id="count">0</strong></div>
