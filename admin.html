@@ -23,6 +23,32 @@
     </style>
 </head>
 <body>
+
+<div class="admin-card">
+    <h3>⚙️ Zarządzanie fazą zrzutki</h3>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="btn" onclick="setMode('auto')" style="background: #334155;">Tryb AUTO (Blokada 1-4 dzień)</button>
+        <button class="btn" onclick="setMode('manual')" style="background: var(--cherry);">Tryb MANUAL (Zawsze otwarta)</button>
+    </div>
+    <div id="manual-controls" style="margin-top: 15px; display: none;">
+        <button class="btn" onclick="setStatus('open')" style="background: var(--success);">Otwórz wpłaty</button>
+        <button class="btn" onclick="setStatus('closed')" style="background: #ef4444;">Zamknij zrzutkę (Koniec edycji)</button>
+    </div>
+</div>
+
+<script>
+async function setMode(mode) {
+    await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ key: 'group_buy_mode', value: mode })
+    });
+    document.getElementById('manual-controls').style.display = (mode === 'manual') ? 'block' : 'none';
+    alert('Tryb zmieniony na ' + mode);
+}
+</script>
+
+
     <div class="container">
         <h1>👑 Centrum Dowodzenia</h1>
         <div id="login-sec">

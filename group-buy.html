@@ -477,6 +477,21 @@
 
             <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl mb-20">
                 <h3 class="text-xl font-bold mb-6">Dołącz do aktualnej edycji</h3>
+<div class="goal-container" style="margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(160, 19, 74, 0.3); text-align: left;">
+        <h4 style="margin: 0 0 15px 0; color: #f8fafc; font-size: 0.9rem; font-weight: bold;">🎯 Cele cenowe (Diamond):</h4>
+        <div id="price-milestones" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+            <div class="milestone" id="m15" style="color: #94a3b8;">👥 15 osób: <span style="color: #cbd5e1;">71.00 zł</span></div>
+            <div class="milestone" id="m20" style="color: #94a3b8;">👥 20 osób: <span style="color: #cbd5e1;">53.25 zł</span></div>
+            <div class="milestone" id="m25" style="font-weight: bold; border-left: 3px solid #10b981; padding-left: 10px; color: #f8fafc;">
+                👥 25 osób: <span style="color: #10b981;">42.60 zł</span> 🔥
+            </div>
+            <div class="milestone" id="m30" style="color: #94a3b8;">👥 30 osób: <span style="color: #cbd5e1;">35.50 zł</span></div>
+        </div>
+        <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+            *Obecnie wpłaciło: <strong id="current-count" style="color: #db2777;">0</strong> osób.
+        </p>
+    </div>
+
                 <form id="signupForm" class="flex flex-col gap-4">
                     <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
                     <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
@@ -740,6 +755,7 @@
             const userCountEl = document.getElementById('userCount'); 
             const priceElOld = document.getElementById('pricePerPerson'); 
 
+            if(document.getElementById('current-count')) document.getElementById('current-count').innerText = data.users;
             if(countEl) countEl.innerText = data.users;
             if(userCountEl) userCountEl.innerText = data.users;
             
