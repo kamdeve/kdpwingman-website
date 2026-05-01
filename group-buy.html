@@ -339,6 +339,21 @@
                 </p>
             </div>
 
+            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl mb-12">
+    <h3 class="text-xl font-bold mb-6 text-center">Dołącz do aktualnej edycji</h3>
+    <form id="signupForm" class="flex flex-col gap-4">
+        <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
+        <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
+            class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-pink-500 focus:outline-none transition">
+        <button type="submit" 
+            class="w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1"
+            style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);">
+            Sprawdź status / Dołącz
+        </button>
+    </form>
+    <p id="message" class="mt-4 text-sm hidden"></p>
+</div>
+
             <section class="mb-20 mt-20">
                 <h2 class="text-3xl font-bold text-white mb-4 text-center">Jak to działa? <span style="color: #a0134a;">Proste zasady.</span></h2>
                 <p class="text-center text-gray-400 mb-12 max-w-2xl mx-auto">Dołączasz do grupy, korzystamy razem, a nadwyżka wraca do Ciebie. Czysta gra.</p>
@@ -486,35 +501,6 @@
 
     </div>
 
-            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl mb-20">
-                <h3 class="text-xl font-bold mb-6">Dołącz do aktualnej edycji</h3>
-<div class="goal-container" style="margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(160, 19, 74, 0.3); text-align: left;">
-        <h4 style="margin: 0 0 15px 0; color: #f8fafc; font-size: 0.9rem; font-weight: bold;">🎯 Cele cenowe (Diamond):</h4>
-        <div id="price-milestones" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
-            <div class="milestone" id="m15" style="color: #94a3b8;">👥 15 osób: <span style="color: #cbd5e1;">71.00 zł</span></div>
-            <div class="milestone" id="m20" style="color: #94a3b8;">👥 20 osób: <span style="color: #cbd5e1;">53.25 zł</span></div>
-            <div class="milestone" id="m25" style="font-weight: bold; border-left: 3px solid #10b981; padding-left: 10px; color: #f8fafc;">
-                👥 25 osób: <span style="color: #10b981;">42.60 zł</span> 🔥
-            </div>
-            <div class="milestone" id="m30" style="color: #94a3b8;">👥 30 osób: <span style="color: #cbd5e1;">35.50 zł</span></div>
-        </div>
-        <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
-            *Obecnie wpłaciło: <strong id="current-count" style="color: #db2777;">0</strong> osób.
-        </p>
-    </div>
-
-                <form id="signupForm" class="flex flex-col gap-4">
-                    <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
-                    <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
-                        class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-pink-500 focus:outline-none transition">
-                    <button type="submit" 
-                        class="w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1"
-                        style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);">
-                        Sprawdź status / Dołącz
-                    </button>
-                </form>
-                <p id="message" class="mt-4 text-sm hidden"></p>
-            </div>
 
         </div>
     </main>
@@ -709,22 +695,27 @@
 
     // --- LICZNIK CZASU (POPRAWIONY) ---
     async function updateCountdown() {
-    // 1. Pytamy serwer czy zrzutka jest otwarta (z uwzględnieniem Twoich zmian w Adminie)
     const statusRes = await fetch(`${API_URL}/api/group-buy/status`);
     const statusData = await statusRes.json();
     const joinBtn = document.querySelector('#signupForm button');
+    const countdownBox = document.getElementById('countdown').parentElement;
 
     // 2. Blokada wizualna (jeśli serwer mówi, że zamknięte)
     if (statusData.isLocked) {
         document.getElementById('countdown').innerText = "PRZERWA TECHNICZNA";
+        // Żółty styl (tło i czarny tekst)
+        countdownBox.style.background = "#ffbb33";
+        document.getElementById('countdown').style.color = "#000";
         if(joinBtn) {
             joinBtn.disabled = true;
             joinBtn.innerText = "Startujemy 5-go!";
-            joinBtn.style.background = "#555";
+            joinBtn.style.background = "#444";
         }
         return;
     }
 
+
+    
     // 3. Jeśli otwarte -> licznik do końca miesiąca
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
@@ -755,6 +746,31 @@
             const pricePlnEl = document.getElementById('current-price-pln');
             const userCountEl = document.getElementById('userCount'); 
             const priceElOld = document.getElementById('pricePerPerson'); 
+            const goals = [15, 20, 25, 30];
+const prices = { 15: 71, 20: 53, 25: 42, 30: 35 };
+const container = document.getElementById('goals-container');
+container.innerHTML = "";
+
+goals.forEach(goal => {
+    const needed = goal - data.users;
+    const progress = Math.min(100, (data.users / goal) * 100);
+    const isReached = data.users >= goal;
+    
+    container.innerHTML += `
+        <div class="bg-gray-900/50 p-4 rounded-xl border ${isReached ? 'border-green-500/50' : 'border-gray-700'}">
+            <div class="flex justify-between mb-2 text-sm">
+                <span class="${isReached ? 'text-green-400 font-bold' : 'text-gray-300'}">Cel: ${goal} osób</span>
+                <span class="font-bold text-white">${prices[goal]} zł</span>
+            </div>
+            <div class="w-full bg-gray-800 h-3 rounded-full overflow-hidden">
+                <div class="h-full ${isReached ? 'bg-green-500' : 'bg-pink-600'}" style="width: ${progress}%"></div>
+            </div>
+            <p class="text-[10px] mt-2 ${isReached ? 'text-green-400' : 'text-gray-500'}">
+                ${isReached ? '✅ Osiągnięto!' : 'Brakuje jeszcze ' + needed + ' osób'}
+            </p>
+        </div>
+    `;
+});
 
             if(document.getElementById('current-count')) document.getElementById('current-count').innerText = data.users;
             if(countEl) countEl.innerText = data.users;

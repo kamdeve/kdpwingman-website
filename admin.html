@@ -38,7 +38,10 @@
     <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">
         Zmień tryb na <strong>Manualny</strong>, aby odblokować wpłaty niezależnie od dnia miesiąca.
     </p>
-    <div style="display: flex; gap: 10px;">
+    
+
+        <div id="panel" style="display:none; margin-top: 20px;">
+<div style="display: flex; gap: 10px;">
         <button class="btn" onclick="setMode('auto')" style="background: #334155;">Tryb AUTO (Blokada 1-4 dzień)</button>
         <!-- Poprawiony kolor przycisku Manual -->
         <button class="btn" onclick="setMode('manual')" style="background: #a0134a; font-weight: bold;">Tryb MANUAL (Zawsze otwarta)</button>
@@ -77,7 +80,6 @@ async function setStatus(status) {
 }
 </script>
 
-        <div id="panel" style="display:none; margin-top: 20px;">
             <div style="display:flex; justify-content:space-between; background:#f8f9fa; padding:15px; border-radius:8px;">
                 <div>Uczestników: <strong id="count">0</strong></div>
                 <div>Depozyty: <strong id="pool">0 zł</strong></div>
