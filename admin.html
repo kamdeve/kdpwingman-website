@@ -32,6 +32,8 @@
         <div id="login-sec">
             <input type="password" id="pass" placeholder="Hasło..."> <button onclick="login()" class="btn btn-blue">Login</button>
         </div>
+
+        <div id="admin-content" style="display: none;">
         
 <div class="settle-box" style="background: #fff; border-left: 5px solid #a0134a; margin-bottom: 30px;">
     <h3 style="margin-top: 0;">⚙️ Zarządzanie fazą zrzutki</h3>
@@ -102,8 +104,7 @@ async function setStatus(status) {
     <input type="text" id="helium-login" placeholder="Login (e-mail) do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
 <input type="text" id="helium-password" placeholder="Hasło do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
 
-<input type="text" id="email-login" placeholder="E-mail do logowania (np. Gmail)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-<input type="text" id="email-password" placeholder="Hasło do e-maila" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+
 
 <button onclick="sendHeliumCredentials()" id="send-cred-btn" class="btn btn-blue" style="width: 100%; padding: 12px; background: #a0134a; font-weight: bold; font-size: 1rem;">
     Wyślij loginy do grupy z tego miesiąca
@@ -219,6 +220,7 @@ async function setStatus(status) {
                 
                 document.getElementById('login-sec').style.display = 'none';
                 document.getElementById('panel').style.display = 'block';
+                document.getElementById('admin-content').style.display = 'block';
                 
                 USER_COUNT = data.count;
                 CURRENT_RATE = data.currentRate || 3.95;
@@ -433,12 +435,10 @@ console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`
 async function sendHeliumCredentials() {
     const login = document.getElementById('helium-login').value;
     const pass = document.getElementById('helium-password').value;
-    const mailLogin = document.getElementById('email-login').value; // Nowe
-    const mailPass = document.getElementById('email-password').value;
     const msgEl = document.getElementById('send-cred-msg');
     const btn = document.getElementById('send-cred-btn');
 
-    if (!login || !pass || !mailLogin || !mailPass) {
+    if (!login || !pass) {
         msgEl.innerText = "Uzupełnij wszystkie dane logowania!";
         msgEl.style.color = "#dc3545";
         return;
@@ -463,10 +463,8 @@ async function sendHeliumCredentials() {
             body: JSON.stringify({ 
                 heliumLogin: login, 
                 heliumPassword: pass,
-                emailLogin: mailLogin,   // Nowe
-                emailPassword: mailPass, // Nowe
-                secret: KEY, // <- System użyje hasła, którym już się zalogowałeś!
-                emails: CURRENT_EMAILS // <- Przesyłamy gotową listę maili z tabeli
+                secret: KEY,
+                emails: CURRENT_EMAILS 
             })
         });
 
@@ -474,8 +472,8 @@ async function sendHeliumCredentials() {
 
         if (res.ok) {
             msgEl.innerText = "✅ " + data.message;
-            msgEl.style.color = "#28a745"; // Zielony
-            document.getElementById('helium-password').value = ""; // Czyści hasło po wysyłce
+            msgEl.style.color = "#28a745"; 
+            document.getElementById('helium-password').value = ""; 
         } else {
             msgEl.innerText = "Błąd: " + data.error;
             msgEl.style.color = "#dc3545";
