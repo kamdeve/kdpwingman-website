@@ -166,7 +166,19 @@
             </div>
         </div>
     </div>
-
+<!-- MODAL DO CZYTANIA WĄTKU I KOMENTOWANIA -->
+    <div id="thread-modal" class="modal">
+        <div class="card" style="width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--cherry); position: relative;">
+            <button onclick="closeThread()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            
+            <div id="thread-content">Ładowanie...</div>
+            
+            <div style="margin-top: 25px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
+                <textarea id="comment-content" placeholder="Napisz odpowiedź... (Zdobądź punkty za aktywność!)" style="height: 100px; resize: none;"></textarea>
+                <button class="btn-primary" onclick="submitComment()">Opublikuj Odpowiedź 🚀</button>
+            </div>
+        </div>
+    </div>
     <script>
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
         const userEmail = localStorage.getItem('wingman_user');
@@ -183,25 +195,117 @@
             }
         }
 
+        // Wyliczanie poziomu na podstawie punktów z lajków
+        function getLevel(rep) {
+            const points = parseInt(rep) || 0;
+            if (points < 5) return { lvl: 1, name: "Początkujący" };
+            if (points < 15) return { lvl: 2, name: "Uczeń" };
+            if (points < 30) return { lvl: 3, name: "Twórca" };
+            if (points < 60) return { lvl: 4, name: "Ekspert" };
+            return { lvl: 5, name: "KDP Master" };
+        }
+
         function renderPosts(posts) {
             const feed = document.getElementById('forum-feed');
             if (posts.length === 0) {
-                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">Brak tematów w tej kategorii. Bądź pierwszy!</p>`;
+                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">Brak tematów. Bądź pierwszy!</p>`;
                 return;
             }
 
-            feed.innerHTML = posts.map(p => `
-                <div class="post-card">
+            feed.innerHTML = posts.map(p => {
+                const levelData = getLevel(p.rep);
+                return `
+                <div class="post-card" onclick="openThread(${p.id})" style="cursor: pointer;">
                     <div class="post-header">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span class="tag">${p.topic}</span>
-                            <span class="author">${p.email.split('@')[0]}</span>
+                            <span class="author" style="color: white; font-weight: bold;">
+                                ${p.email.split('@')[0]} 
+                                <span style="color: #38bdf8; font-size: 0.75rem; margin-left: 5px;">[Lvl ${levelData.lvl}]</span>
+                            </span>
                         </div>
-                        <button onclick="likePost(${p.id})" class="like-btn">👍 ${p.likes}</button>
+                        <!-- event.stopPropagation() zapobiega otwarciu wątku przy samym kliknięciu lajka -->
+                        <button onclick="event.stopPropagation(); likePost(${p.id})" class="like-btn">👍 ${p.likes}</button>
                     </div>
                     <div class="content">${p.content}</div>
+                    <div style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="far fa-comments"></i> Kliknij, aby zobaczyć odpowiedzi...
+                    </div>
                 </div>
-            `).join('');
+            `}).join('');
+        }
+
+        let currentThreadId = null;
+
+        async function openThread(postId) {
+            currentThreadId = postId;
+            document.getElementById('thread-modal').style.display = 'flex';
+            const threadContent = document.getElementById('thread-content');
+            threadContent.innerHTML = '<p style="text-align: center;">Ładowanie wątku...</p>';
+
+            try {
+                const res = await fetch(`${API}/api/forum/post/${postId}`);
+                const data = await res.json();
+                
+                if (data.error) {
+                    threadContent.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                    return;
+                }
+
+                const postLvl = getLevel(data.post.rep);
+                
+                // Render głównego posta
+                let html = `
+                    <div style="margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
+                        <span class="tag">${data.post.topic}</span>
+                        <h3 style="margin: 10px 0 5px 0; color: white;">${data.post.email.split('@')[0]} <span style="color: #38bdf8; font-size: 0.8rem;">[Lvl ${postLvl.lvl}]</span></h3>
+                        <p style="color: #cbd5e1; line-height: 1.6; white-space: pre-wrap;">${data.post.content}</p>
+                    </div>
+                    <h4 style="color: var(--text-muted); margin-bottom: 15px;">Odpowiedzi (${data.comments.length}):</h4>
+                `;
+
+                // Render komentarzy
+                if (data.comments.length === 0) {
+                    html += `<p style="color: var(--text-muted); font-size: 0.9rem;">Brak odpowiedzi. Możesz pomóc jako pierwszy!</p>`;
+                } else {
+                    html += data.comments.map(c => {
+                        const cLvl = getLevel(c.rep);
+                        return `
+                        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                            <strong style="color: white; font-size: 0.9rem;">${c.email.split('@')[0]} <span style="color: #38bdf8; font-size: 0.75rem;">[Lvl ${cLvl.lvl}]</span></strong>
+                            <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap;">${c.content}</p>
+                        </div>
+                    `}).join('');
+                }
+
+                threadContent.innerHTML = html;
+
+            } catch (e) {
+                threadContent.innerHTML = '<p style="color: red;">Błąd ładowania wątku.</p>';
+            }
+        }
+
+        function closeThread() {
+            document.getElementById('thread-modal').style.display = 'none';
+            currentThreadId = null;
+        }
+
+        async function submitComment() {
+            if (!userEmail) return alert("Zaloguj się, aby odpowiadać!");
+            const content = document.getElementById('comment-content').value;
+            
+            if (content.length < 3) return alert("Komentarz jest za krótki!");
+
+            const res = await fetch(`${API}/api/forum/comment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, postId: currentThreadId, content })
+            });
+
+            if (res.ok) {
+                document.getElementById('comment-content').value = '';
+                openThread(currentThreadId); // Odświeżamy wątek, by pokazać nowy komentarz
+            }
         }
 
         function filterPosts(category, btn) {
