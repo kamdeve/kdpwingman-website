@@ -133,6 +133,28 @@
                 </button>
             </div>
 
+            <!-- GŁÓWNY PANEL GRYWALIZACJI (Wzorowany na Skool) -->
+            <div id="gamification-panel" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Twój postęp (Level <span id="user-current-level">1</span>)</span>
+                        <div style="color: white; font-size: 1.1rem; font-weight: bold; margin-top: 5px;">
+                            Cel: <span style="color: #10b981;">Starter Pack SVG</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span id="user-current-points" style="font-size: 1.5rem; font-weight: 800; color: #38bdf8;">0</span>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">/ 15 pkt</span>
+                    </div>
+                </div>
+                
+                <!-- Pasek postępu -->
+                <div style="width: 100%; background: rgba(255,255,255,0.05); border-radius: 50px; height: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+                    <div id="progress-bar-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8 0%, #3b82f6 100%); transition: width 1s ease-in-out; border-radius: 50px;"></div>
+                </div>
+                <p id="progress-motivation" style="font-size: 0.8rem; color: var(--text-muted); margin: 10px 0 0 0; text-align: center;">Napisz posta lub zdobądź lajka, aby awansować!</p>
+            </div>
+
             <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterPosts('all', this)">Wszystkie</button>
                 <button class="filter-btn" onclick="filterPosts('Research', this)">🔍 Research</button>
@@ -362,9 +384,55 @@
         W edycjach od: ${new Date(data.joined).toLocaleDateString()}
     `);
 }
+async function loadUserGamification() {
+            if (!userEmail) return;
+            try {
+                const res = await fetch(`${API}/api/user/status`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const data = await res.json();
+                
+                if (data.reputationPoints !== undefined) {
+                    const points = data.reputationPoints;
+                    const maxPoints = 15; // Próg dla Level 3 (Starter Pack)
+                    
+                    document.getElementById('gamification-panel').style.display = 'block';
+                    document.getElementById('user-current-points').innerText = points;
+                    
+                    // Wyliczanie Levelu tak samo jak w postach
+                    let lvl = 1;
+                    if (points >= 5) lvl = 2;
+                    if (points >= 15) lvl = 3;
+                    if (points >= 30) lvl = 4;
+                    if (points >= 60) lvl = 5;
+                    document.getElementById('user-current-level').innerText = lvl;
 
+                    // Obliczanie szerokości paska (max 100%)
+                    let percentage = (points / maxPoints) * 100;
+                    if (percentage > 100) percentage = 100;
+                    
+                    // Animacja paska
+                    setTimeout(() => {
+                        document.getElementById('progress-bar-fill').style.width = percentage + '%';
+                    }, 300);
+
+                    // Teksty motywacyjne
+                    const motivationEl = document.getElementById('progress-motivation');
+                    if (points >= 15) {
+                        motivationEl.innerHTML = '🎉 <strong>Cel osiągnięty!</strong> Odbierz nagrodę w <a href="dashboard.html" style="color: #10b981;">Panelu</a>.';
+                        document.getElementById('progress-bar-fill').style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+                    } else {
+                        const left = maxPoints - points;
+                        motivationEl.innerText = `Brakuje Ci jeszcze ${left} pkt do odblokowania nagrody!`;
+                    }
+                }
+            } catch (e) { console.error("Błąd ładowania punktów grywalizacji"); }
+        }
         // Start
         loadForum();
+        loadUserGamification();
     </script>
 </body>
 </html>
