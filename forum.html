@@ -106,6 +106,52 @@
             width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border);
             border-radius:8px; color:white; padding:12px; margin-bottom:15px; font-family: inherit;
         }
+
+        /* --- ROADMAP GRYWALIZACJI --- */
+        .roadmap-wrapper {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); 
+            border-radius: 12px; padding: 25px 20px 45px 20px; margin-bottom: 25px; overflow-x: auto;
+        }
+        .rm-container {
+            display: flex; align-items: center; justify-content: space-between; 
+            position: relative; min-width: 500px; margin-top: 25px;
+        }
+        .rm-line-bg {
+            position: absolute; top: 50%; left: 0; right: 0; height: 6px; 
+            background: rgba(255,255,255,0.05); z-index: 1; transform: translateY(-50%); border-radius: 3px;
+        }
+        .rm-line-fill {
+            position: absolute; top: 50%; left: 0; width: 0%; height: 6px; 
+            background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%); 
+            z-index: 1; transform: translateY(-50%); transition: width 1.2s ease-in-out; border-radius: 3px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+        .rm-node {
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: #0f172a; border: 3px solid #334155; color: #475569; font-size: 1.1rem;
+            position: relative; z-index: 2; transition: 0.4s;
+        }
+        .rm-node.unlocked {
+            background: #10b981; border-color: #059669; color: white;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .rm-node.current {
+            background: #0f172a; border-color: #38bdf8; color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+            animation: pulse-border 2s infinite;
+        }
+        .rm-label {
+            position: absolute; top: 55px; left: 50%; transform: translateX(-50%);
+            white-space: nowrap; font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-align: center;
+        }
+        .rm-label span { display: block; font-size: 0.65rem; font-weight: normal; opacity: 0.7; margin-top: 2px;}
+        .rm-node.unlocked .rm-label, .rm-node.current .rm-label { color: white; }
+        
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
     </style>
 </head>
 <body>
@@ -133,26 +179,26 @@
                 </button>
             </div>
 
-            <!-- GŁÓWNY PANEL GRYWALIZACJI (Wzorowany na Skool) -->
-            <div id="gamification-panel" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+            <!-- MAPA DROGOWA (Roadmap) -->
+            <div id="gamification-panel" class="roadmap-wrapper" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Twój postęp (Level <span id="user-current-level">1</span>)</span>
+                        <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Twoja Ścieżka Wydawcy</span>
                         <div style="color: white; font-size: 1.1rem; font-weight: bold; margin-top: 5px;">
-                            Cel: <span style="color: #10b981;">Starter Pack SVG</span>
+                            Aktualne punkty: <span id="rm-points-display" style="color: #38bdf8;">0</span>
                         </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <span id="user-current-points" style="font-size: 1.5rem; font-weight: 800; color: #38bdf8;">0</span>
-                        <span style="color: var(--text-muted); font-size: 0.9rem;">/ 15 pkt</span>
                     </div>
                 </div>
                 
-                <!-- Pasek postępu -->
-                <div style="width: 100%; background: rgba(255,255,255,0.05); border-radius: 50px; height: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;">
-                    <div id="progress-bar-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8 0%, #3b82f6 100%); transition: width 1s ease-in-out; border-radius: 50px;"></div>
+                <!-- Tu wygeneruje się oś czasu -->
+                <div class="rm-container">
+                    <div class="rm-line-bg"></div>
+                    <div id="rm-line-fill" class="rm-line-fill"></div>
+                    <div id="rm-nodes-container" style="display: flex; justify-content: space-between; width: 100%; position: relative; z-index: 2;">
+                        <!-- JS wstrzyknie tu checkpointy -->
+                    </div>
                 </div>
-                <p id="progress-motivation" style="font-size: 0.8rem; color: var(--text-muted); margin: 10px 0 0 0; text-align: center;">Napisz posta lub zdobądź lajka, aby awansować!</p>
+                <p id="rm-motivation-text" style="font-size: 0.85rem; color: var(--text-muted); margin: 45px 0 0 0; text-align: center;"></p>
             </div>
 
             <div class="filter-bar">
@@ -396,39 +442,80 @@ async function loadUserGamification() {
                 
                 if (data.reputationPoints !== undefined) {
                     const points = data.reputationPoints;
-                    const maxPoints = 15; // Próg dla Level 3 (Starter Pack)
-                    
                     document.getElementById('gamification-panel').style.display = 'block';
-                    document.getElementById('user-current-points').innerText = points;
-                    
-                    // Wyliczanie Levelu tak samo jak w postach
-                    let lvl = 1;
-                    if (points >= 5) lvl = 2;
-                    if (points >= 15) lvl = 3;
-                    if (points >= 30) lvl = 4;
-                    if (points >= 60) lvl = 5;
-                    document.getElementById('user-current-level').innerText = lvl;
+                    document.getElementById('rm-points-display').innerText = points;
 
-                    // Obliczanie szerokości paska (max 100%)
-                    let percentage = (points / maxPoints) * 100;
-                    if (percentage > 100) percentage = 100;
+                    // Definicja naszych przystanków (Checkpointów)
+                    const levels = [
+                        { req: 0, name: "Start", sub: "Lvl 1" },
+                        { req: 5, name: "Uczeń", sub: "5 pkt" },
+                        { req: 15, name: "Starter Pack 🎁", sub: "15 pkt" },
+                        { req: 30, name: "Ekspert", sub: "30 pkt" },
+                        { req: 60, name: "Master", sub: "60 pkt" }
+                    ];
+
+                    const nodesContainer = document.getElementById('rm-nodes-container');
+                    let html = '';
+                    let activeSegment = 0;
+                    let fraction = 0;
+
+                    // Generowanie kółek (Węzłów)
+                    for (let i = 0; i < levels.length; i++) {
+                        let statusClass = "locked";
+                        let icon = '<i class="fas fa-lock"></i>'; // Domyślnie kłódka
+                        
+                        if (points >= levels[i].req) {
+                            statusClass = "unlocked";
+                            icon = '<i class="fas fa-check"></i>'; // Odblokowane = Ptaszek
+                            activeSegment = i; // Aktualizujemy najdalszy odblokowany segment
+                        }
+
+                        // Jeśli to jest dokładnie ten poziom, na którym teraz jest user (i nie jest to koniec gry)
+                        if (i === activeSegment && points < levels[levels.length-1].req) {
+                            statusClass = "current";
+                            icon = '<i class="fas fa-user-astronaut"></i>'; // Ikonka gracza na obecnym etapie
+                        }
+
+                        html += `
+                            <div class="rm-node ${statusClass}">
+                                ${icon}
+                                <div class="rm-label">${levels[i].name}<span>${levels[i].sub}</span></div>
+                            </div>
+                        `;
+                    }
+                    nodesContainer.innerHTML = html;
+
+                    // Obliczanie matematyczne długości niebieskiej linii (żeby zatrzymywała się dokładnie między punktami)
+                    if (activeSegment < levels.length - 1) {
+                        const currentReq = levels[activeSegment].req;
+                        const nextReq = levels[activeSegment + 1].req;
+                        const pointsInSegment = points - currentReq;
+                        const segmentSize = nextReq - currentReq;
+                        fraction = pointsInSegment / segmentSize;
+                    } else {
+                        fraction = 0; // Jeśli max lvl, to linia jest na 100%
+                    }
+
+                    const segmentPercentage = 100 / (levels.length - 1);
+                    const totalWidth = (activeSegment * segmentPercentage) + (fraction * segmentPercentage);
                     
-                    // Animacja paska
                     setTimeout(() => {
-                        document.getElementById('progress-bar-fill').style.width = percentage + '%';
+                        document.getElementById('rm-line-fill').style.width = Math.min(totalWidth, 100) + '%';
                     }, 300);
 
-                    // Teksty motywacyjne
-                    const motivationEl = document.getElementById('progress-motivation');
-                    if (points >= 15) {
-                        motivationEl.innerHTML = '🎉 <strong>Cel osiągnięty!</strong> Odbierz nagrodę w <a href="dashboard.html" style="color: #10b981;">Panelu</a>.';
-                        document.getElementById('progress-bar-fill').style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+                    // Tekst motywacyjny
+                    const motivationEl = document.getElementById('rm-motivation-text');
+                    if (points >= 15 && points < 30) {
+                        motivationEl.innerHTML = '🎉 <strong>Starter Pack odblokowany!</strong> Odbierz go w <a href="dashboard.html" style="color: #10b981;">Panelu</a>. Zbieraj dalej na rangę Eksperta!';
+                    } else if (points >= 60) {
+                        motivationEl.innerHTML = '👑 Jesteś legendą tego forum. Osiągnąłeś maksymalny poziom!';
                     } else {
-                        const left = maxPoints - points;
-                        motivationEl.innerText = `Brakuje Ci jeszcze ${left} pkt do odblokowania nagrody!`;
+                        const nextTarget = levels[activeSegment + 1].req;
+                        const left = nextTarget - points;
+                        motivationEl.innerText = `Zdobywaj lajki i odpowiadaj! Brakuje Ci ${left} pkt do następnego odblokowania 🔓.`;
                     }
                 }
-            } catch (e) { console.error("Błąd ładowania punktów grywalizacji"); }
+            } catch (e) { console.error("Błąd ładowania grywalizacji", e); }
         }
         // Start
         loadForum();
