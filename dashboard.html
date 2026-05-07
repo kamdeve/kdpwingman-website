@@ -235,6 +235,51 @@
     box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
 }
 
+/* --- KARNET LOJALNOŚCIOWY KEBAB --- */
+        .kebab-card {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid #fbbf24;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.1);
+        }
+        .stamp-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .stamp-slot {
+            aspect-ratio: 1;
+            background: rgba(0,0,0,0.3);
+            border: 2px dashed #475569;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.05);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .stamp-slot.active {
+            background: #fbbf24;
+            border: 2px solid #d97706;
+            color: #0f172a;
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+        .stamp-slot.bonus {
+            border: 2px solid #10b981;
+            color: #10b981;
+        }
+        .stamp-slot.bonus.active {
+            background: #10b981;
+            border-color: #059669;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -326,6 +371,23 @@
         </div>
     </div>
 </div>
+
+<div class="kebab-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 style="color: #fbbf24; margin: 0;"><i class="fas fa-ticket-alt"></i> Twój Karnet Lojalnościowy</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 5px 0 0 0;">
+                                Zbierz 6 pieczątek, a <strong>7. zrzutka będzie gratis!</strong> 🎁
+                            </p>
+                        </div>
+                        <div id="stamps-counter" style="background: #fbbf24; color: #0f172a; padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.9rem;">
+                            0 / 6
+                        </div>
+                    </div>
+
+                    <div class="stamp-grid" id="kebab-stamps">
+                        </div>
+                </div>
 
                 <div class="card">
                     <h3><i class="fas fa-history"></i> Historia Zrzutek</h3>
@@ -774,6 +836,39 @@
                 }
             }, 100);
             loadForum();
+
+            // --- WIZUALIZACJA PIECZĄTEK (SYSTEM KEBAB) ---
+            const stamps = data.loyalty_stamps || 0;
+            const stampsContainer = document.getElementById('kebab-stamps');
+            const stampsCounter = document.getElementById('stamps-counter');
+            
+            if (stampsContainer) {
+                let stampsHtml = '';
+                for (let i = 1; i <= 7; i++) {
+                    let className = "stamp-slot";
+                    let icon = '<i class="fas fa-stamp"></i>';
+                    
+                    if (i === 7) {
+                        className += " bonus";
+                        icon = '<i class="fas fa-gift"></i>';
+                    }
+                    
+                    if (i <= stamps) {
+                        className += " active";
+                        icon = '<i class="fas fa-check-circle"></i>';
+                    }
+                    
+                    stampsHtml += `<div class="${className}">${icon}</div>`;
+                }
+                stampsContainer.innerHTML = stampsHtml;
+                if (stampsCounter) {
+                    stampsCounter.innerText = `${stamps} / 6`;
+                    if (stamps >= 6) {
+                        stampsCounter.style.background = "#10b981";
+                        stampsCounter.innerText = "GOTOWE! 🎉";
+                    }
+                }
+            }
 
         }
 
