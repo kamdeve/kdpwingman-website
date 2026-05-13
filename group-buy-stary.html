@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDP Wingman - Wspólny Dostęp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* --- STYLE Z HLOWNY STRONY (Premium Dark Mode) --- */
+        :root {
+            --bg-dark: #020617;
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --cherry: #a0134a;
+            --cherry-glow: rgba(160, 19, 74, 0.5);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* TŁO GLOW (To samo co na głównej) */
+        .background-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 20%, var(--cherry-glow) 0%, transparent 35%),
+                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.15) 0%, transparent 35%);
+            pointer-events: none;
+        }
+
+        /* CIEMNY NAVBAR */
+        .navbar-container {
+            background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky; top: 0; z-index: 1000; width: 100%;
+        }
+        .navbar-content {
+            max-width: 1200px; margin: 0 auto; height: 70px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+        }
+        .logo-link { text-decoration: none; font-weight: 800; font-size: 1.4rem; color: white; display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 35px; }
+        .nav-links { display: flex; align-items: center; gap: 25px; }
+        .nav-item { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: 0.3s; }
+        .nav-item:hover, .nav-item.highlight { color: var(--cherry); }
+        .btn-login {
+            text-decoration: none; padding: 8px 24px; border: 1px solid var(--cherry); border-radius: 50px;
+            color: white; font-weight: 600; transition: 0.3s; background: rgba(160, 19, 74, 0.1);
+        }
+        .btn-login:hover { background: var(--cherry); box-shadow: 0 0 15px var(--cherry-glow); }
+        .hamburger-btn { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .bar { width: 25px; height: 3px; background-color: white; border-radius: 2px; }
+
+        /* NOWE KARTY "JAK TO DZIAŁA" (Zamiast kółek) */
+        .process-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .process-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--cherry);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .step-icon-wrapper {
+            width: 70px; height: 70px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.8rem;
+            color: var(--cherry);
+            box-shadow: 0 0 20px rgba(160, 19, 74, 0.2);
+        }
+        .step-number-bg {
+            position: absolute; top: -10px; right: -10px;
+            font-size: 5rem; font-weight: 800; color: rgba(255,255,255,0.03);
+            z-index: 0; pointer-events: none;
+        }
+
+        /* GALERIA */
+        .gallery-container { position: relative; max-width: 1000px; margin: 0 auto; overflow: hidden; }
+        .gallery-scroll { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; padding: 20px 0; scrollbar-width: none; justify-content: center; }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+        .proof-item { 
+    min-width: 260px; 
+    max-width: 260px; 
+    height: 480px; /* Stała wysokość kafelka */
+    background: #1f2937; 
+    border-radius: 20px; /* Bardziej zaokrąglone rogi jak w telefonie */
+    padding: 10px; 
+    border: 4px solid #334155; /* Grubsza ramka udająca telefon */
+    cursor: pointer; 
+    transition: transform 0.3s, border-color 0.3s; 
+    flex-shrink: 0; 
+    overflow: hidden; /* To ukrywa dolną część długiego zdjęcia! */
+    position: relative;
+}
+
+.proof-item:hover { 
+    transform: translateY(-5px); 
+    border-color: #a0134a; 
+}
+
+/* Obrazek w miniaturze - kluczowe ustawienia */
+.proof-img { 
+    width: 100%; 
+    height: 100%; /* Wypełnij kafelek */
+    object-fit: cover; /* Wypełnij bez zniekształceń */
+    object-position: top; /* POKAŻ TYLKO GÓRĘ ZDJĘCIA (Resztę utnij) */
+    border-radius: 12px; 
+}
+
+/* "Lupa" po najechaniu - zachęta do kliknięcia */
+.proof-item::after {
+    content: '🔍 Zobacz całość';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: white;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: 0.3s;
+}
+.proof-item:hover::after { opacity: 1; }
+
+
+/* --- LIGHTBOX (Pełny widok) --- */
+#lightbox { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.95); 
+    z-index: 9999; 
+    display: none; 
+    
+    /* Ustawienie na start (góra), żeby scroll działał poprawnie */
+    align-items: flex-start; 
+    justify-content: center;
+    
+    /* Włącz przewijanie, gdy zdjęcie jest dłuższe niż ekran */
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch; /* Płynne przewijanie na iPhone */
+    backdrop-filter: blur(5px); 
+}
+
+/* Zdjęcie w Lightboxie - musi być długie */
+#lightbox img { 
+    max-width: 600px; /* Nie za szerokie na PC */
+    width: 100%;      /* Pełna szerokość na mobile */
+    height: auto;     /* Naturalna wysokość (bardzo długa) */
+    border-radius: 8px; 
+    box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+    margin-bottom: 50px; /* Miejsce na dole przy scrollowaniu */
+}
+
+#lightbox-close { 
+    position: fixed; /* Przyklejony przycisk zamykania */
+    top: 20px; right: 30px; 
+    color: white; font-size: 3rem; cursor: pointer; 
+    z-index: 10001;
+    background: rgba(0,0,0,0.5);
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 0;
+}
+        .scroll-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #a0134a; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 10; font-weight: bold; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
+        .scroll-left { left: 10px; } .scroll-right { right: 10px; }
+
+        @media (max-width: 768px) {
+            .hamburger-btn { display: flex; }
+            .nav-links { display: none; position: absolute; top: 70px; left: 0; width: 100%; background: #020617; flex-direction: column; padding: 20px 0; border-bottom: 2px solid var(--cherry); }
+            .nav-links.active { display: flex; }
+            .nav-item { padding: 10px; width: 100%; text-align: center; }
+            .scroll-btn { display: none; }
+        }
+        
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        #lightbox img { 
+    width: 100%;           /* Na telefonie zajmij całą szerokość */
+    max-width: 600px;      /* Na komputerze nie szalej, wyglądaj jak telefon */
+    height: auto;          /* KLUCZOWE: Zachowaj naturalną długość (nie ściskaj!) */
+    max-height: none;      /* KLUCZOWE: Usuwamy blokadę wysokości ekranu */
+    
+    border-radius: 12px; 
+    box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+    margin-top: 60px;      /* Odstęp od góry (żeby nie weszło pod X) */
+    margin-bottom: 60px;   /* Odstęp od dołu (żeby dało się przewinąć do końca) */
+    object-fit: contain;
+}
+        #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; }
+   .nav-link {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s;
+    font-family: 'Inter', sans-serif; /* Wymuszenie poprawnej czcionki */
+}
+.nav-link:hover {
+    color: var(--cherry);
+}
+
+.btn-forum {
+    border: 1px solid var(--cherry);
+    padding: 8px 18px;
+    border-radius: 50px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.3s;
+    background: rgba(160, 19, 74, 0.1);
+    margin-right: 15px;
+}
+.btn-forum:hover {
+    background: var(--cherry);
+    box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
+}
+.btn-pink-active {
+    background: linear-gradient(90deg, #a0134a 0%, #d63384 100%) !important;
+    color: white !important;
+}
+
+   </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="background-glow"></div>
+
+    <header class="navbar-container">
+        <nav class="navbar-content">
+            <a href="index.html" class="logo-link">
+                <img src="images/logo.svg" alt="KDP Wingman Icon" class="logo-img">
+                <span>KDP <span style="color: #a0134a;">Wingman</span></span>
+            </a>
+
+            <button class="hamburger-btn" onclick="toggleMobileMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </button>
+
+            <div class="nav-links" id="nav-menu">
+                <a href="index.html#how-it-works" class="nav-item">Jak to działa</a>
+                <a href="index.html#features" class="nav-item">Funkcje</a>
+                <a href="https://chrome.google.com/webstore/detail/kdp-wingman" target="_blank" class="nav-item">Rozszerzenie</a>
+                <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item" style="color:white;"><i class="fab fa-youtube text-xl hover:text-pink-600 transition"></i></a>
+                <a href="forum.html" class="btn-forum">
+    <i class="fas fa-comments"></i> Forum
+</a>
+                <a href="dashboard.html" class="btn-login">🔒 Zaloguj</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-20 min-h-screen">
+        <div class="container mx-auto px-4 text-center">
+            
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Wspólny Dostęp <span style="color: #a0134a;">Premium</span></h1>
+            <p class="text-gray-300 mb-8 text-lg max-w-2xl mx-auto">
+                Dołącz do grupy i korzystaj z Helium 10 Diamond za ułamek ceny. 
+                Koszt całkowity ($287.20) jest dzielony na wszystkich.
+            </p>
+
+            <div class="mb-12 inline-block bg-gray-800 px-8 py-4 rounded-full border border-gray-700 shadow-xl">
+                <p class="text-gray-400 text-sm uppercase tracking-widest mb-1">Koniec zapisów za:</p>
+                <div id="countdown" class="text-2xl md:text-3xl font-bold text-white font-mono">Ładowanie...</div>
+            </div>
+
+            <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700 relative">
+    <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Uczestnicy edycji</p>
+    <div id="participant-count" class="text-6xl font-bold text-white">0</div>
+    
+    <!-- Pasek Progresu (dynamiczny) -->
+    <div class="w-full bg-gray-700 rounded-full h-4 mt-6 mb-4 overflow-hidden border border-gray-600">
+        <div id="progress-bar-visual" class="bg-gradient-to-r from-pink-600 to-green-500 h-full transition-all duration-1000" style="width: 5%"></div>
+    </div>
+    
+    <p class="text-xs text-gray-400 mb-2">
+        <i class="fas fa-users text-blue-400"></i> Minimum do startu: <strong>15 osób</strong><br>
+        <span class="text-gray-500">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
+    </p>
+</div>
+                
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border-2 relative overflow-hidden" style="border-color: #a0134a;">
+                    <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">TERAZ</div>
+                    <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
+                    <div id="current-price-usd" class="text-5xl font-bold text-white mb-1">$287.20</div>
+                    <div id="current-price-pln" class="text-xl font-medium" style="color: #4ade80;">ok. 1065 PLN</div>
+                    
+                    <div class="mt-4 p-2 bg-gray-900/50 rounded border border-gray-600 text-left">
+                        <p class="text-xs text-gray-300">
+                            <i class="fas fa-history text-yellow-400"></i> <strong>Historycznie:</strong><br>
+                            Cena końcowa zazwyczaj spada poniżej <strong>75 PLN</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+<div class="max-w-4xl mx-auto mb-12 p-8 bg-gray-800/40 border border-gray-700 rounded-3xl">
+    <h3 class="text-xl font-bold mb-6 text-center">🎯 Cele cenowe edycji (Helium 10 Diamond)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="goals-container">
+        <!-- Tutaj skrypt automatycznie wstawi paski postępu -->
+    </div>
+</div>
+
+            <div class="max-w-2xl mx-auto mb-16 p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-300">
+                <p class="mb-3 flex items-center justify-center gap-2">
+                    <span style="color: #a0134a;">●</span> 
+                    Zapisy trwają do <strong>ostatniego dnia miesiąca</strong>.
+                </p>
+                <p class="flex items-center justify-center gap-2">
+                    <span style="color: #a0134a;">●</span> 
+                    Dostęp otrzymasz na maila <strong>5-go dnia miesiąca</strong>.
+                </p>
+            </div>
+
+            <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl mb-12">
+    <h3 class="text-xl font-bold mb-6 text-center">Dołącz do aktualnej edycji</h3>
+    <form id="signupForm" class="flex flex-col gap-4">
+        <label class="text-left text-gray-400 text-sm ml-1">Twój adres e-mail</label>
+        <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
+            class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-pink-500 focus:outline-none transition">
+        <button type="submit" 
+            class="w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1"
+            style="background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);">
+            Sprawdź status / Dołącz
+        </button>
+    </form>
+    <p id="message" class="mt-4 text-sm hidden"></p>
+</div>
+
+            <section class="mb-20 mt-20">
+                <h2 class="text-3xl font-bold text-white mb-4 text-center">Jak to działa? <span style="color: #a0134a;">Proste zasady.</span></h2>
+                <p class="text-center text-gray-400 mb-12 max-w-2xl mx-auto">Dołączasz do grupy, korzystamy razem, a nadwyżka wraca do Ciebie. Czysta gra.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                    
+                    <div class="process-card">
+                        <div class="step-number-bg">1</div>
+                        <div class="step-icon-wrapper">
+                            <i class="fas fa-lock"></i> </div>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Wpłacasz Depozyt</h3>
+                        <p class="text-gray-400 text-sm relative z-10">
+                            Wpłacasz bezpieczny depozyt 75 zł. To Twoja rezerwacja miejsca w grupie.
+                        </p>
+                    </div>
+
+                    <div class="process-card">
+                        <div class="step-number-bg">2</div>
+                        <div class="step-icon-wrapper">
+                            <i class="fas fa-users"></i> </div>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Zbieramy Grupę</h3>
+                        <p class="text-gray-400 text-sm relative z-10">
+                            Czekamy do ostatniego dnia miesiąca. Im więcej nas jest, tym niższa cena dla każdego.
+                        </p>
+                    </div>
+
+                    <div class="process-card">
+                        <div class="step-number-bg">3</div>
+                        <div class="step-icon-wrapper">
+                            <i class="fas fa-key"></i> </div>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Dostajesz Dostęp</h3>
+                        <p class="text-gray-400 text-sm relative z-10">
+                            5-go dnia miesiąca otrzymujesz login i hasło do narzędzia na swojego maila.
+                        </p>
+                    </div>
+
+                    <div class="process-card">
+                        <div class="step-number-bg">4</div>
+                        <div class="step-icon-wrapper">
+                            <i class="fas fa-coins"></i> </div>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Automatyczny Zwrot</h3>
+                        <p class="text-gray-400 text-sm relative z-10">
+                            Koszt narzędzia + opłata serwisowa 10 zł jest odejmowana od depozytu. Reszta (nadpłata) wraca do Twojego portfela.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+            <section style="margin-bottom: 60px;">
+                <h2 class="text-2xl font-bold text-white mb-4">💸 Transparentność to podstawa</h2>
+                
+                <div class="gallery-container">
+                    <button type="button" class="scroll-btn scroll-left" onclick="scrollGallery(-1)">&#10094;</button>
+                    
+                    <div class="gallery-scroll" id="gallery">
+                        
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_jan2026.jpg" class="proof-img" alt="Przelew Styczen">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Styczeń 2026</span>
+    </div>
+</div>
+
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_dec2025.jpg" class="proof-img" alt="Przelew Grudzień">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Grudzień 2025</span>
+    </div>
+</div>
+
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_nov2025.jpg" class="proof-img" alt="Przelew Listopad">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Listopad 2025</span>
+    </div>
+</div>
+
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_oct2025.jpg" class="proof-img" alt="Przelew Pazdziernik">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Październik 2025</span>
+    </div>
+</div>
+
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_sep2025.jpg" class="proof-img" alt="Przelew Wrzesień">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Wrzesień 2025</span>
+    </div>
+</div>
+
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_aug2025.jpg" class="proof-img" alt="Przelew Sierpień">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Sierpień 2025</span>
+    </div>
+</div>
+
+                        <div class="proof-item" onclick="openLightbox(this)">
+    <img src="images/proof_full_jul2025.jpg" class="proof-img" alt="Przelew Lipiec">
+    
+    <div style="position:absolute; bottom:10px; left:0; width:100%; text-align:center; z-index:5;">
+        <span style="background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius:10px; font-size:0.8rem; color:#cbd5e1;">Lipiec 2025</span>
+    </div>
+</div>
+                    
+                    <button type="button" class="scroll-btn scroll-right" onclick="scrollGallery(1)">&#10095;</button>
+                </div>
+            </section>
+
+            <div style="max-width: 800px; margin: 60px auto 40px auto; padding: 0 20px; text-align: center;">
+        
+        <h2 class="text-3xl font-bold text-white mb-4 text-center">🎥 Jak dołączyć do zrzutki?
+            
+        </h2>
+        <p style="color: #a0134a; margin-bottom: 25px;"> 
+            Zobacz krótki poradnik krok po kroku (od A do Z)
+        </p>
+
+        <div style="
+            position: relative; 
+            padding-bottom: 56.25%; /* Proporcja 16:9 */
+            height: 0; 
+            overflow: hidden; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 50px rgba(160, 19, 74, 0.15); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #000;">
+            
+            <iframe 
+                src="https://www.youtube.com/embed/3F-wcavauzg" 
+                title="Jak dołączyć do zrzutki KDP Wingman"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+    </div>
+
+
+        </div>
+    </main>
+
+    <footer class="bg-gray-950 py-10 border-t border-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex flex-col md:flex-row justify-center gap-6 mb-6 text-sm text-gray-400">
+                <a href="terms.html" class="hover:text-white transition">Regulamin Zrzutki</a>
+                <a href="privacy.html" class="hover:text-white transition">Polityka Prywatności</a>
+                <a href="mailto:kontakt@kdpwingman.com" class="hover:text-white transition">Kontakt</a>
+            </div>
+            <p class="text-xs text-gray-600">
+                &copy; 2026 KDP Wingman. Serwis ułatwia wspólny zakup dostępu do narzędzi analitycznych.<br>
+                Nie jesteśmy powiązani z Amazon ani Helium 10. Opłata serwisowa jest bezzwrotna w przypadku realizacji usługi.
+            </p>
+        </div>
+    </footer>
+
+    <div id="lightbox" onclick="this.style.display='none'"><span id="lightbox-close">&times;</span><img id="lightbox-img" src=""></div>
+    <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fas fa-arrow-up"></i></div>
+
+    <script>
+    const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
+    
+    // Elementy DOM
+    const form = document.getElementById('signupForm'); 
+    const emailInput = document.getElementById('emailInput');
+    const btn = form.querySelector('button');
+    
+    // Tworzymy kontener na komunikaty
+    const messageBox = document.createElement('div');
+    messageBox.style.marginTop = "15px";
+    messageBox.style.fontWeight = "bold";
+    messageBox.style.display = 'none';
+    form.appendChild(messageBox); // Dodajemy pod przyciskiem
+
+    // Tworzymy dynamicznie pola na hasło (domyślnie ukryte)
+    const passwordContainer = document.createElement('div');
+    passwordContainer.style.display = 'none';
+    passwordContainer.style.marginTop = '10px';
+    passwordContainer.innerHTML = `
+        <input type="password" id="quick-password" placeholder="Ustaw hasło (min. 6 znaków)" 
+        class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-blue-500 focus:outline-none transition mb-2">
+        
+        <input type="password" id="quick-password-confirm" placeholder="Powtórz hasło" 
+        class="w-full p-4 rounded-lg bg-gray-900 border border-gray-600 text-white focus:border-blue-500 focus:outline-none transition mb-2">
+        
+        <p class="text-xs text-gray-400 mb-2">Konto zostanie utworzone automatycznie. Nie musisz potwierdzać maila.</p>
+    `;
+    // Wstawiamy pola hasła PRZED przyciskiem
+    form.insertBefore(passwordContainer, btn);
+
+    // Funkcja pomocnicza do komunikatów
+    function showMessage(text, color = 'white') {
+        messageBox.innerText = text;
+        messageBox.style.display = 'block';
+        messageBox.style.color = color;
+    }
+
+    // --- GŁÓWNA LOGIKA ---
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const passwordInput = document.getElementById('quick-password');
+        const confirmInput = document.getElementById('quick-password-confirm');
+        
+        const password = passwordInput.value.trim();
+        const confirmPass = confirmInput.value.trim();
+
+        if (!email) return showMessage("Wpisz adres e-mail!", "#ff4444");
+
+        // RESET UI
+        messageBox.style.display = 'none';
+        
+        // SCENARIUSZ A: Rejestracja nowego użytkownika (jeśli pola hasła są widoczne)
+        if (passwordContainer.style.display === 'block') {
+            if (password.length < 6) return showMessage("Hasło musi mieć min. 6 znaków!", "#ff4444");
+            if (password !== confirmPass) return showMessage("Hasła nie są takie same!", "#ff4444");
+            
+            btn.disabled = true;
+            btn.innerText = "Tworzenie konta...";
+
+            try {
+                // 1. Rejestracja w tle
+                const regRes = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!regRes.ok) {
+                    const errData = await regRes.json();
+                    throw new Error(errData.message || "Błąd rejestracji");
+                }
+
+                showMessage("✅ Konto utworzone! Przechodzę do płatności...", "#00C851");
+                passwordContainer.style.display = 'none';
+                
+                // Automatycznie przechodzimy do logiki sprawdzania
+                setTimeout(() => checkUserStatus(email), 1000);
+
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerText = "Załóż konto i dołącz";
+                showMessage("Błąd: " + err.message, "#ff4444");
+            }
+            return;
+        }
+
+        // SCENARIUSZ B: Standardowe sprawdzanie (pierwszy klik)
+        await checkUserStatus(email);
+    });
+
+    async function checkUserStatus(email) {
+        btn.disabled = true;
+        btn.innerText = "Sprawdzanie...";
+        
+        try {
+            const statusRes = await fetch(`${API_URL}/api/user/status`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+            });
+
+            // 1. NIE MA KONTA -> Pokaż pola hasła
+            if (statusRes.status === 404) {
+                showMessage("⚠️ Nie masz konta. Ustaw hasło, aby dołączyć:", "#ffbb33");
+                passwordContainer.style.display = 'block';
+                btn.innerText = "Załóż konto i dołącz";
+                btn.disabled = false;
+                return;
+            }
+
+            const statusData = await statusRes.json();
+
+            // 2. MA KONTO -> Sprawdź czy już dołączył
+            if (statusData.has_joined) {
+                showMessage(`✅ Już jesteś na liście w tej edycji!`, "#00C851");
+                btn.innerText = "Przejdź do Panelu";
+                btn.onclick = () => window.location.href = "dashboard.html";
+                btn.disabled = false;
+                return;
+            }
+
+            // 3. MA KONTO, ALE NIE ZAPŁACIŁ -> Płatność / Dopłata
+            if (statusData.wallet_balance < 75) {
+                const missingAmount = (75 - statusData.wallet_balance).toFixed(2);
+                let payAmount = parseFloat(missingAmount);
+                if(payAmount < 5) payAmount = 5.00; // Minimum Stripe
+
+                showMessage(`⚠️ Brakuje środków. Dopłać różnicę.`, "#ffbb33");
+                btn.innerText = `Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                btn.disabled = false;
+
+                btn.onclick = async (ev) => {
+                    ev.preventDefault();
+                    btn.innerText = "Łączenie z bankiem...";
+                    btn.disabled = true;
+                    try {
+                        const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, amount: payAmount }) 
+                        });
+                        const payData = await payRes.json();
+                        if(payData.url) window.location.href = payData.url;
+                        else { alert("Błąd płatności"); btn.disabled = false; }
+                    } catch(e) { alert("Błąd: " + e.message); btn.disabled = false; }
+                };
+                return;
+            } 
+            
+            // 4. MA ŚRODKI -> Auto Join
+            else {
+                if(confirm("Masz środki w portfelu. Dołączyć do zrzutki?")) {
+                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+                    });
+                    if(joinRes.ok) { 
+                        alert("Dołączono!"); 
+                        window.location.href = "dashboard.html"; 
+                    } else { throw new Error("Błąd dołączania"); }
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "Sprawdź status / Dołącz";
+                }
+            }
+
+        } catch (err) {
+            showMessage("Błąd: " + err.message, "#ff4444");
+            btn.disabled = false;
+            btn.innerText = "Spróbuj ponownie";
+        }
+    }
+
+    // --- LICZNIK CZASU (POPRAWIONY) ---
+    async function updateCountdown() {
+    const statusRes = await fetch(`${API_URL}/api/group-buy/status`);
+    const statusData = await statusRes.json();
+    const joinBtn = document.querySelector('#signupForm button');
+    const countdownBox = document.getElementById('countdown').parentElement;
+
+    if (statusData.isLocked) {
+        document.getElementById('countdown').innerText = "PRZERWA TECHNICZNA";
+        countdownBox.style.background = "#ffbb33"; // Przywracamy żółty kolor
+        document.getElementById('countdown').style.color = "#000";
+        if(joinBtn) {
+        joinBtn.disabled = true;
+        joinBtn.innerText = "Startujemy 5-go!";
+        joinBtn.classList.remove('btn-pink-active'); // Usuń różowy gdy przerwa
+        joinBtn.style.background = "#444"; // Szary kolor przerwy
+    }
+    return;
+}
+
+
+if(joinBtn) {
+    joinBtn.disabled = false;
+    joinBtn.classList.add('btn-pink-active'); // Zawsze przywracaj różowy
+    joinBtn.style.background = ""; // Czyści szary kolor przerwy
+}
+
+    // Reset stylu gdy otwarta
+    countdownBox.style.background = ""; 
+    document.getElementById('countdown').style.color = "";
+
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const diff = lastDay - now;
+
+    if(joinBtn && joinBtn.disabled) {
+        joinBtn.disabled = false;
+        joinBtn.innerText = "Sprawdź status / Dołącz";
+        joinBtn.style.background = "";
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
+}
+    
+    // Uruchom od razu, nie czekaj 1 sekundy
+    updateCountdown(); 
+    setInterval(updateCountdown, 1000);
+
+    // --- POBIERANIE STATUSU (LICZNIK I CENY) ---
+    fetch(`${API_URL}/api/group-buy/status`)
+        .then(res => res.json())
+        .then(data => {
+            // 1. Definicja wszystkich potencjalnych elementów (z Twojego pliku)
+            const countEl = document.getElementById('participant-count'); 
+            const priceUsdEl = document.getElementById('current-price-usd');
+            const pricePlnEl = document.getElementById('current-price-pln');
+            const userCountEl = document.getElementById('userCount'); 
+            const priceElOld = document.getElementById('pricePerPerson'); 
+            const currentCountLabel = document.getElementById('current-count');
+
+            // 2. Aktualizacja tekstów (tylko jeśli istnieją w HTML)
+            if(countEl) countEl.innerText = data.users;
+            if(userCountEl) userCountEl.innerText = data.users;
+            if(currentCountLabel) currentCountLabel.innerText = data.users;
+            
+            if(priceUsdEl) priceUsdEl.innerText = `$${data.priceUSD}`;
+            if(pricePlnEl) pricePlnEl.innerText = `ok. ${data.pricePLN} PLN`;
+            if(priceElOld) priceElOld.innerText = data.priceUSD + " $";
+
+            // 3. Generowanie 4 pasków postępu dla celów (15, 20, 25, 30 osób)
+            const goals = [15, 20, 25, 30];
+            const prices = { 15: 71, 20: 53, 25: 42, 30: 35 };
+            const container = document.getElementById('goals-container');
+            
+            if(container) {
+                container.innerHTML = ""; // Czyścimy stare paski
+                goals.forEach(goal => {
+                    const progress = Math.min(100, (data.users / goal) * 100);
+                    const isReached = data.users >= goal;
+                    const needed = goal - data.users;
+                    
+                    container.innerHTML += `
+                        <div class="bg-gray-900/50 p-4 rounded-xl border ${isReached ? 'border-green-500/50' : 'border-gray-700'}">
+                            <div class="flex justify-between mb-2 text-sm">
+                                <span class="${isReached ? 'text-green-400 font-bold' : 'text-gray-300'}">Cel: ${goal} osób</span>
+                                <span class="font-bold text-white">${prices[goal]} zł</span>
+                            </div>
+                            <div class="w-full bg-gray-800 h-3 rounded-full overflow-hidden">
+                                <div class="h-full ${isReached ? 'bg-green-500' : 'bg-pink-600'}" style="width: ${progress}%"></div>
+                            </div>
+                            <p class="text-[10px] mt-2 ${isReached ? 'text-green-400' : 'text-gray-500'}">
+                                ${isReached ? '✅ Osiągnięto!' : 'Brakuje jeszcze ' + needed + ' osób'}
+                            </p>
+                        </div>
+                    `;
+                });
+            }
+
+            // 4. Główny pasek progresu w dużej karcie (dzielimy przez 25 osób jako cel "Diamond")
+            const visualBar = document.getElementById('progress-bar-visual');
+            if(visualBar) {
+                let percent = Math.max(5, (data.users / 25) * 100); 
+                if(percent > 100) percent = 100;
+                visualBar.style.width = percent + "%";
+            }
+        })
+        .catch(err => console.error("Błąd licznika:", err));
+
+    // Obsługa Menu Mobilnego
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('nav ul');
+    if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+
+function scrollGallery(direction) {
+        const container = document.getElementById('gallery');
+        // Przesuń o 300 pikseli w lewo (-1) lub w prawo (1)
+        const scrollAmount = 300; 
+        
+        if (direction === 1) {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        } else {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    }
+
+    // Opcjonalnie: Funkcja do powiększania zdjęć (Lightbox)
+    // Jeśli nie masz jeszcze funkcji openLightbox, to jest prosta wersja:
+    function openLightbox(element) {
+        const imgSrc = element.querySelector('img').src;
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        
+        lightboxImg.src = imgSrc;
+        lightbox.style.display = 'flex'; // Używamy flex zamiast block
+        document.body.style.overflow = 'hidden'; // Blokujemy przewijanie strony pod spodem
+    }
+
+    // Funkcja zamykania (dodaj do onclick w HTML lightboaxa lub tutaj)
+    document.getElementById('lightbox').onclick = function(e) {
+        if(e.target !== document.getElementById('lightbox-img')) {
+            this.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Odblokuj stronę
+        }
+    }
+    
+    // Obsługa X
+    document.getElementById('lightbox-close').onclick = function() {
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+</script>
+
+</body>
+</html>
