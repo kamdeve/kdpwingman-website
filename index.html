@@ -11,17 +11,17 @@
     
     <style>
         :root {
-            --bg-dark: #020617;
-            --card-bg: rgba(30, 41, 59, 0.6);
+            --bg-light: #f8fafc; /* Bardzo jasny, pastelowy szary */
+            --bg-white: #ffffff;
             --cherry: #a0134a;
-            --cherry-glow: rgba(160, 19, 74, 0.5);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --cherry-light: rgba(160, 19, 74, 0.1);
+            --text-main: #0f172a; /* Głęboki, elegancki grafit */
+            --text-muted: #475569;
+            --border-light: #e2e8f0;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-light);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -29,182 +29,190 @@
             overflow-x: hidden;
         }
 
-        /* --- TŁO GLOW --- */
-        .background-glow {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 20%, var(--cherry-glow) 0%, transparent 35%),
-                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.15) 0%, transparent 35%);
-            pointer-events: none;
-        }
-
-        /* --- NAVBAR (Twój obecny, lekko odświeżony) --- */
+        /* --- NAVBAR --- */
         .navbar-container {
-            background: rgba(2, 6, 23, 0.8);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--border-light);
             position: sticky; top: 0; z-index: 1000; width: 100%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         .navbar-content {
             max-width: 1200px; margin: 0 auto; height: 70px;
             display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
         }
         .logo-link {
-            text-decoration: none; font-weight: 800; font-size: 1.4rem; color: white;
+            text-decoration: none; font-weight: 800; font-size: 1.4rem; color: var(--text-main);
             display: flex; align-items: center; gap: 10px;
         }
         .logo-img { height: 35px; }
         .nav-links { display: flex; align-items: center; gap: 25px; }
-        .nav-item { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: 0.3s; }
+        .nav-item { text-decoration: none; color: var(--text-muted); font-weight: 600; transition: 0.3s; }
         .nav-item:hover, .nav-item.highlight { color: var(--cherry); }
         
         .btn-login {
             text-decoration: none; padding: 8px 24px;
-            border: 1px solid var(--cherry); border-radius: 50px;
-            color: white; font-weight: 600; transition: 0.3s;
-            background: rgba(160, 19, 74, 0.1);
+            border: 2px solid var(--cherry); border-radius: 50px;
+            color: var(--cherry); font-weight: 700; transition: 0.3s;
+            background: transparent;
         }
-        .btn-login:hover { background: var(--cherry); box-shadow: 0 0 15px var(--cherry-glow); }
+        .btn-login:hover { background: var(--cherry); color: white; box-shadow: 0 4px 15px var(--cherry-light); }
+
+        .btn-forum {
+            border: none; padding: 8px 18px; border-radius: 50px;
+            color: var(--cherry); text-decoration: none; font-size: 0.9rem; font-weight: 600;
+            transition: 0.3s; background: var(--cherry-light); margin-right: 15px;
+        }
+        .btn-forum:hover { background: var(--cherry); color: white; }
 
         /* Hamburger */
         .hamburger-btn { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; }
-        .bar { width: 25px; height: 3px; background-color: white; border-radius: 2px; }
+        .bar { width: 25px; height: 3px; background-color: var(--text-main); border-radius: 2px; }
 
         /* --- HERO SECTION --- */
         .hero-section {
-            text-align: center; padding: 120px 20px 80px; max-width: 900px; margin: 0 auto;
+            text-align: center; padding: 80px 20px 60px; max-width: 1000px; margin: 0 auto;
         }
         .hero-title {
-            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
-            background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px;
+            color: var(--text-main);
         }
-        .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
-        .cta-button {
-            display: inline-block; padding: 16px 40px; font-size: 1.2rem; font-weight: bold; color: white;
-            background: linear-gradient(90deg, #a0134a 0%, #d63384 100%);
-            border-radius: 50px; text-decoration: none; transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 10px 30px rgba(160, 19, 74, 0.4);
+        .hero-title span { color: var(--cherry); }
+        .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto; }
+        
+        /* Video Wrapper */
+        .video-wrapper {
+            width: 100%; max-width: 800px; margin: 0 auto 40px auto;
+            aspect-ratio: 16/9; background: #cbd5e1; border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden; border: 4px solid white;
         }
-        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(160, 19, 74, 0.6); }
+        /* Placeholder styling (to be replaced with actual iframe/video) */
+        .video-placeholder {
+            color: var(--text-muted); font-size: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .video-placeholder i { font-size: 4rem; color: white; text-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        /* --- ZIG-ZAG STEPS (NOWA SEKCJA) --- */
+        .cta-button {
+            display: inline-block; padding: 18px 45px; font-size: 1.2rem; font-weight: 800; color: white;
+            background: var(--cherry); border-radius: 50px; text-decoration: none; 
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 25px rgba(160, 19, 74, 0.3);
+        }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(160, 19, 74, 0.5); }
+
+        /* --- PULS ZRZUTKI (SOCIAL PROOF CAROUSEL) --- */
+        .social-proof-section {
+            max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px;
+        }
+        .social-proof-header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+        }
+        .social-proof-header h3 { font-size: 1.4rem; margin: 0; color: var(--text-main); }
+        .pulse-dot {
+            width: 12px; height: 12px; background-color: #10b981; border-radius: 50%;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .carousel-container {
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+            gap: 20px; padding-bottom: 15px; scrollbar-width: none; /* Hide scrollbar Firefox */
+        }
+        .carousel-container::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+        
+        .carousel-card {
+            min-width: 320px; background: white; border-radius: 12px; padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); scroll-snap-align: start;
+            border-left: 4px solid var(--cherry); flex-shrink: 0;
+        }
+        .card-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
+        .card-text { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+        /* --- ZIG-ZAG STEPS --- */
         .steps-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; }
         .step-row {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 120px; gap: 60px;
-            opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 100px; gap: 60px;
         }
-        .step-row.visible { opacity: 1; transform: translateY(0); }
         .step-row.reverse { flex-direction: row-reverse; }
         
         .step-content { flex: 1; }
-        .step-number { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--cherry); font-weight: bold; margin-bottom: 10px; display: block; }
-        .step-title { font-size: 2.2rem; font-weight: 700; margin-bottom: 20px; color: white; }
+        .step-number { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--cherry); font-weight: 800; margin-bottom: 10px; display: block; }
+        .step-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 20px; color: var(--text-main); }
         .step-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; }
         
         .step-visual { flex: 1.2; position: relative; }
         
-        /* Glass Card */
-        .glass-card {
-    background: var(--card-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 20px; /* Troszkę większy margines wewnątrz */
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s;
-    
-    /* KLUCZOWE ZMIANY: */
-    width: 100%;            /* Karta zajmuje 100% dostępnej szerokości kolumny */
-    max-width: 100%;        /* Nie może być szersza niż ekran */
-    height: 450px;          /* Stała wysokość na komputerze */
-    overflow: hidden;       /* ✂️ OBCINA wszystko co wystaje (klucz do naprawy telefonu) */
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box; /* Padding nie powiększa pudełka */
-}
+        /* Light Card */
+        .light-card {
+            background: white; border: 1px solid var(--border-light);
+            border-radius: 20px; padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            width: 100%; max-width: 100%; height: 400px;
+            display: flex; justify-content: center; align-items: center; box-sizing: border-box;
+            overflow: hidden;
+        }
+        .step-img {
+            width: 100%; height: 100%; object-fit: contain; border-radius: 12px; display: block;
+        }
 
-.glass-card:hover { 
-    transform: translateY(-5px); 
-    border-color: var(--cherry); 
-}
-
-/* --- POPRAWIONE ZDJĘCIE --- */
-.step-img {
-    width: 100%;            /* Próbuj zająć całą szerokość... */
-    height: 100%;           /* ...i całą wysokość */
-    object-fit: contain;    /* ...ALE zachowaj proporcje i zmieść się w środku (nie ucinaj, nie rozciągaj) */
-    border-radius: 12px;
-    display: block;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); /* Cień rzucany przez sam obiekt na zdjęciu */
-}
-
-/* --- POPRAWKA NA TELEFON (Żeby nie przesuwało strony) --- */
-@media (max-width: 768px) {
-    .glass-card {
-        height: 300px; /* Na telefonie karta jest niższa */
-        margin-bottom: 20px;
-    }
-    
-    .step-visual {
-        width: 100%;       /* Kontener zdjęcia nie może być szerszy niż ekran */
-        padding: 0 10px;   /* Margines bezpieczeństwa */
-        box-sizing: border-box;
-    }
-}
-
-        /* --- FEATURES SECTION (ZACHOWANA, ALE ODŚWIEŻONA) --- */
-        .features-section { padding: 80px 20px; background: rgba(0,0,0,0.2); }
+        /* --- FEATURES SECTION --- */
+        .features-section { padding: 80px 20px; background: white; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; color: var(--text-main); font-weight: 800; }
         
-        /* ZMIANA: Grid ustawiony tak, by mieścił 2 karty obok siebie na desktopie */
-.feature-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Szersze karty, układ 2x2 */
-    gap: 40px; 
-}
-
-/* Na telefonach wracamy do jednej kolumny */
-@media (max-width: 768px) {
-    .feature-grid { grid-template-columns: 1fr; }
-}
-        .feature-card {
-            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px;
-            transition: 0.3s;
+        .feature-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 40px; 
         }
-        .feature-card:hover { background: rgba(30, 41, 59, 0.9); border-color: var(--cherry); }
-        .feature-icon { font-size: 2rem; color: var(--cherry); margin-bottom: 20px; }
-        .feature-card h3 { margin-bottom: 10px; font-size: 1.3rem; }
-        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
-        .feature-video { width: 100%; border-radius: 8px; margin-top: 20px; border: 1px solid #334155; }
+        .feature-card {
+            background: var(--bg-light); border: 1px solid var(--border-light); border-radius: 16px; padding: 40px;
+            transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--cherry); box-shadow: 0 15px 30px rgba(160, 19, 74, 0.1); }
+        .feature-icon { font-size: 2.5rem; color: var(--cherry); margin-bottom: 20px; }
+        .feature-card h3 { margin-bottom: 15px; font-size: 1.4rem; font-weight: 700; }
+        .feature-card p { color: var(--text-muted); font-size: 1rem; line-height: 1.6; }
 
-        /* --- FOOTER & REGISTER --- */
+        /* --- REGISTER FORM --- */
         .register-section {
-            text-align: center; padding: 80px 20px; background: linear-gradient(180deg, transparent, #0f172a);
+            text-align: center; padding: 100px 20px; background: var(--bg-light);
+        }
+        .register-box {
+            background: white; max-width: 450px; margin: 0 auto; padding: 40px;
+            border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid var(--border-light);
         }
         .register-form {
-            max-width: 400px; margin: 30px auto; display: flex; flex-direction: column; gap: 15px;
+            display: flex; flex-direction: column; gap: 15px; margin-top: 25px;
         }
         .register-form input {
-            padding: 15px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 1rem;
+            padding: 15px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--bg-light); 
+            color: var(--text-main); font-size: 1rem; transition: 0.3s;
         }
+        .register-form input:focus { outline: none; border-color: var(--cherry); background: white; }
         .register-form button {
-            padding: 15px; border-radius: 8px; border: none; background: var(--cherry); color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s;
+            padding: 15px; border-radius: 8px; border: none; background: var(--cherry); color: white; 
+            font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.2s; margin-top: 10px;
         }
-        .register-form button:hover { background: #d63384; }
+        .register-form button:hover { background: #8a0f3e; transform: translateY(-2px); }
 
-        footer { border-top: 1px solid #334155; padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+        footer { border-top: 1px solid var(--border-light); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; background: white;}
+        footer a { color: var(--text-muted); text-decoration: underline; margin: 0 10px; transition: 0.2s; }
+        footer a:hover { color: var(--cherry); }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hamburger-btn { display: flex; }
             .nav-links {
                 display: none; position: absolute; top: 70px; left: 0; width: 100%;
-                background: #0f172a; flex-direction: column; padding: 20px 0; border-bottom: 2px solid var(--cherry);
+                background: white; flex-direction: column; padding: 20px 0; border-bottom: 2px solid var(--cherry);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
             .nav-links.active { display: flex; }
             .nav-item { padding: 10px; width: 100%; text-align: center; }
@@ -212,46 +220,63 @@
             .hero-title { font-size: 2.5rem; }
             .step-row, .step-row.reverse { flex-direction: column; gap: 30px; margin-bottom: 80px; }
             .step-content { text-align: center; }
+            .light-card { height: 300px; margin-bottom: 20px; }
+            .feature-grid { grid-template-columns: 1fr; }
         }
-        .nav-link {
-    color: var(--text-main);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: 0.3s;
-    font-family: 'Inter', sans-serif; /* Wymuszenie poprawnej czcionki */
-}
-.nav-link:hover {
-    color: var(--cherry);
-}
-
-.btn-forum {
-    border: 1px solid var(--cherry);
-    padding: 8px 18px;
-    border-radius: 50px;
-    color: white;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: 0.3s;
-    background: rgba(160, 19, 74, 0.1);
-    margin-right: 15px;
-}
-.btn-forum:hover {
-    background: var(--cherry);
-    box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
-}
+        /* --- STYLE DLA PANELU ADMINA (MODAL) --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px);
+            z-index: 2000; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: white; width: 90%; max-width: 500px; border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        @keyframes modalFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 25px; border-bottom: 1px solid var(--border-light); background: var(--bg-light);
+        }
+        .modal-header h3 { margin: 0; font-size: 1.2rem; color: var(--text-main); }
+        .close-btn { background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .close-btn:hover { color: var(--cherry); }
+        
+        .modal-body { padding: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .modal-body label { font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+        .modal-body input, .modal-body textarea {
+            width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: 8px;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; box-sizing: border-box;
+        }
+        .modal-body input:focus, .modal-body textarea:focus { outline: none; border-color: var(--cherry); }
+        
+        /* Obszar Drag & Drop */
+        .drop-zone {
+            border: 2px dashed var(--border-light); border-radius: 8px; padding: 30px 20px;
+            text-align: center; cursor: pointer; transition: 0.3s; background: var(--bg-light);
+        }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--cherry); background: var(--cherry-light); }
+        .drop-zone i { font-size: 2rem; color: var(--cherry); margin-bottom: 10px; }
+        .drop-zone p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        
+        .modal-footer {
+            padding: 20px 25px; border-top: 1px solid var(--border-light);
+            display: flex; justify-content: flex-end; gap: 15px; background: var(--bg-light);
+        }
+        .btn-cancel { padding: 10px 20px; border: 1px solid var(--border-light); background: white; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-save { padding: 10px 20px; border: none; background: var(--cherry); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-save:hover { background: #8a0f3e; }
     </style>
 </head>
 <body>
-
-    <div class="background-glow"></div>
 
     <header class="navbar-container">
         <nav class="navbar-content">
             <a href="index.html" class="logo-link">
                 <img src="images/logo.svg" alt="KDP Wingman Icon" class="logo-img">
-                <span>KDP <span style="color: #a0134a;">Wingman</span></span>
+                <span>KDP <span style="color: var(--cherry);">Wingman</span></span>
             </a>
 
             <button class="hamburger-btn" onclick="toggleMobileMenu()">
@@ -265,25 +290,68 @@
                 <a href="#features" class="nav-item">Funkcje</a>
                 <a href="https://chromewebstore.google.com/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" target="_blank" class="nav-item">Rozszerzenie</a>
                 <a href="group-buy.html" class="nav-item highlight">Wspólny Dostęp</a>
-                <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item youtube-icon" data-tooltip="Jak korzystać z wtyczki?">
+                <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item youtube-icon">
                     <i class="fab fa-youtube"></i>
                 </a>
                 <a href="forum.html" class="btn-forum">
-    <i class="fas fa-comments"></i> Forum
-</a>
-                <a href="dashboard.html" class="btn-login">🔒 Zaloguj</a>
+                    <i class="fas fa-comments"></i> Forum
+                </a>
+                <a href="dashboard.html" class="btn-login">Zaloguj się</a>
             </div>
         </nav>
     </header>
 
     <section class="hero-section">
-        <h1 class="hero-title">Dołącz do zrzutki i korzystaj za ułamek ceny</h1>
+        <h1 class="hero-title">Zdominuj Amazon KDP za <span>ułamek ceny</span></h1>
         <p class="hero-subtitle">
-            Profesjonalne narzędzia do Amazon KDP bez przepłacania. 
-            Zautomatyzowany system, transparentne zasady i społeczność, która wspiera Twój sukces.
+            Profesjonalne narzędzia do analizy bez przepłacania. Przestań zgadywać, zacznij publikować zyskownie dzięki współdzielonym kosztom.
         </p>
-        <a href="group-buy.html" class="cta-button">Dołącz do grupy 🚀</a>
+        
+        <div class="video-wrapper">
+    <video width="100%" height="auto" controls style="border-radius: 20px; display: block;">
+        <source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4">
+        Twoja przeglądarka nie obsługuje odtwarzacza wideo.
+    </video>
+</div>
+
+        <a href="group-buy.html" class="cta-button">Zarezerwuj swoje miejsce 🚀</a>
     </section>
+
+    <section class="social-proof-section">
+    <div class="social-proof-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="pulse-dot"></div>
+            <h3>Puls Zrzutki</h3>
+        </div>
+        <button id="admin-add-post-btn" onclick="openPostModal()" style="display:none; background: var(--cherry); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Dodaj wpis
+        </button>
+    </div>
+    
+    <div style="position: relative;">
+        <button onclick="scrollCarousel(-1)" class="nav-btn left"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-container" id="dynamic-posts-container">
+            </div>
+        <button onclick="scrollCarousel(1)" class="nav-btn right"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</section>
+
+<style>
+    /* Naprawa nawigacji na komputerze */
+    .nav-btn {
+        position: absolute; top: 50%; transform: translateY(-50%);
+        background: white; border: 1px solid var(--border-light);
+        width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+        z-index: 10; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
+    }
+    .nav-btn:hover { background: var(--cherry); color: white; }
+    .nav-btn.left { left: -20px; }
+    .nav-btn.right { right: -20px; }
+
+    /* Ukrywamy strzałki na telefonie, bo tam działa dotyk */
+    @media (max-width: 768px) { .nav-btn { display: none; } }
+</style>
 
     <div id="how-it-works" class="steps-container">
 
@@ -293,12 +361,12 @@
                 <h2 class="step-title">Dołącz do obecnej edycji</h2>
                 <p class="step-desc">
                     Wystarczy podać swój e-mail. Nasz system sprawdzi, czy masz już konto. 
-                    Jeśli nie - stworzysz je w 30 sekund. Prosty formularz to pierwszy krok do oszczędności.
+                    Jeśli nie - stworzysz je w 30 sekund. Prosty formularz to pierwszy krok do ogromnych oszczędności.
                 </p>
             </div>
             <div class="step-visual">
-                <div class="glass-card">
-                    <img src="images/step1.png" class="step1-img">
+                <div class="light-card">
+                    <img src="images/step1.png" class="step-img" alt="Krok 1">
                 </div>
             </div>
         </div>
@@ -308,13 +376,13 @@
                 <span class="step-number">Krok 02</span>
                 <h2 class="step-title">Dokonaj wpłaty depozytu</h2>
                 <p class="step-desc">
-                    Bezpieczna płatność przez Stripe (Karta/BLIK). Wpłacasz 75 zł depozytu. 
-                    Twoje środki są bezpieczne i czekają na zamknięcie listy uczestników.
+                    Bezpieczna płatność przez Stripe (Karta/BLIK). Wpłacasz stały depozyt. 
+                    Twoje środki są bezpieczne i czekają na zamknięcie listy uczestników pierwszego dnia miesiąca.
                 </p>
             </div>
             <div class="step-visual">
-                <div class="glass-card">
-                    <img src="images/step2.png" class="step-img">
+                <div class="light-card">
+                    <img src="images/step2.png" class="step-img" alt="Krok 2">
                 </div>
             </div>
         </div>
@@ -324,13 +392,12 @@
                 <span class="step-number">Krok 03</span>
                 <h2 class="step-title">Zajmij miejsce i obserwuj spadek ceny</h2>
                 <p class="step-desc">
-                    Im więcej nas jest, tym mniej płacisz. Po wpłacie zobaczysz swój numer na liście 
-                    oraz aktualną prognozę ceny. To czysta matematyka!
+                    Im więcej nas jest, tym mniej płacisz. Po wpłacie w panelu uaktywni się wykres i zobaczysz, jak cena spada z każdą kolejną osobą. To czysta, przyjemna matematyka!
                 </p>
             </div>
             <div class="step-visual">
-                <div class="glass-card">
-                    <img src="images/step3.png" class="step-img">
+                <div class="light-card">
+                    <img src="images/step3.png" class="step-img" alt="Krok 3">
                 </div>
             </div>
         </div>
@@ -340,29 +407,13 @@
                 <span class="step-number">Krok 04</span>
                 <h2 class="step-title">Nadpłacone środki wracają do Ciebie</h2>
                 <p class="step-desc">
-                    Narzędzie kosztowało 50 zł, a wpłaciłeś 75 zł? Różnica (25 zł) automatycznie 
-                    wraca na Twój wirtualny portfel w Panelu. Możesz ją wykorzystać w następnym miesiącu.
+                    Narzędzie po podziale kosztowało zaledwie 35 zł? Różnica automatycznie 
+                    wraca na Twój wirtualny portfel. Możesz z nich opłacić kolejny miesiąc. Loginy otrzymujesz zawsze 5-go dnia miesiąca.
                 </p>
             </div>
             <div class="step-visual">
-                <div class="glass-card">
-                    <img src="images/step4.png" class="step-img">
-                </div>
-            </div>
-        </div>
-
-        <div class="step-row">
-            <div class="step-content">
-                <span class="step-number">Krok 05</span>
-                <h2 class="step-title">Pełna wolność finansowa</h2>
-                <p class="step-desc">
-                    Zrezygnowałeś? Jednym kliknięciem wypłacasz środki z portfela na swoje konto bankowe. 
-                    Dołączasz kiedy chcesz, rezygnujesz kiedy chcesz.
-                </p>
-            </div>
-            <div class="step-visual">
-                <div class="glass-card">
-                   <img src="images/step5.png" class="step-img">
+                <div class="light-card">
+                    <img src="images/step4.png" class="step-img" alt="Krok 4">
                 </div>
             </div>
         </div>
@@ -373,7 +424,7 @@
         <div class="container">
             <div class="section-header">
                 <h2>Jedno narzędzie, <span style="color:var(--cherry)">wiele możliwości</span></h2>
-                <p>Oprócz wspólnego dostępu, otrzymujesz darmowe rozszerzenie Chrome.</p>
+                <p style="color: var(--text-muted); font-size: 1.1rem;">Oprócz wspólnego dostępu, otrzymujesz potężne rozszerzenie do przeglądarki Chrome.</p>
             </div>
     
             <div class="feature-grid">
@@ -382,59 +433,50 @@
                     <div class="feature-icon"><i class="fas fa-search"></i></div>
                     <h3>Historia BSR</h3>
                     <p>Zbieraj kluczowe dane (ASIN, BSR, historia) bezpośrednio z wyników wyszukiwania. Oszczędzaj dziesiątki minut na każdym researchu.</p>
-                    <video autoplay loop muted playsinline class="feature-video">
-                        <source src="videos/ui-wrapper.mp4" type="video/mp4">
-                    </video>
                 </div>
         
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-magic"></i></div>
                     <h3>Generator AI</h3>
-                    <p>Twórz opisy produktów, które naprawdę sprzedają. Zapomnij o pustce w głowie – sztuczna inteligencja napisze tekst za Ciebie.</p>
-                    <video autoplay loop muted playsinline class="feature-video">
-                        <source src="videos/opis_ai.mp4" type="video/mp4">
-                    </video>
+                    <p>Twórz opisy produktów, które naprawdę sprzedają. Zapomnij o pustce w głowie – sztuczna inteligencja napisze świetny tekst za Ciebie.</p>
                 </div>
         
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-calculator"></i></div>
                     <h3>Kalkulatory KDP</h3>
                     <p>Inteligentny kalkulator sam pobiera cenę i liczbę stron, dając Ci natychmiastową analizę rentowności. Twarde dane zamiast zgadywania.</p>
-                    <video autoplay loop muted playsinline class="feature-video">
-                        <source src="videos/kalkulator_kdp.mp4" type="video/mp4">
-                    </video>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
                     <h3>Auto MKL i Symulator PPC</h3>
-                    <p>Twórz Master Keyword List w sekundy, zamiast godzin w Excelu. Sprawdź rentowność niszy i koszty reklamy, zanim wydasz choćby złotówkę.</p>
-                    <video autoplay loop muted playsinline class="feature-video">
-                        <source src="videos/symulator_ppc.mp4" type="video/mp4">
-                    </video>
+                    <p>Twórz Master Keyword List w sekundy. Sprawdź rentowność niszy i szacowane koszty reklamy, zanim wydasz choćby złotówkę na kampanię.</p>
                 </div>
 
             </div>
+        </div>
     </section>
 
     <section id="register" class="register-section">
-        <h2 style="font-size:2rem; margin-bottom:10px; color:white;">Dołącz do społeczności Wingmana</h2>
-        <p style="color:var(--text-muted);">Zarejestruj się już dziś i zacznij swoją podróż ku niezależności.</p>
-        
-        <form class="register-form">
-            <input type="email" placeholder="Twój adres e-mail" required>
-            <input type="password" placeholder="Stwórz hasło" required>
-            <input type="password" placeholder="Powtórz hasło" required>
-            <button type="submit">Stwórz darmowe konto</button>
-        </form>
+        <div class="register-box">
+            <h2 style="font-size:1.8rem; margin-bottom:10px; color:var(--text-main); font-weight:800;">Dołącz do społeczności</h2>
+            <p style="color:var(--text-muted);">Zarejestruj się już dziś i zacznij swoją podróż ku niezależności z KDP Wingman.</p>
+            
+            <form class="register-form">
+                <input type="email" placeholder="Twój adres e-mail" required>
+                <input type="password" placeholder="Stwórz bezpieczne hasło" required>
+                <input type="password" placeholder="Powtórz hasło" required>
+                <button type="submit">Stwórz darmowe konto</button>
+            </form>
+        </div>
     </section>
 
     <footer>
         <div class="container">
             <p>
                 &copy; 2026 KDP Wingman. Wszelkie prawa zastrzeżone.<br>
-                <a href="terms.html" style="color: white; text-decoration: underline; margin-right: 10px;">Regulamin Serwisu</a> | 
-                <a href="privacy.html" style="color: white; text-decoration: underline; margin-left: 10px;">Polityka Prywatności</a>
+                <a href="terms.html">Regulamin Serwisu</a> | 
+                <a href="privacy.html">Polityka Prywatności</a>
             </p>
         </div>
     </footer>
@@ -446,22 +488,15 @@
             menu.classList.toggle('active');
         }
 
-        // 2. Animacja pojawiania się (Scroll)
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.2 });
-        document.querySelectorAll('.step-row').forEach((el) => observer.observe(el));
-
-        // 3. Logika Rejestracji (ZACHOWANA Z ORYGINAŁU)
+        // 2. Animacja pojawiania się (Scroll) - Wymaga ewentualnego dodania klas do elementów CSS
+        // (W jasnym motywie pominąłem zbytnie animacje ukrywania dla przejrzystości, ale logika zostaje dla przyszłych rozwinięć).
+        
+        // 3. Logika Rejestracji (ZACHOWANA W ORYGINALE)
         const registerForm = document.querySelector('.register-form');
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             const email = registerForm.querySelector('input[type="email"]').value;
-            const password = registerForm.querySelector('input[type="password"]').value;
+            const password = registerForm.querySelectorAll('input[type="password"]')[0].value;
             const passwordConfirm = registerForm.querySelectorAll('input[type="password"]')[1].value;
     
             if (password !== passwordConfirm) {
@@ -470,6 +505,7 @@
             }
     
             try {
+                // Twoje połącznie z backendem Railway
                 const response = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -488,9 +524,251 @@
                 alert(`Błąd: ${error.message}`);
             }
         });
+
+// --- ŁADOWANIE POSTÓW Z BAZY ---
+async function loadPulsPosts() {
+    const container = document.getElementById('dynamic-posts-container');
+    if (!container) return;
+    
+    // Sprawdzamy czy to Ty przeglądasz stronę, żeby pokazać kosz na śmieci
+    const isAdmin = localStorage.getItem('admin_secret') === 'super_tajne_haslo_admina';
+
+    try {
+        const res = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/puls/posts');
+        const posts = await res.json();
+        
+        container.innerHTML = posts.map(post => {
+            // Sprawdzamy, czy ten komputer już lajkował post (żeby pokolorować ogień na wiśniowo)
+            const hasLiked = localStorage.getItem(`liked_puls_${post.id}`);
+            const fireColor = hasLiked ? 'var(--cherry)' : 'var(--text-muted)';
+
+            return `
+            <div class="carousel-card" style="position: relative; display: flex; flex-direction: column;">
+                
+                ${isAdmin ? `
+                    <button onclick="deletePulsPost(${post.id})" style="position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.95); color:#e11d48; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15); z-index: 10; transition: 0.2s;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+                
+                ${post.image_url ? `<img src="${post.image_url}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">` : ''}
+                
+                <span class="card-date" style="margin-bottom: 8px;">
+                    ${new Date(post.created_at).toLocaleDateString('pl-PL', {day: 'numeric', month: 'long', year: 'numeric'})}
+                </span>
+                
+                <h4 class="card-title">${post.title}</h4>
+                <p class="card-text" style="flex-grow: 1;">${post.content}</p>
+                
+                <div style="border-top: 1px solid var(--border-light); margin-top: 15px; padding-top: 12px; display: flex; justify-content: flex-end;">
+                    <button onclick="likePulsPost(${post.id})" id="like-btn-${post.id}" style="background:none; border:none; color:${fireColor}; cursor:pointer; font-size:1.1rem; font-weight: bold; transition:0.2s; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-fire"></i> <span id="like-count-${post.id}">${post.likes || 0}</span>
+                    </button>
+                </div>
+
+            </div>
+        `}).join('');
+    } catch (e) { console.error("Błąd ładowania postów:", e); }
+}
+
+// --- NOWE FUNKCJE: USUWANIE I LAJKOWANIE ---
+async function deletePulsPost(id) {
+    if (!confirm("⚠️ Czy na pewno chcesz trwale usunąć ten post?")) return;
+    
+    const secret = localStorage.getItem('admin_secret');
+    try {
+        const res = await fetch(`https://kdpwingmanv2backend-production.up.railway.app/api/puls/post/${id}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ secret })
+        });
+        if (res.ok) loadPulsPosts(); // Odświeża karuzelę po usunięciu
+        else alert("Błąd usuwania!");
+    } catch (e) { console.error(e); }
+}
+
+async function likePulsPost(id) {
+    // 1. Sprawdzenie, czy już lajkowałeś
+    if (localStorage.getItem(`liked_puls_${id}`)) {
+        alert("Już polubiłeś ten wpis! 🔥");
+        return;
+    }
+    
+    try {
+        const res = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/puls/like', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id })
+        });
+        
+        if (res.ok) {
+            // Sukces!
+            localStorage.setItem(`liked_puls_${id}`, 'true');
+            
+            const countSpan = document.getElementById(`like-count-${id}`);
+            const btn = document.getElementById(`like-btn-${id}`);
+            
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+            btn.style.color = 'var(--cherry)';
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 200); 
+        } else {
+            // Serwer odpowiedział, ale błędem
+            alert("Błąd serwera: Prawdopodobnie plik index.js na Railway jeszcze się nie zaktualizował. Odczekaj minutę.");
+        }
+    } catch (e) { 
+        console.error(e); 
+        // Błąd krytyczny (np. brak internetu)
+        alert("Błąd połączenia z serwerem. Zobacz konsolę (F12).");
+    }
+}
+
+// --- LOGIKA NOWEGO MODALA I DRAG & DROP ---
+let base64ImageString = ""; 
+
+function openPostModal() {
+    const modal = document.getElementById('admin-post-modal');
+    if(modal) modal.style.display = 'flex';
+    
+    document.getElementById('post-title').value = '';
+    document.getElementById('post-content').value = '';
+    document.getElementById('image-preview').style.display = 'none';
+    document.getElementById('drop-zone').style.display = 'block';
+    base64ImageString = "";
+}
+
+function closePostModal() {
+    const modal = document.getElementById('admin-post-modal');
+    if(modal) modal.style.display = 'none';
+}
+
+// Zabezpieczone podpinanie Drag & Drop
+document.addEventListener("DOMContentLoaded", () => {
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('post-image-input');
+    const imagePreview = document.getElementById('image-preview');
+
+    if (dropZone && fileInput && imagePreview) {
+        dropZone.addEventListener('dragover', (e) => { 
+            e.preventDefault(); 
+            dropZone.classList.add('dragover'); 
+        });
+        
+        dropZone.addEventListener('dragleave', () => { 
+            dropZone.classList.remove('dragover'); 
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); 
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFileUpload(e.dataTransfer.files[0], imagePreview, dropZone);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0], imagePreview, dropZone);
+            }
+        });
+    }
+});
+
+function handleFileUpload(file, imagePreview, dropZone) {
+    if (!file.type.startsWith('image/')) return alert('Wybierz plik graficzny!');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        base64ImageString = e.target.result;
+        imagePreview.src = base64ImageString;
+        imagePreview.style.display = 'block';
+        dropZone.style.display = 'none'; 
+    };
+    reader.readAsDataURL(file);
+}
+
+// --- WYSYŁKA POSTA NA SERWER ---
+async function submitNewPost() {
+    const title = document.getElementById('post-title').value;
+    const content = document.getElementById('post-content').value;
+    const secret = localStorage.getItem('admin_secret');
+
+    if (!title || !content) return alert("Wypełnij temat i treść!");
+
+    const btn = document.querySelector('.btn-save');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zapisywanie...';
+
+    try {
+        const res = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/puls/post', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ title, content, image_url: base64ImageString, secret })
+        });
+        
+        if (res.ok) {
+            closePostModal();
+            loadPulsPosts(); 
+        } else {
+            alert("Błąd zapisu! Upewnij się, że zaktualizowałeś index.js na serwerze.");
+        }
+    } catch (e) { console.error(e); }
+    
+    btn.innerHTML = originalText;
+}
+
+// --- SYSTEM ADMINA I NAWIGACJI ---
+function checkAdminStatus() {
+    const secret = localStorage.getItem('admin_secret');
+    const btn = document.getElementById('admin-add-post-btn');
+    if (secret === 'super_tajne_haslo_admina' && btn) {
+        btn.style.display = 'block';
+    }
+}
+
+function scrollCarousel(direction) {
+    const container = document.getElementById('dynamic-posts-container');
+    if (container) {
+        const scrollAmount = 340; 
+        container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+}
+
+// --- URUCHOMIENIE PO ZAŁADOWANIU ---
+loadPulsPosts();
+checkAdminStatus();
+
+
     </script>
 
-    
+<div id="admin-post-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Nowy wpis na Pulsie</h3>
+                <button onclick="closePostModal()" class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <label>Temat wpisu</label>
+                <input type="text" id="post-title" placeholder="np. Startujemy z nową promocją!">
+                
+                <label>Treść wpisu</label>
+                <textarea id="post-content" rows="4" placeholder="Napisz coś ciekawego..."></textarea>
+                
+                <label>Miniaturka (Przeciągnij lub kliknij)</label>
+                <div class="drop-zone" id="drop-zone" onclick="document.getElementById('post-image-input').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p id="drop-zone-text">Przeciągnij zdjęcie tutaj lub kliknij, aby wybrać z dysku</p>
+                    <input type="file" id="post-image-input" accept="image/*" style="display: none;">
+                </div>
+                <img id="image-preview" style="display: none; width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-top: 10px;">
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="closePostModal()" class="btn-cancel">Anuluj</button>
+                <button onclick="submitNewPost()" class="btn-save">Opublikuj wpis <i class="fas fa-rocket"></i></button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
