@@ -368,7 +368,7 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
         <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
             <h4 style="color: var(--cherry); margin: 0 0 10px 0; font-size: 0.9rem;">Obecne bonusy:</h4>
-            <ul style="font-size: 0.8rem; color: var(--text-muted); padding-left: 15px; margin: 0;">
+            <ul id="current-bonuses-list" style="font-size: 0.8rem; color: var(--text-muted); padding-left: 15px; margin: 0;">
                 <li>Standardowy czas zwrotów</li>
                 <li>Dostęp do Forum Społeczności</li>
             </ul>
@@ -381,6 +381,20 @@
         </div>
     </div>
 </div>
+
+
+<div class="lottery-card" style="border: 1px solid #eab308; background-color: #1a1e27; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.05);">
+    <h3 style="color: #eab308; display: flex; align-items: center; font-weight: bold; font-size: 16px; margin-bottom: 10px;">
+        🎟️ LOTERIA: ZŁOTY BILET
+    </h3>
+    <p style="color: #a0aec0; font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
+        Opłać swoją zrzutkę na czas (do <strong>5. dnia miesiąca</strong>), aby automatycznie wziąć udział w losowaniu. Zwycięzca otrzymuje kolejną zrzutkę <strong>całkowicie za darmo!</strong>
+    </p>
+    <div style="background-color: rgba(234, 179, 8, 0.1); padding: 10px 15px; border-radius: 8px; display: inline-block;">
+        <span style="color: #e2e8f0; font-size: 13px;">🏆 Zwycięzca w poprzednim miesiącu: <strong id="lottery-winner-name" style="color: #ffffff;">Oczekujemy na wyniki...</strong></span>
+    </div>
+</div>
+
 
 <div class="kebab-card">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -592,6 +606,19 @@
     if (balanceEl && data.wallet_balance !== undefined) {
         balanceEl.innerText = data.wallet_balance.toFixed(2) + " zł";
     }
+
+    // Aktualizacja imienia zwycięzcy loterii
+if (data.lottery_winner) {
+    document.getElementById('lottery-winner-name').innerText = data.lottery_winner;
+}
+
+// Dodawanie zielonej odznaki o darmowej zrzutce, jeśli wygrał loterię
+if (data.has_free_ticket) {
+    const bonusList = document.getElementById('current-bonuses-list');
+    if (bonusList) {
+        bonusList.innerHTML += `<li style="color: #22c55e; font-weight: bold; margin-top: 5px;">🎁 Masz darmową zrzutkę w tym miesiącu!</li>`;
+    }
+}
     document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
     // --- NOWOŚĆ: WSTRZYKIWANIE ODZNAK LOJALNOŚCIOWYCH ---
@@ -1282,6 +1309,34 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <script src="//code.tidio.co/q6vbfqclwkzfcgohcacijiwzgaqcvhrz.js" async></script>
+
+
+<div id="admin-lottery-panel" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 20px; border: 2px solid #eab308; border-radius: 12px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h3 style="color: #eab308; margin-top: 0;">👑 Zarządzaj Loterią</h3>
+    <input type="text" id="admin-winner-name" placeholder="Imię (np. Michał K.)" style="width: 100%; margin-bottom: 10px; padding: 10px;">
+    <input type="email" id="admin-winner-email" placeholder="Email zwycięzcy" style="width: 100%; margin-bottom: 10px; padding: 10px;">
+    <input type="password" id="admin-secret" placeholder="Hasło admina" style="width: 100%; margin-bottom: 10px; padding: 10px;">
+    <button onclick="setLotteryWinner()" class="btn btn-primary" style="background: #eab308; color: #0f172a;">Zapisz Zwycięzcę i daj darmowy bilet</button>
+    <button onclick="document.getElementById('admin-lottery-panel').style.display='none'" class="btn" style="background: transparent; color: white; margin-top: 5px;">Zamknij</button>
+</div>
+
+<script>
+    // Wpisz w konsoli przeglądarki "showAdmin()" aby wysunąć panel
+    function showAdmin() { document.getElementById('admin-lottery-panel').style.display = 'block'; }
+    
+    async function setLotteryWinner() {
+        const name = document.getElementById('admin-winner-name').value;
+        const email = document.getElementById('admin-winner-email').value;
+        const secret = document.getElementById('admin-secret').value;
+        
+        const res = await fetch(`${API}/api/admin/set-winner`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ secret, winnerName: name, winnerEmail: email })
+        });
+        if(res.ok) { alert("Gotowe! System zapisał zwycięzcę."); location.reload(); } 
+        else { alert("Błąd!"); }
+    }
+</script>
 
 </body>
 </html>
