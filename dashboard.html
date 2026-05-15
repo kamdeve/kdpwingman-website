@@ -364,8 +364,10 @@
 
                  <div id="loyalty-status-row" class="status-container"></div>
 
-                 <div class="card" style="margin-top: 0;"> <h3><i class="fas fa-medal"></i> Twoje Przywileje</h3>
+                 <div class="card" style="margin-top: 0;"> 
+    <h3><i class="fas fa-medal"></i> Twoje Przywileje</h3>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+        
         <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
             <h4 style="color: var(--cherry); margin: 0 0 10px 0; font-size: 0.9rem;">Obecne bonusy:</h4>
             <ul id="current-bonuses-list" style="font-size: 0.8rem; color: var(--text-muted); padding-left: 15px; margin: 0;">
@@ -373,12 +375,16 @@
                 <li>Dostęp do Forum Społeczności</li>
             </ul>
         </div>
+        
         <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--success);">
             <h4 style="color: var(--success); margin: 0 0 10px 0; font-size: 0.9rem;">Następny poziom (Ekspert KDP):</h4>
             <ul style="font-size: 0.8rem; color: var(--text-muted); padding-left: 15px; margin: 0;">
-                <li>Wypłaty bez prowizji systemowej</li> <li>Dostęp do zamkniętej bazy nisz (PDF)</li> <li>Wymagane: 25 pkt reputacji</li>
+                <li>Wypłaty bez prowizji systemowej</li> 
+                <li>Dostęp do zamkniętej bazy nisz (PDF)</li> 
+                <li>Wymagane: 25 pkt reputacji</li>
             </ul>
         </div>
+
     </div>
 </div>
 
@@ -607,7 +613,10 @@
         balanceEl.innerText = data.wallet_balance.toFixed(2) + " zł";
     }
 
-    // Aktualizacja imienia zwycięzcy loterii
+  
+    document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
+
+// Aktualizacja imienia zwycięzcy loterii
 if (data.lottery_winner) {
     document.getElementById('lottery-winner-name').innerText = data.lottery_winner;
 }
@@ -619,7 +628,6 @@ if (data.has_free_ticket) {
         bonusList.innerHTML += `<li style="color: #22c55e; font-weight: bold; margin-top: 5px;">🎁 Masz darmową zrzutkę w tym miesiącu!</li>`;
     }
 }
-    document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
 
     // --- NOWOŚĆ: WSTRZYKIWANIE ODZNAK LOJALNOŚCIOWYCH ---
     const loyaltyRow = document.getElementById('loyalty-status-row');
