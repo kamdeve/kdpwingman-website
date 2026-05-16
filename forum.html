@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
         /* --- JASNY STYL --- */
         :root {
@@ -163,7 +163,7 @@
             <input type="text" id="knowledge-title" placeholder="np. Jak szukać nisz w Helium 10?">
             
             <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Treść wpisu</label>
-            <textarea id="knowledge-content" rows="6" placeholder="Podziel się wiedzą..."></textarea>
+            <div id="editor-container" style="height: 300px; background: var(--bg-white); margin-bottom: 15px; border-radius: 0 0 8px 8px;"></div>
             
             <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Miniaturka (Opcjonalnie)</label>
             <div class="drop-zone" id="knowledge-drop-zone" onclick="document.getElementById('knowledge-image-input').click()">
@@ -189,6 +189,39 @@
         let currentTab = 'admin';
         let currentThreadId = null;
         let knowledgeImageBase64 = "";
+
+
+// --- INICJALIZACJA EDYTORA QUILL ---
+        let quill;
+        window.addEventListener('load', function() {
+            if (isAdmin) {
+                quill = new Quill('#editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Podziel się wiedzą...',
+                    modules: {
+                        toolbar: {
+                            container: [
+                                ['bold', 'italic', 'underline', 'strike'], // Pogrubienie, kursywa, podkreślenie, przekreślenie
+                                [{ 'color': [] }, { 'background': [] }],   // Kolor tekstu i tła
+                                [{ 'align': [] }],                         // Wyrównanie do lewej, środka, prawej
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }], // Listy numerowane i punktowane
+                                ['link', 'image']                          // Linki i zdjęcia
+                            ],
+                            handlers: {
+                                image: function() {
+                                    // Zabezpieczenie przed Base64 - prosimy o link do zdjęcia
+                                    const range = this.quill.getSelection();
+                                    const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com lub postimages.org):');
+                                    if(value){
+                                        this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
 
         // --- INICJALIZACJA STRONY ---
         if (isAdmin) {
@@ -341,7 +374,7 @@
         function openAdminModal() {
             document.getElementById('admin-knowledge-modal').style.display = 'flex';
             document.getElementById('knowledge-title').value = '';
-            document.getElementById('knowledge-content').value = '';
+            if(quill) quill.setContents([]);
             document.getElementById('knowledge-image-preview').style.display = 'none';
             document.getElementById('knowledge-drop-zone').style.display = 'block';
             knowledgeImageBase64 = "";
@@ -383,7 +416,7 @@
 
         async function submitKnowledgePost() {
             const title = document.getElementById('knowledge-title').value;
-            const content = document.getElementById('knowledge-content').value;
+            const content = quill.root.innerHTML;
             if (!title || !content) return alert("Wypełnij temat i treść!");
 
             const btn = document.getElementById('admin-save-btn');
@@ -547,5 +580,7 @@
         }
 
     </script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
 </body>
 </html>
