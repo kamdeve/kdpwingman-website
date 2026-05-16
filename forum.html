@@ -8,313 +8,372 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- STYLE WSPÓLNE (Premium Glass) --- */
+        /* --- JASNY STYL (Zgodny z resztą strony) --- */
         :root {
-            --bg-dark: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
             --cherry: #a0134a;
-            --cherry-gradient: linear-gradient(135deg, #a0134a 0%, #db2777 100%);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --cherry-light: rgba(160, 19, 74, 0.1);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-light: #e2e8f0;
             --success: #10b981;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-light);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        .background-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 20%, rgba(160, 19, 74, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
+            margin: 0; min-height: 100vh;
         }
 
         /* --- NAVBAR --- */
-        .navbar {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 2rem;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
+        .navbar-container {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky; top: 0; z-index: 1000; width: 100%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
-        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;}
-        .logo span { color: #db2777; }
-        
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { color: white; }
+        .navbar-content {
+            max-width: 1000px; margin: 0 auto; height: 70px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+        }
+        .logo-link {
+            text-decoration: none; font-weight: 800; font-size: 1.4rem; color: var(--text-main);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-links { display: flex; align-items: center; gap: 25px; }
+        .nav-item { text-decoration: none; color: var(--text-muted); font-weight: 600; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { color: var(--cherry); }
 
         /* --- LAYOUT --- */
-        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        /* --- FILTRY I PRZYCISKI --- */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-        .filter-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-            color: var(--text-muted); padding: 8px 16px; border-radius: 50px;
-            cursor: pointer; transition: 0.3s; font-size: 0.85rem;
-        }
-        .filter-btn.active { background: var(--cherry); color: white; border-color: var(--cherry); }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
 
         .btn-primary {
-            background: var(--cherry-gradient); color: white; border: none;
-            padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;
+            background: var(--cherry); color: white; border: none;
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer;
             transition: 0.3s; display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px var(--cherry-light);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(160, 19, 74, 0.4); }
+        .btn-primary:hover { background: #8a0f3e; transform: translateY(-2px); }
 
-        /* --- POSTY --- */
+        /* --- ZAKŁADKI (TABS) --- */
+        .tabs-container {
+            display: flex; gap: 10px; margin-bottom: 25px;
+            background: var(--bg-white); padding: 10px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-light);
+        }
+        .tab-btn {
+            flex: 1; padding: 12px; border: none; background: transparent;
+            font-weight: 700; color: var(--text-muted); border-radius: 8px;
+            cursor: pointer; transition: 0.3s; font-size: 1rem;
+        }
+        .tab-btn.active { background: var(--cherry-light); color: var(--cherry); }
+
+        /* --- POSTY FACEBOOK STYLE --- */
         .post-card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: 0.3s;
+            background: var(--bg-white); border: 1px solid var(--border-light);
+            border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s;
         }
-        .post-card:hover { border-color: rgba(255,255,255,0.2); }
+        .post-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-color: #cbd5e1; }
 
-        .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .tag { font-size: 0.65rem; background: var(--cherry); padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
-        .author { font-size: 0.85rem; color: var(--text-muted); }
-        .content { color: #cbd5e1; line-height: 1.6; white-space: pre-wrap; }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .author-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; background: var(--cherry-light); color: var(--cherry); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        .author-name { font-weight: 700; color: var(--text-main); font-size: 1.05rem; margin-bottom: 2px;}
+        .post-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .tag { font-size: 0.7rem; background: #e2e8f0; color: var(--text-muted); padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase; }
 
-        .like-btn {
-            background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2);
-            color: #38bdf8; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-weight: bold;
-        }
+        .post-title { font-size: 1.3rem; font-weight: 800; margin: 15px 0 10px 0; color: var(--text-main); }
+        .post-content { color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem; }
+        .post-image { width: 100%; border-radius: 10px; margin-top: 15px; object-fit: cover; max-height: 400px; border: 1px solid var(--border-light); }
+
+        .post-actions { display: flex; gap: 15px; margin-top: 20px; border-top: 1px solid var(--border-light); padding-top: 15px; }
+        .action-btn { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+        .action-btn:hover { color: var(--cherry); }
+        .action-btn.liked { color: var(--cherry); }
 
         /* --- MODAL --- */
         .modal {
             display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(8px);
+            background:rgba(15, 23, 42, 0.8); z-index:2000; justify-content:center; align-items:center; backdrop-filter: blur(5px);
         }
+        .modal-box {
+            background: var(--bg-white); width: 90%; max-width: 600px; border-radius: 16px;
+            padding: 30px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); border: 1px solid var(--border-light);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-box h3 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; }
 
         textarea, select {
-            width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border);
-            border-radius:8px; color:white; padding:12px; margin-bottom:15px; font-family: inherit;
+            width:100%; background:var(--bg-light); border:1px solid var(--border-light);
+            border-radius:8px; color:var(--text-main); padding:15px; margin-bottom:15px; font-family: inherit; font-size: 1rem;
         }
+        textarea:focus, select:focus { outline: none; border-color: var(--cherry); }
 
-        /* --- ROADMAP GRYWALIZACJI --- */
-        .roadmap-wrapper {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); 
-            border-radius: 12px; padding: 25px 20px 45px 20px; margin-bottom: 25px; overflow-x: auto;
-        }
-        .rm-container {
-            display: flex; align-items: center; justify-content: space-between; 
-            position: relative; min-width: 500px; margin-top: 25px;
-        }
-        .rm-line-bg {
-            position: absolute; top: 50%; left: 0; right: 0; height: 6px; 
-            background: rgba(255,255,255,0.05); z-index: 1; transform: translateY(-50%); border-radius: 3px;
-        }
-        .rm-line-fill {
-            position: absolute; top: 50%; left: 0; width: 0%; height: 6px; 
-            background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%); 
-            z-index: 1; transform: translateY(-50%); transition: width 1.2s ease-in-out; border-radius: 3px;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-        }
-        .rm-node {
-            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            background: #0f172a; border: 3px solid #334155; color: #475569; font-size: 1.1rem;
-            position: relative; z-index: 2; transition: 0.4s;
-        }
-        .rm-node.unlocked {
-            background: #10b981; border-color: #059669; color: white;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
-        }
-        .rm-node.current {
-            background: #0f172a; border-color: #38bdf8; color: #38bdf8;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
-            animation: pulse-border 2s infinite;
-        }
-        .rm-label {
-            position: absolute; top: 55px; left: 50%; transform: translateX(-50%);
-            white-space: nowrap; font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-align: center;
-        }
-        .rm-label span { display: block; font-size: 0.65rem; font-weight: normal; opacity: 0.7; margin-top: 2px;}
-        .rm-node.unlocked .rm-label, .rm-node.current .rm-label { color: white; }
-        
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
-        }
+        /* --- COMMENT SECTION (MODAL) --- */
+        .comment-box { background: var(--bg-light); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border-light); }
+        .comment-author { font-weight: 700; color: var(--text-main); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .comment-text { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; line-height: 1.5; white-space: pre-wrap; }
+
+        .hidden { display: none !important; }
     </style>
 
 <script>
+    // Inicjalizacja PostHog
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Mi Ri init Vi Gi Rr Wi Ji Bi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync un identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Xi createPersonProfile setInternalOrTestUser sn Hi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ki debug Lr rn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('phc_oYerNzYJWaJzr6PafVdVLMzb3nwSWsSGgJaNyHyw582D', {
-        api_host: 'https://analityka.kdpwingman.com',
-        defaults: '2026-01-30',
-        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-    })
+    posthog.init('phc_oYerNzYJWaJzr6PafVdVLMzb3nwSWsSGgJaNyHyw582D', { api_host: 'https://analityka.kdpwingman.com' })
 </script>
-
 </head>
 <body>
 
-    <div class="background-glow"></div>
-
-    <nav class="navbar">
-        <a href="index.html" class="logo">
-            <i class="fas fa-chart-line" style="color: var(--cherry);"></i> KDP <span>Wingman</span>
-        </a>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Główna</a>
-            <a href="group-buy.html" class="nav-link">Zrzutka</a>
-            <a href="forum.html" class="nav-link active">Forum</a>
-            <a href="dashboard.html" class="nav-link">Mój Panel</a>
-        </div>
-    </nav>
+    <header class="navbar-container">
+        <nav class="navbar-content">
+            <a href="index.html" class="logo-link">
+                <i class="fas fa-chart-line" style="color: var(--cherry);"></i> KDP <span style="color: var(--cherry);">Wingman</span>
+            </a>
+            <div class="nav-links">
+                <a href="group-buy.html" class="nav-item">Zrzutka</a>
+                <a href="forum.html" class="nav-item active">Społeczność</a>
+                <a href="dashboard.html" class="nav-item">Mój Panel</a>
+            </div>
+        </nav>
+    </header>
 
     <div class="container">
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <h2 style="margin:0;">👥 Społeczność Wingman</h2>
-                <button class="btn-primary" onclick="document.getElementById('post-modal').style.display='flex'">
-                    <i class="fas fa-plus"></i> Zadaj Pytanie
-                </button>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; margin: 0;">Centrum <span style="color: var(--cherry);">Wiedzy</span></h1>
+                <p style="color: var(--text-muted); margin-top: 5px;">Ucz się, pytaj i rozwijaj swój biznes na KDP.</p>
             </div>
+            <button id="add-post-btn" class="btn-primary hidden" onclick="document.getElementById('post-modal').style.display='flex'">
+                <i class="fas fa-edit"></i> Napisz post
+            </button>
+        </div>
 
-            <!-- MAPA DROGOWA (Roadmap) -->
-            <div id="gamification-panel" class="roadmap-wrapper" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
-                    <div>
-                        <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Twoja Ścieżka Wydawcy</span>
-                        <div style="color: white; font-size: 1.1rem; font-weight: bold; margin-top: 5px;">
-                            Aktualne punkty: <span id="rm-points-display" style="color: #38bdf8;">0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tu wygeneruje się oś czasu -->
-                <div class="rm-container">
-                    <div class="rm-line-bg"></div>
-                    <div id="rm-line-fill" class="rm-line-fill"></div>
-                    <div id="rm-nodes-container" style="display: flex; justify-content: space-between; width: 100%; position: relative; z-index: 2;">
-                        <!-- JS wstrzyknie tu checkpointy -->
-                    </div>
-                </div>
-                <p id="rm-motivation-text" style="font-size: 0.85rem; color: var(--text-muted); margin: 45px 0 0 0; text-align: center;"></p>
+        <div class="tabs-container">
+            <button id="tab-admin" class="tab-btn active" onclick="switchMainTab('admin')"><i class="fas fa-graduation-cap"></i> Wiedza od Kamila</button>
+            <button id="tab-user" class="tab-btn" onclick="switchMainTab('user')"><i class="fas fa-users"></i> Dyskusje Społeczności</button>
+        </div>
+
+        <div id="feed-admin">
+            <div id="admin-posts-container">
+                <p style="text-align: center; color: var(--text-muted); padding: 40px;">Ładowanie wpisów...</p>
             </div>
+        </div>
 
-            <div class="filter-bar">
-                <button class="filter-btn active" onclick="filterPosts('all', this)">Wszystkie</button>
-                <button class="filter-btn" onclick="filterPosts('Research', this)">🔍 Research</button>
-                <button class="filter-btn" onclick="filterPosts('Design', this)">🎨 Design</button>
-                <button class="filter-btn" onclick="filterPosts('Reklamy', this)">📈 Reklamy</button>
-                <button class="filter-btn" onclick="filterPosts('Techniczne', this)">⚙️ Techniczne</button>
-            </div>
-
-            <div id="forum-feed">
+        <div id="feed-user" class="hidden">
+            <div id="user-posts-container">
                 <p style="text-align: center; color: var(--text-muted); padding: 40px;">Ładowanie dyskusji...</p>
             </div>
         </div>
+
     </div>
 
     <div id="post-modal" class="modal">
-        <div class="card" style="width: 90%; max-width: 500px; border: 1px solid var(--cherry);">
-            <h3 style="color:white; margin-bottom: 20px;">Nowy temat na forum</h3>
-            
+        <div class="modal-box">
+            <h3>Utwórz nowy wątek</h3>
             <select id="forum-topic">
                 <option value="Research">🔍 Research & Nisze</option>
                 <option value="Design">🎨 Design & Ilustracje</option>
                 <option value="Reklamy">📈 Reklamy KDP</option>
                 <option value="Techniczne">⚙️ Sprawy techniczne</option>
             </select>
-
-            <textarea id="forum-content" placeholder="Opisz swój problem lub podziel się wiedzą..." style="height: 150px; resize: none;"></textarea>
+            <textarea id="forum-content" placeholder="O co chcesz zapytać grupę?" style="height: 150px;"></textarea>
             
-            <div style="display:flex; gap:10px;">
-                <button class="btn-primary" onclick="submitPost()">Opublikuj 🚀</button>
-                <button class="filter-btn" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
+            <div style="display:flex; justify-content: flex-end; gap:10px;">
+                <button class="tab-btn" style="background: var(--bg-light); border: 1px solid var(--border-light);" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
+                <button class="btn-primary" onclick="submitUserPost()">Opublikuj <i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
-<!-- MODAL DO CZYTANIA WĄTKU I KOMENTOWANIA -->
+
     <div id="thread-modal" class="modal">
-        <div class="card" style="width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--cherry); position: relative;">
-            <button onclick="closeThread()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <div class="modal-box" style="position: relative;">
+            <button onclick="document.getElementById('thread-modal').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
             
             <div id="thread-content">Ładowanie...</div>
             
-            <div style="margin-top: 25px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
-                <textarea id="comment-content" placeholder="Napisz odpowiedź... (Zdobądź punkty za aktywność!)" style="height: 100px; resize: none;"></textarea>
-                <button class="btn-primary" onclick="submitComment()">Opublikuj Odpowiedź 🚀</button>
+            <div style="margin-top: 25px; border-top: 1px solid var(--border-light); padding-top: 20px;">
+                <textarea id="comment-content" placeholder="Napisz odpowiedź..." style="height: 100px; margin-bottom: 10px;"></textarea>
+                <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="submitComment()">Opublikuj Odpowiedź</button>
             </div>
         </div>
     </div>
+
     <script>
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
         const userEmail = localStorage.getItem('wingman_user');
-        let allPosts = [];
 
-        async function loadForum() {
-            try {
-                const res = await fetch(`${API}/api/forum/posts`);
-                allPosts = await res.json();
-                renderPosts(allPosts);
-            } catch (e) {
-                console.error("Błąd ładowania:", e);
-                document.getElementById('forum-feed').innerHTML = "Błąd połączenia z bazą.";
-            }
-        }
-
-        // Wyliczanie poziomu na podstawie punktów z lajków
-        function getLevel(rep) {
-            const points = parseInt(rep) || 0;
-            if (points < 5) return { lvl: 1, name: "Początkujący" };
-            if (points < 15) return { lvl: 2, name: "Uczeń" };
-            if (points < 30) return { lvl: 3, name: "Twórca" };
-            if (points < 60) return { lvl: 4, name: "Ekspert" };
-            return { lvl: 5, name: "KDP Master" };
-        }
-
-        function renderPosts(posts) {
-            const feed = document.getElementById('forum-feed');
-            if (posts.length === 0) {
-                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">Brak tematów. Bądź pierwszy!</p>`;
-                return;
-            }
-
-            feed.innerHTML = posts.map(p => {
-                const levelData = getLevel(p.rep);
-                return `
-                <div class="post-card" onclick="openThread(${p.id})" style="cursor: pointer;">
-                    <div class="post-header">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="tag">${p.topic}</span>
-                            <span class="author" style="color: white; font-weight: bold;">
-                                ${p.email.split('@')[0]} 
-                                <span style="color: #38bdf8; font-size: 0.75rem; margin-left: 5px;">[Lvl ${levelData.lvl}]</span>
-                            </span>
-                        </div>
-                        <!-- event.stopPropagation() zapobiega otwarciu wątku przy samym kliknięciu lajka -->
-                        <button onclick="event.stopPropagation(); likePost(${p.id})" class="like-btn">👍 ${p.likes}</button>
-                    </div>
-                    <div class="content">${p.content}</div>
-                    <div style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);">
-                        <i class="far fa-comments"></i> Kliknij, aby zobaczyć odpowiedzi...
-                    </div>
-                </div>
-            `}).join('');
-        }
-
+        let currentTab = 'admin';
         let currentThreadId = null;
 
+        // Przełączanie głównych zakładek
+        function switchMainTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-admin').classList.remove('active');
+            document.getElementById('tab-user').classList.remove('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            document.getElementById('feed-admin').classList.add('hidden');
+            document.getElementById('feed-user').classList.add('hidden');
+            document.getElementById(`feed-${tab}`).classList.remove('hidden');
+
+            const addBtn = document.getElementById('add-post-btn');
+            if (tab === 'user') {
+                addBtn.classList.remove('hidden');
+                loadUserPosts();
+            } else {
+                addBtn.classList.add('hidden');
+            }
+        }
+
+        // --- ZAKŁADKA 1: WIEDZA (Zaciąga z Puls Zrzutki) ---
+        async function loadAdminPosts() {
+            try {
+                const res = await fetch(`${API}/api/puls/posts`);
+                const posts = await res.json();
+                const container = document.getElementById('admin-posts-container');
+                
+                if (posts.length === 0) {
+                    container.innerHTML = `<p style="text-align: center;">Brak artykułów.</p>`;
+                    return;
+                }
+
+                container.innerHTML = posts.map(p => {
+                    const hasLiked = localStorage.getItem(`liked_puls_${p.id}`);
+                    const likeClass = hasLiked ? 'liked' : '';
+                    
+                    // Obcinamy tekst do wyświetlenia i dodajemy przycisk
+                    const isLong = p.content.length > 250;
+                    const shortText = isLong ? p.content.substring(0, 250) + '...' : p.content;
+
+                    return `
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="author-info">
+                                <div class="avatar"><img src="images/logo.svg" style="width: 25px;"></div>
+                                <div>
+                                    <div class="author-name">Kamil Sznicer <i class="fas fa-check-circle" style="color: #38bdf8; font-size: 0.8rem;"></i></div>
+                                    <div class="post-meta">${new Date(p.created_at).toLocaleDateString('pl-PL', {day: 'numeric', month: 'long', year: 'numeric'})}</div>
+                                </div>
+                            </div>
+                            <span class="tag">Baza Wiedzy</span>
+                        </div>
+                        
+                        <h4 class="post-title">${p.title}</h4>
+                        <div class="post-content" id="admin-text-${p.id}">
+                            ${shortText}
+                            ${isLong ? `<button onclick="toggleAdminText(${p.id})" style="background:none; border:none; color:var(--cherry); font-weight:bold; cursor:pointer; padding:0; margin-left:5px;">Czytaj dalej</button>` : ''}
+                        </div>
+                        <div class="post-content hidden" id="admin-full-${p.id}">${p.content}</div>
+
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-image">` : ''}
+
+                        <div class="post-actions">
+                            <button class="action-btn ${likeClass}" id="admin-like-btn-${p.id}" onclick="likeAdminPost(${p.id})">
+                                <i class="fas fa-fire"></i> Przydatne (<span id="admin-like-count-${p.id}">${p.likes || 0}</span>)
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        function toggleAdminText(id) {
+            document.getElementById(`admin-text-${id}`).classList.add('hidden');
+            document.getElementById(`admin-full-${id}`).classList.remove('hidden');
+        }
+
+        async function likeAdminPost(id) {
+            if (localStorage.getItem(`liked_puls_${id}`)) return alert("Już to polubiłeś!");
+            try {
+                const res = await fetch(`${API}/api/puls/like`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ id }) });
+                if (res.ok) {
+                    localStorage.setItem(`liked_puls_${id}`, 'true');
+                    const countSpan = document.getElementById(`admin-like-count-${id}`);
+                    countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                    document.getElementById(`admin-like-btn-${id}`).classList.add('liked');
+                }
+            } catch (e) {}
+        }
+
+        // --- ZAKŁADKA 2: DYSKUSJE SPOŁECZNOŚCI (Zaciąga z Forum) ---
+        async function loadUserPosts() {
+            try {
+                const res = await fetch(`${API}/api/forum/posts`);
+                const posts = await res.json();
+                const container = document.getElementById('user-posts-container');
+
+                if (posts.length === 0) {
+                    container.innerHTML = `<p style="text-align: center;">Brak pytań. Bądź pierwszy!</p>`;
+                    return;
+                }
+
+                container.innerHTML = posts.map(p => {
+                    const authorAlias = p.email.split('@')[0];
+                    const initial = authorAlias.charAt(0).toUpperCase();
+
+                    return `
+                    <div class="post-card" style="cursor: pointer;" onclick="openThread(${p.id})">
+                        <div class="post-header">
+                            <div class="author-info">
+                                <div class="avatar" style="background: #e2e8f0; color: #64748b;">${initial}</div>
+                                <div>
+                                    <div class="author-name">${authorAlias}</div>
+                                    <div class="post-meta">${new Date(p.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <span class="tag" style="background: var(--cherry-light); color: var(--cherry);">${p.topic}</span>
+                        </div>
+                        
+                        <div class="post-content" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${p.content}</div>
+
+                        <div class="post-actions" style="justify-content: space-between;">
+                            <button class="action-btn" onclick="event.stopPropagation(); likeUserPost(${p.id}, this)">
+                                <i class="fas fa-thumbs-up"></i> Lubię to (${p.likes || 0})
+                            </button>
+                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+                                <i class="far fa-comment-alt"></i> Komentarze
+                            </span>
+                        </div>
+                    </div>
+                `}).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function submitUserPost() {
+            if (!userEmail) { alert("Zaloguj się, aby dodać wpis!"); return; }
+            const topic = document.getElementById('forum-topic').value;
+            const content = document.getElementById('forum-content').value;
+            if (content.length < 5) return alert("Napisz coś więcej!");
+
+            const res = await fetch(`${API}/api/forum/post`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, topic, content })
+            });
+
+            if (res.ok) {
+                document.getElementById('post-modal').style.display = 'none';
+                document.getElementById('forum-content').value = '';
+                loadUserPosts();
+            }
+        }
+
+        async function likeUserPost(id, btnElement) {
+            if (!userEmail) return alert("Zaloguj się, aby lajkować!");
+            const res = await fetch(`${API}/api/forum/like`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, postId: id })
+            });
+            if (res.ok) {
+                loadUserPosts(); // Odświeża listę, żeby zaktualizować licznik
+            }
+        }
+
+        // --- CZYTANIE WĄTKU I KOMENTARZE ---
         async function openThread(postId) {
             currentThreadId = postId;
             document.getElementById('thread-modal').style.display = 'flex';
@@ -325,211 +384,62 @@
                 const res = await fetch(`${API}/api/forum/post/${postId}`);
                 const data = await res.json();
                 
-                if (data.error) {
-                    threadContent.innerHTML = `<p style="color: red;">${data.error}</p>`;
-                    return;
-                }
+                const authorAlias = data.post.email.split('@')[0];
+                const initial = authorAlias.charAt(0).toUpperCase();
 
-                const postLvl = getLevel(data.post.rep);
-                
-                // Render głównego posta
                 let html = `
-                    <div style="margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
-                        <span class="tag">${data.post.topic}</span>
-                        <h3 style="margin: 10px 0 5px 0; color: white;">${data.post.email.split('@')[0]} <span style="color: #38bdf8; font-size: 0.8rem;">[Lvl ${postLvl.lvl}]</span></h3>
-                        <p style="color: #cbd5e1; line-height: 1.6; white-space: pre-wrap;">${data.post.content}</p>
+                    <div style="margin-bottom: 20px;">
+                        <div class="post-header">
+                            <div class="author-info">
+                                <div class="avatar" style="background: #e2e8f0; color: #64748b;">${initial}</div>
+                                <div>
+                                    <div class="author-name">${authorAlias}</div>
+                                    <div class="post-meta">${new Date(data.post.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <span class="tag" style="background: var(--cherry-light); color: var(--cherry);">${data.post.topic}</span>
+                        </div>
+                        <div class="post-content" style="font-size: 1.05rem;">${data.post.content}</div>
                     </div>
-                    <h4 style="color: var(--text-muted); margin-bottom: 15px;">Odpowiedzi (${data.comments.length}):</h4>
+                    <h4 style="margin: 25px 0 15px 0; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">Odpowiedzi (${data.comments.length})</h4>
                 `;
 
-                // Render komentarzy
                 if (data.comments.length === 0) {
-                    html += `<p style="color: var(--text-muted); font-size: 0.9rem;">Brak odpowiedzi. Możesz pomóc jako pierwszy!</p>`;
+                    html += `<p style="color: var(--text-muted); font-size: 0.9rem;">Brak odpowiedzi. Bądź pierwszy!</p>`;
                 } else {
                     html += data.comments.map(c => {
-                        const cLvl = getLevel(c.rep);
+                        const cAlias = c.email.split('@')[0];
                         return `
-                        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                            <strong style="color: white; font-size: 0.9rem;">${c.email.split('@')[0]} <span style="color: #38bdf8; font-size: 0.75rem;">[Lvl ${cLvl.lvl}]</span></strong>
-                            <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap;">${c.content}</p>
+                        <div class="comment-box">
+                            <div class="comment-author">${cAlias} <span style="font-weight:normal; font-size:0.75rem; color:var(--text-muted);">${new Date(c.created_at).toLocaleDateString()}</span></div>
+                            <div class="comment-text">${c.content}</div>
                         </div>
                     `}).join('');
                 }
-
                 threadContent.innerHTML = html;
-
             } catch (e) {
                 threadContent.innerHTML = '<p style="color: red;">Błąd ładowania wątku.</p>';
             }
         }
 
-        function closeThread() {
-            document.getElementById('thread-modal').style.display = 'none';
-            currentThreadId = null;
-        }
-
         async function submitComment() {
             if (!userEmail) return alert("Zaloguj się, aby odpowiadać!");
             const content = document.getElementById('comment-content').value;
-            
             if (content.length < 3) return alert("Komentarz jest za krótki!");
 
             const res = await fetch(`${API}/api/forum/comment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail, postId: currentThreadId, content })
             });
 
             if (res.ok) {
                 document.getElementById('comment-content').value = '';
-                openThread(currentThreadId); // Odświeżamy wątek, by pokazać nowy komentarz
+                openThread(currentThreadId); 
             }
         }
 
-        function filterPosts(category, btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            if (category === 'all') renderPosts(allPosts);
-            else renderPosts(allPosts.filter(p => p.topic === category));
-        }
-
-        async function submitPost() {
-            if (!userEmail) return alert("Zaloguj się, aby pisać!");
-            const topic = document.getElementById('forum-topic').value;
-            const content = document.getElementById('forum-content').value;
-            
-            if (content.length < 5) return alert("Wpisz treść!");
-
-            const res = await fetch(`${API}/api/forum/post`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, topic, content })
-            });
-
-            if (res.ok) {
-                document.getElementById('post-modal').style.display = 'none';
-                document.getElementById('forum-content').value = '';
-                loadForum();
-            }
-        }
-
-        async function likePost(id) {
-            if (!userEmail) return alert("Zaloguj się, aby lajkować!");
-            const res = await fetch(`${API}/api/forum/like`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, postId: id })
-            });
-            if (res.ok) loadForum();
-        }
-
-        async function showProfile(authorEmail) {
-    const res = await fetch(`${API}/api/user/public-profile`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email: authorEmail })
-    });
-    const data = await res.json();
-    
-    // Prosty alert na początek, później zrobimy z tego ładny modal
-    alert(`
-        Profil: ${authorEmail.split('@')[0]}
-        Ranga: ${data.tier}
-        Reputacja: ${data.rep} pkt
-        W edycjach od: ${new Date(data.joined).toLocaleDateString()}
-    `);
-}
-async function loadUserGamification() {
-            if (!userEmail) return;
-            try {
-                const res = await fetch(`${API}/api/user/status`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: userEmail })
-                });
-                const data = await res.json();
-                
-                if (data.reputationPoints !== undefined) {
-                    const points = data.reputationPoints;
-                    document.getElementById('gamification-panel').style.display = 'block';
-                    document.getElementById('rm-points-display').innerText = points;
-
-                    // Definicja naszych przystanków (Checkpointów)
-                    const levels = [
-                        { req: 0, name: "Start", sub: "Lvl 1" },
-                        { req: 5, name: "Uczeń", sub: "5 pkt" },
-                        { req: 15, name: "Starter Pack 🎁", sub: "15 pkt" },
-                        { req: 30, name: "Ekspert", sub: "30 pkt" },
-                        { req: 60, name: "Master", sub: "60 pkt" }
-                    ];
-
-                    const nodesContainer = document.getElementById('rm-nodes-container');
-                    let html = '';
-                    let activeSegment = 0;
-                    let fraction = 0;
-
-                    // Generowanie kółek (Węzłów)
-                    for (let i = 0; i < levels.length; i++) {
-                        let statusClass = "locked";
-                        let icon = '<i class="fas fa-lock"></i>'; // Domyślnie kłódka
-                        
-                        if (points >= levels[i].req) {
-                            statusClass = "unlocked";
-                            icon = '<i class="fas fa-check"></i>'; // Odblokowane = Ptaszek
-                            activeSegment = i; // Aktualizujemy najdalszy odblokowany segment
-                        }
-
-                        // Jeśli to jest dokładnie ten poziom, na którym teraz jest user (i nie jest to koniec gry)
-                        if (i === activeSegment && points < levels[levels.length-1].req) {
-                            statusClass = "current";
-                            icon = '<i class="fas fa-user-astronaut"></i>'; // Ikonka gracza na obecnym etapie
-                        }
-
-                        html += `
-                            <div class="rm-node ${statusClass}">
-                                ${icon}
-                                <div class="rm-label">${levels[i].name}<span>${levels[i].sub}</span></div>
-                            </div>
-                        `;
-                    }
-                    nodesContainer.innerHTML = html;
-
-                    // Obliczanie matematyczne długości niebieskiej linii (żeby zatrzymywała się dokładnie między punktami)
-                    if (activeSegment < levels.length - 1) {
-                        const currentReq = levels[activeSegment].req;
-                        const nextReq = levels[activeSegment + 1].req;
-                        const pointsInSegment = points - currentReq;
-                        const segmentSize = nextReq - currentReq;
-                        fraction = pointsInSegment / segmentSize;
-                    } else {
-                        fraction = 0; // Jeśli max lvl, to linia jest na 100%
-                    }
-
-                    const segmentPercentage = 100 / (levels.length - 1);
-                    const totalWidth = (activeSegment * segmentPercentage) + (fraction * segmentPercentage);
-                    
-                    setTimeout(() => {
-                        document.getElementById('rm-line-fill').style.width = Math.min(totalWidth, 100) + '%';
-                    }, 300);
-
-                    // Tekst motywacyjny
-                    const motivationEl = document.getElementById('rm-motivation-text');
-                    if (points >= 15 && points < 30) {
-                        motivationEl.innerHTML = '🎉 <strong>Starter Pack odblokowany!</strong> Odbierz go w <a href="dashboard.html" style="color: #10b981;">Panelu</a>. Zbieraj dalej na rangę Eksperta!';
-                    } else if (points >= 60) {
-                        motivationEl.innerHTML = '👑 Jesteś legendą tego forum. Osiągnąłeś maksymalny poziom!';
-                    } else {
-                        const nextTarget = levels[activeSegment + 1].req;
-                        const left = nextTarget - points;
-                        motivationEl.innerText = `Zdobywaj lajki i odpowiadaj! Brakuje Ci ${left} pkt do następnego odblokowania 🔓.`;
-                    }
-                }
-            } catch (e) { console.error("Błąd ładowania grywalizacji", e); }
-        }
         // Start
-        loadForum();
-        loadUserGamification();
+        loadAdminPosts();
     </script>
 </body>
 </html>
