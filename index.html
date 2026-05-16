@@ -568,7 +568,10 @@ async function loadPulsPosts() {
                 </span>
                 
                 <h4 class="card-title">${post.title}</h4>
-                <p class="card-text" style="flex-grow: 1;">${post.content}</p>
+                <div style="flex-grow: 1; display: flex; flex-direction: column;">
+                    <div id="post-text-${post.id}" class="card-text" style="white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0;">${post.content}</div>
+                    ${post.content.length > 150 ? `<button id="read-more-btn-${post.id}" onclick="togglePostText(${post.id})" style="background: none; border: none; color: var(--cherry); font-weight: 700; cursor: pointer; padding: 8px 0 0 0; text-align: left; font-size: 0.85rem; align-self: flex-start; transition: 0.3s;">Rozwiń tekst <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 3px;"></i></button>` : ''}
+                </div>
                 
                 <div style="border-top: 1px solid var(--border-light); margin-top: 15px; padding-top: 12px; display: flex; justify-content: flex-end;">
                     <button onclick="likePulsPost(${post.id})" id="like-btn-${post.id}" style="background:none; border:none; color:${fireColor}; cursor:pointer; font-size:1.1rem; font-weight: bold; transition:0.2s; display: flex; align-items: center; gap: 6px;">
@@ -596,6 +599,8 @@ async function deletePulsPost(id) {
         else alert("Błąd usuwania!");
     } catch (e) { console.error(e); }
 }
+
+
 
 async function likePulsPost(id) {
     // 1. Sprawdzenie, czy już lajkowałeś
@@ -633,6 +638,20 @@ async function likePulsPost(id) {
     }
 }
 
+// --- FUNKCJA ROZWIJANIA/ZWIJANIA TEKSTU ---
+function togglePostText(id) {
+    const textBox = document.getElementById(`post-text-${id}`);
+    const btn = document.getElementById(`read-more-btn-${id}`);
+    
+    // Sprawdzamy, czy tekst jest obecnie zwinięty
+    if (textBox.style.webkitLineClamp === '4' || textBox.style.webkitLineClamp === 4) {
+        textBox.style.webkitLineClamp = 'unset'; // Usuwamy limit linijek (rozwijamy)
+        btn.innerHTML = 'Zwiń tekst <i class="fas fa-chevron-up" style="font-size: 0.75rem; margin-left: 3px;"></i>';
+    } else {
+        textBox.style.webkitLineClamp = '4'; // Przywracamy limit 4 linijek (zwijamy)
+        btn.innerHTML = 'Rozwiń tekst <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 3px;"></i>';
+    }
+}
 // --- LOGIKA NOWEGO MODALA I DRAG & DROP ---
 let base64ImageString = ""; 
 
