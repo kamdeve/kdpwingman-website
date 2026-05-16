@@ -232,6 +232,9 @@
                 const posts = await res.json();
                 const container = document.getElementById('admin-posts-container');
                 
+                // ZAPISUJEMY POSTY DO ZMIENNEJ GLOBALNEJ, żeby użyć ich przy rozwijaniu
+                knowledgePostsList = posts;
+
                 if (posts.length === 0) {
                     container.innerHTML = `<p style="text-align: center;">Brak artykułów w bazie wiedzy.</p>`;
                     return;
@@ -241,8 +244,11 @@
                     const hasLiked = localStorage.getItem(`liked_knowledge_${p.id}`);
                     const likeClass = hasLiked ? 'liked' : '';
                     
-                    const isLong = p.content.length > 250;
-                    const shortText = isLong ? p.content.substring(0, 250) + '...' : p.content;
+                    const isLong = p.content.length > 300;
+                    
+                    // W widoku skróconym usuwamy tagi HTML, żeby nie psuły wyglądu listy
+                    const strippedText = p.content.replace(/<[^>]*>?/gm, '');
+                    const shortText = strippedText.length > 300 ? strippedText.substring(0, 300) + '...' : strippedText;
 
                     return `
                     <div class="post-card">
@@ -260,13 +266,15 @@
                         </div>
                         
                         <h4 class="post-title">${p.title}</h4>
-                        <div class="post-content" id="admin-text-${p.id}">
+                        
+                        <div class="post-content" id="admin-short-text-${p.id}" style="line-height: 1.6;">
                             ${shortText}
-                            ${isLong ? `<button onclick="toggleAdminText(${p.id})" style="background:none; border:none; color:var(--cherry); font-weight:bold; cursor:pointer; padding:0; margin-left:5px;">Czytaj dalej</button>` : ''}
+                            ${isLong ? `<button onclick="toggleAdminText(${p.id})" id="admin-read-btn-${p.id}" style="background:none; border:none; color:var(--cherry); font-weight:bold; cursor:pointer; padding:0; margin-left:5px;">Czytaj dalej <i class="fas fa-chevron-down"></i></button>` : ''}
                         </div>
-                        <div class="post-content hidden" id="admin-full-${p.id}">${p.content}</div>
+                        
+                        <div class="post-content hidden" id="admin-full-text-${p.id}" style="line-height: 1.6; font-size: 1.05rem;"></div>
 
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-image">` : ''}
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-image" id="admin-thumb-${p.id}">` : ''}
 
                         <div class="post-actions">
                             <button class="action-btn ${likeClass}" id="admin-like-btn-${p.id}" onclick="likeKnowledgePost(${p.id})">
@@ -279,8 +287,30 @@
         }
 
         function toggleAdminText(id) {
-            document.getElementById(`admin-text-${id}`).classList.add('hidden');
-            document.getElementById(`admin-full-${id}`).classList.remove('hidden');
+            const shortText = document.getElementById(`admin-short-text-${id}`);
+            const fullText = document.getElementById(`admin-full-text-${id}`);
+            const btn = document.getElementById(`admin-read-btn-${id}`);
+            const thumb = document.getElementById(`admin-thumb-${id}`);
+
+            if (fullText.classList.contains('hidden')) {
+                // Rozwijamy
+                shortText.classList.add('hidden');
+                if (thumb) thumb.classList.add('hidden'); // Opcjonalnie: ukryj miniaturkę, żeby nie dublować obrazków
+
+                // Znajdujemy post w globalnej liście i wstrzykujemy czysty HTML
+                const post = knowledgePostsList.find(p => p.id === id);
+                fullText.innerHTML = post.content;
+                fullText.classList.remove('hidden');
+                btn.innerHTML = 'Zwiń tekst <i class="fas fa-chevron-up"></i>';
+                btn.classList.remove('hidden'); // Przycisk wraca
+            } else {
+                // Zwijamy
+                fullText.classList.add('hidden');
+                fullText.innerHTML = ''; // Czyścimy dla oszczędności pamięci
+                shortText.classList.remove('hidden');
+                if (thumb) thumb.classList.remove('hidden'); // Przywracamy miniaturkę
+                btn.innerHTML = 'Czytaj dalej <i class="fas fa-chevron-down"></i>';
+            }
         }
 
         async function likeKnowledgePost(id) {
