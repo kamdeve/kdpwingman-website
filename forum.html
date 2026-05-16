@@ -98,7 +98,7 @@
                 <h1 style="font-size: 2rem; font-weight: 800; margin: 0;">Centrum <span style="color: var(--cherry);">Wiedzy</span></h1>
                 <p style="color: var(--text-muted); margin-top: 5px;">Ucz się, pytaj i rozwijaj swój biznes na KDP.</p>
             </div>
-            <button id="add-post-btn" class="btn-primary hidden" onclick="document.getElementById('post-modal').style.display='flex'">
+            <button id="add-post-btn" class="btn-primary hidden" onclick="document.getElementById('post-modal').style.display='flex'; if(userQuill) userQuill.setContents([]);">
                 <i class="fas fa-edit"></i> Napisz post
             </button>
             <button id="admin-add-post-btn" class="btn-primary hidden" onclick="openAdminModal()" style="background: #0f172a;">
@@ -133,7 +133,8 @@
                 <option value="Reklamy">📈 Reklamy KDP</option>
                 <option value="Techniczne">⚙️ Sprawy techniczne</option>
             </select>
-            <textarea id="forum-content" placeholder="O co chcesz zapytać grupę?" style="height: 150px;"></textarea>
+            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Treść pytania / wpisu</label>
+<div id="user-editor-container" style="height: 200px; background: var(--bg-white); margin-bottom: 15px; border-radius: 0 0 8px 8px;"></div>
             
             <div style="display:flex; justify-content: flex-end; gap:10px;">
                 <button class="tab-btn" style="background: var(--bg-light); border: 1px solid var(--border-light);" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
@@ -192,8 +193,35 @@
 
 
 // --- INICJALIZACJA EDYTORA QUILL ---
-        let quill;
+        let quill;      // Edytor admina
+        let userQuill;  // Edytor użytkownika
         window.addEventListener('load', function() {
+            // 1. Edytor dla zwykłych użytkowników (Zawsze aktywny)
+            userQuill = new Quill('#user-editor-container', {
+                theme: 'snow',
+                placeholder: 'O co chcesz zapytać grupę? Możesz formatować tekst i dodawać zdjęcia...',
+                modules: {
+                    toolbar: {
+                        container: [
+                            ['bold', 'italic', 'underline'], 
+                            [{ 'color': [] }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link', 'image']
+                        ],
+                        handlers: {
+                            image: function() {
+                                const range = this.quill.getSelection();
+                                const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com):');
+                                if(value){
+                                    this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Edytor dla Admina (Tylko jeśli zalogowany jako admin)
             if (isAdmin) {
                 quill = new Quill('#editor-container', {
                     theme: 'snow',
@@ -201,17 +229,16 @@
                     modules: {
                         toolbar: {
                             container: [
-                                ['bold', 'italic', 'underline', 'strike'], // Pogrubienie, kursywa, podkreślenie, przekreślenie
-                                [{ 'color': [] }, { 'background': [] }],   // Kolor tekstu i tła
-                                [{ 'align': [] }],                         // Wyrównanie do lewej, środka, prawej
-                                [{ 'list': 'ordered'}, { 'list': 'bullet' }], // Listy numerowane i punktowane
-                                ['link', 'image']                          // Linki i zdjęcia
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'align': [] }],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['link', 'image']
                             ],
                             handlers: {
                                 image: function() {
-                                    // Zabezpieczenie przed Base64 - prosimy o link do zdjęcia
                                     const range = this.quill.getSelection();
-                                    const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com lub postimages.org):');
+                                    const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com):');
                                     if(value){
                                         this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
                                     }
@@ -488,7 +515,7 @@
         async function submitUserPost() {
             if (!userEmail) { alert("Zaloguj się, aby dodać wpis!"); return; }
             const topic = document.getElementById('forum-topic').value;
-            const content = document.getElementById('forum-content').value;
+            const content = userQuill.root.innerHTML;
             if (content.length < 5) return alert("Napisz coś więcej!");
 
             const res = await fetch(`${API}/api/forum/post`, {
@@ -498,7 +525,7 @@
 
             if (res.ok) {
                 document.getElementById('post-modal').style.display = 'none';
-                document.getElementById('forum-content').value = '';
+                if(userQuill) userQuill.setContents([]);
                 loadUserPosts();
             }
         }
