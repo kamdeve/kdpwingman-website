@@ -1289,6 +1289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Funkcja sprawdzająca czy użytkownik ma już ustawione imię
 // Funkcja sprawdzająca czy użytkownik ma już ustawione imię
 function checkUserNickname(userData) {
+    console.log("Otrzymane dane to:", userData);
     // NOWA LINIJKA: Zapisujemy pobrany email do pamięci przeglądarki
     localStorage.setItem('userEmail', userData.email); 
 
