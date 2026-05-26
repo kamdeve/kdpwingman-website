@@ -606,6 +606,7 @@
     }
 
     const data = await res.json();
+    checkUserNickname(data);
     
     // 2. Aktualizacja podstawowych informacji (Saldo i Edycja)
     const balanceEl = document.getElementById('balance');
@@ -1284,6 +1285,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         checkUrlForActions();
+
+        // Funkcja sprawdzająca czy użytkownik ma już ustawione imię
+function checkUserNickname(userData) {
+    // Jeśli w bazie pole nickname jest puste lub nie istnieje
+    if (!userData.nickname || userData.nickname.trim() === "") {
+        // Pokazujemy okienko i blokujemy resztę strony
+        document.getElementById('nickname-modal').style.display = 'flex';
+    }
+}
+
+// Funkcja wysyłająca wpisane imię do bazy danych
+async function saveRequiredNickname() {
+    const nickname = document.getElementById('new-nickname-input').value.trim();
+    const email = localStorage.getItem('userEmail'); // Pobieramy email zalogowanej osoby
+
+    if (nickname.length < 3) {
+        return alert("Imię musi mieć minimum 3 znaki!");
+    }
+
+    try {
+        const res = await fetch(`${API}/api/user/update-nickname`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, nickname })
+        });
+
+        if (res.ok) {
+            // Jeśli zapis się udał, chowamy okienko i odświeżamy stronę
+            document.getElementById('nickname-modal').style.display = 'none';
+            window.location.reload();
+        } else {
+            alert("Wystąpił błąd podczas zapisywania. Spróbuj ponownie.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Błąd połączenia z serwerem.");
+    }
+}
     </script>
 
     <script>
@@ -1349,6 +1388,15 @@ document.addEventListener('DOMContentLoaded', () => {
         else { alert("Błąd!"); }
     }
 </script>
+
+<div id="nickname-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; padding: 30px; border-radius: 16px; border: 2px solid #a0134a; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <h2 style="color: white; margin-bottom: 10px; font-weight: 800;">Powiedz jak Cię nazywać :)</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">Tak będą widzieć Cię inni użytkownicy na naszym forum i czacie. Wpisz swoje imię lub pseudonim.</p>
+        <input type="text" id="new-nickname-input" placeholder="np. Tomek, KasiaKDP" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #374151; background: #0f172a; color: white; margin-bottom: 20px; font-size: 1rem; text-align: center;">
+        <button onclick="saveRequiredNickname()" style="background: linear-gradient(135deg, #a0134a 0%, #db2777 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">Zatwierdź i wejdź</button>
+    </div>
+</div>
 
 </body>
 </html>
