@@ -1289,9 +1289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Funkcja sprawdzająca czy użytkownik ma już ustawione imię
 // Funkcja sprawdzająca czy użytkownik ma już ustawione imię
 function checkUserNickname(userData) {
-    console.log("Otrzymane dane to:", userData);
-    // NOWA LINIJKA: Zapisujemy pobrany email do pamięci przeglądarki
-    localStorage.setItem('userEmail', userData.email); 
+
 
     // Jeśli w bazie pole nickname jest puste lub nie istnieje
     if (!userData.nickname || userData.nickname.trim() === "") {
@@ -1303,7 +1301,7 @@ function checkUserNickname(userData) {
 // Funkcja wysyłająca wpisane imię do bazy danych
 async function saveRequiredNickname() {
     const nickname = document.getElementById('new-nickname-input').value.trim();
-    const email = localStorage.getItem('userEmail'); // Pobieramy email zalogowanej osoby
+    const email = userEmail; // Pobieramy email zalogowanej osoby
 
     if (nickname.length < 3) {
         return alert("Imię musi mieć minimum 3 znaki!");
