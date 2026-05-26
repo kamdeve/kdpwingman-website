@@ -440,6 +440,9 @@
     passwordContainer.style.display = 'none';
     passwordContainer.style.marginTop = '10px';
     passwordContainer.innerHTML = `
+        <input type="text" id="quick-nickname" placeholder="Jak Cię nazywać? (np. Tomek)" 
+        class="w-full p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#a0134a] focus:outline-none transition mb-2">
+        
         <input type="password" id="quick-password" placeholder="Ustaw hasło (min. 6 znaków)" 
         class="w-full p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#a0134a] focus:outline-none transition mb-2">
         
@@ -471,6 +474,11 @@
         messageBox.style.display = 'none';
         
         if (passwordContainer.style.display === 'block') {
+            // Pobieramy imię
+            const nicknameInput = document.getElementById('quick-nickname');
+            const nickname = nicknameInput ? nicknameInput.value.trim() : "";
+
+            if (nickname.length < 3) return showMessage("Imię musi mieć min. 3 znaki!", "#e11d48");
             if (password.length < 6) return showMessage("Hasło musi mieć min. 6 znaków!", "#e11d48");
             if (password !== confirmPass) return showMessage("Hasła nie są takie same!", "#e11d48");
             
@@ -481,7 +489,8 @@
                 const regRes = await fetch(`${API_URL}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    // DODAJEMY NICKNAME DO PACZKI:
+                    body: JSON.stringify({ email, password, nickname })
                 });
 
                 if (!regRes.ok) {
