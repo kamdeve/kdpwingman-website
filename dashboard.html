@@ -280,9 +280,16 @@
             color: white;
         }
 @media (max-width: 768px) {
-    /* Naprawa uciętego menu */
+    /* Naprawa uciętego menu na telefonie */
     .navbar { padding: 1rem 0.5rem; }
-    .btn-forum { margin-right: 5px !important; padding: 6px 8px !important; font-size: 0.75rem !important; }
+    .logo { font-size: 1.1rem; } /* Zmniejszamy trochę logo na telefonie */
+    
+    /* TU BYŁ BŁĄD: Musimy użyć nowej nazwy przycisków */
+    .btn-forum-clean { 
+        margin-right: 5px !important; 
+        padding: 6px 8px !important; 
+        font-size: 0.75rem !important; 
+    }
     .notifications-wrapper { margin-right: 5px !important; }
     .logout-btn { font-size: 0.75rem; }
 }
@@ -296,11 +303,12 @@
     transition: 0.3s;
     border: none;
     background: transparent;
+    cursor: pointer;
 }
 .btn-forum-clean:hover {
     color: var(--cherry);
 }
-/* Jeśli chcesz, żeby aktualna zakładka była wyróżniona: */
+/* Podświetlenie aktywnej zakładki */
 .btn-forum-clean.active {
     color: var(--cherry);
     border-bottom: 2px solid var(--cherry);
@@ -360,10 +368,10 @@
             <a href="index.html" class="logo">
                 <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
             </a>
-<a href="#" onclick="showDashboard()" class="btn-forum-clean">
+<a href="#" onclick="showDashboard(this)" class="btn-forum-clean active">
     <i class="fas fa-home"></i> Panel
 </a>
-<a href="#" onclick="showCommunity()" class="btn-forum-clean">
+<a href="#" onclick="showCommunity(this)" class="btn-forum-clean">
     <i class="fas fa-users"></i> Społeczność
 </a>
 <a href="forum.html" class="btn-forum-clean">
@@ -1395,24 +1403,26 @@ async function saveRequiredNickname() {
     }
 }
 
-// --- ZAKŁADKA SPOŁECZNOŚĆ ---
-        function showCommunity() {
-            document.getElementById('main-dashboard-content').classList.add('hidden');
-            document.getElementById('community-section').classList.remove('hidden');
-
-document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
-    if(event) event.currentTarget.classList.add('active');
-
-            loadCommunityMembers(); // Ładujemy dane przy wejściu w zakładkę
+// --- ZAKŁADKA SPOŁECZNOŚĆ I PANEL (PRZEŁĄCZANIE) ---
+        function setActiveButton(clickedElement) {
+            if(!clickedElement) return;
+            // Usuwa podświetlenie ze wszystkich przycisków w menu
+            document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
+            // Dodaje podświetlenie tylko do klikniętego
+            clickedElement.classList.add('active');
         }
 
-        function showDashboard() {
+        function showCommunity(element) {
+            document.getElementById('main-dashboard-content').classList.add('hidden');
+            document.getElementById('community-section').classList.remove('hidden');
+            setActiveButton(element); // Odpalamy podświetlenie
+            loadCommunityMembers(); 
+        }
+
+        function showDashboard(element) {
             document.getElementById('community-section').classList.add('hidden');
             document.getElementById('main-dashboard-content').classList.remove('hidden');
-
-document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
-    if(event) event.currentTarget.classList.add('active');
-
+            setActiveButton(element); // Odpalamy podświetlenie
         }
 
         
