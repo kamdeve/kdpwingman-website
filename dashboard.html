@@ -280,13 +280,30 @@
             color: white;
         }
 @media (max-width: 768px) {
-    .navbar { padding: 1rem; }
-    .btn-forum {
-        margin-right: 5px; 
-        padding: 6px 10px; 
-        font-size: 0.75rem; /* Mniejsza czcionka na telefonie */
-    }
-    .logo { font-size: 1.2rem; }
+    /* Naprawa uciętego menu */
+    .navbar { padding: 1rem 0.5rem; }
+    .btn-forum { margin-right: 5px !important; padding: 6px 8px !important; font-size: 0.75rem !important; }
+    .notifications-wrapper { margin-right: 5px !important; }
+    .logout-btn { font-size: 0.75rem; }
+}
+
+.btn-forum-clean {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    transition: 0.3s;
+    border: none;
+    background: transparent;
+}
+.btn-forum-clean:hover {
+    color: var(--cherry);
+}
+/* Jeśli chcesz, żeby aktualna zakładka była wyróżniona: */
+.btn-forum-clean.active {
+    color: var(--cherry);
+    border-bottom: 2px solid var(--cherry);
 }
 
     </style>
@@ -343,15 +360,15 @@
             <a href="index.html" class="logo">
                 <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
             </a>
-<a href="#" onclick="showDashboard()" class="btn-forum" style="border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.1);">
-                <i class="fas fa-home"></i> Panel
-            </a>
-            <a href="#" onclick="showCommunity()" class="btn-forum" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1);">
-                <i class="fas fa-users"></i> Społeczność
-            </a>
-            <a href="forum.html" class="btn-forum">
-                <i class="fas fa-comments"></i> Forum
-            </a>
+<a href="#" onclick="showDashboard()" class="btn-forum-clean">
+    <i class="fas fa-home"></i> Panel
+</a>
+<a href="#" onclick="showCommunity()" class="btn-forum-clean">
+    <i class="fas fa-users"></i> Społeczność
+</a>
+<a href="forum.html" class="btn-forum-clean">
+    <i class="fas fa-comments"></i> Forum
+</a>
 
 <div class="notifications-wrapper" style="position: relative; cursor: pointer; margin-right: 15px;" onclick="toggleNotifications()">
     <i class="fas fa-bell" style="font-size: 1.2rem; color: #94a3b8;"></i>
@@ -1382,13 +1399,23 @@ async function saveRequiredNickname() {
         function showCommunity() {
             document.getElementById('main-dashboard-content').classList.add('hidden');
             document.getElementById('community-section').classList.remove('hidden');
+
+document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
+    if(event) event.currentTarget.classList.add('active');
+
             loadCommunityMembers(); // Ładujemy dane przy wejściu w zakładkę
         }
 
         function showDashboard() {
             document.getElementById('community-section').classList.add('hidden');
             document.getElementById('main-dashboard-content').classList.remove('hidden');
+
+document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
+    if(event) event.currentTarget.classList.add('active');
+
         }
+
+        
 
         async function loadCommunityMembers() {
             const list = document.getElementById('members-list');
