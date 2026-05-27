@@ -317,6 +317,17 @@
             Profesjonalne narzędzia do analizy bez przepłacania. Przestań zgadywać, zacznij publikować zyskownie dzięki współdzielonym kosztom.
         </p>
         
+<div style="margin-top: 15px; display: inline-flex; align-items: center; gap: 10px; background: white; padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border-light); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <div style="display: flex;">
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #38bdf8; border: 2px solid white; margin-right: -8px; z-index: 3;"></div>
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #f59e0b; border: 2px solid white; margin-right: -8px; z-index: 2;"></div>
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: #10b981; border: 2px solid white; z-index: 1;"></div>
+            </div>
+            <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">
+                Dołączyło już do nas <strong id="public-user-count" style="color: var(--cherry);">...</strong> twórców!
+            </span>
+        </div>
+
         <div class="video-wrapper">
     <video width="100%" height="auto" controls style="border-radius: 20px; display: block;">
         <source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4">
@@ -808,6 +819,18 @@ checkAdminStatus();
     </div>
 
     <script src="//code.tidio.co/q6vbfqclwkzfcgohcacijiwzgaqcvhrz.js" async></script>
+
+<script>
+        // Pobieranie globalnego licznika społeczności
+        fetch('https://kdpwingmanv2backend-production.up.railway.app/api/stats/total-users')
+            .then(res => res.json())
+            .then(data => {
+                if(data.total) {
+                    document.getElementById('public-user-count').innerText = data.total;
+                }
+            })
+            .catch(err => console.log('Błąd licznika', err));
+    </script>
 
 </body>
 </html>
