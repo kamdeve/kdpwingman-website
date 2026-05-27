@@ -547,6 +547,24 @@
         </div>
     </div>
 
+    <div id="chat-modal" class="hidden" style="position: fixed; bottom: 20px; right: 20px; width: 380px; height: 500px; background: rgba(30, 41, 59, 0.95); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; flex-direction: column; backdrop-filter: blur(10px);">
+    <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="chat-avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background: #a0134a; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">?</div>
+            <span id="chat-user-name" style="color: white; font-weight: 600; font-size: 0.95rem;">Rozmowa</span>
+        </div>
+        <button onclick="closePrivateChat()" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 1.1rem;"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div id="chat-messages-body" style="flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+        </div>
+
+    <div style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px; background: rgba(0,0,0,0.1); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+        <input type="text" id="chat-message-input" placeholder="Napisz wiadomość..." style="flex-grow: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.6); color: white; font-size: 0.9rem; outline: none;">
+        <button onclick="sendPrivateMessage()" style="background: var(--cherry); border: none; color: white; padding: 0 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s;">Wyślij</button>
+    </div>
+</div>
+
 <!-- Ukryta sekcja z nagrodą (Level 3) -->
 <div id="reward-level-3" style="display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 12px; margin-top: 25px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); border: 1px solid #34d399;">
     <h3 style="margin-top: 0; font-size: 1.4rem;">🎉 Odblokowano Nagrodę: Level 3!</h3>
@@ -1415,9 +1433,9 @@ async function saveRequiredNickname() {
                                 </div>
                             </div>
                         </div>
-                        <button onclick="alert('Wkrótce: Otwieranie prywatnego czatu z ${displayName}')" style="background: transparent; border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
-                            Czat <i class="far fa-comment"></i>
-                        </button>
+                        <button onclick="openPrivateChat(${m.id}, '${displayName}')" style="background: transparent; border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
+    Czat <i class="far fa-comment"></i>
+</button>
                     </div>
                     `;
                 }).join('');
@@ -1425,6 +1443,109 @@ async function saveRequiredNickname() {
             } catch(e) {
                 console.error(e);
                 list.innerHTML = '<p style="color: #ef4444;">Błąd ładowania danych ze społeczności.</p>';
+            }
+        }
+
+
+        // --- OBSŁUGA CZATU PRYWATNEGO ---
+        let currentChatReceiverId = null;
+        let chatInterval = null;
+
+        async function openPrivateChat(receiverId, nickname) {
+            currentChatReceiverId = receiverId;
+            
+            // Ustawienia nagłówka okna czatu
+            document.getElementById('chat-user-name').innerText = nickname;
+            document.getElementById('chat-avatar-placeholder').innerText = nickname.charAt(0).toUpperCase();
+            
+            // Pokazujemy okienko (usuwamy klasę hidden i wymuszamy styl flex)
+            const modal = document.getElementById('chat-modal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            // Ładujemy wiadomości z bazy
+            await loadChatHistory();
+            
+            // Automatyczne odświeżanie czatu co 3 sekundy (aby rozmowa była płynna)
+            clearInterval(chatInterval);
+            chatInterval = setInterval(loadChatHistory, 3000);
+
+            // Obsługa wysyłania klawiszem Enter
+            document.getElementById('chat-message-input').onkeydown = function(e) {
+                if(e.key === 'Enter') sendPrivateMessage();
+            };
+        }
+
+        function closePrivateChat() {
+            const modal = document.getElementById('chat-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            currentChatReceiverId = null;
+            clearInterval(chatInterval); // Wyłączamy pobieranie w tle po zamknięciu
+        }
+
+        async function loadChatHistory() {
+            if (!currentChatReceiverId) return;
+            const body = document.getElementById('chat-messages-body');
+            
+            try {
+                const res = await fetch(`${API}/api/messages/history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ myEmail: userEmail, otherUserId: currentChatReceiverId })
+                });
+                const messages = await res.json();
+                
+                // Jeśli okno jest zamknięte w trakcie ładowania, przerywamy
+                if (!currentChatReceiverId) return;
+
+                if (messages.length === 0) {
+                    body.innerHTML = '<p style="color: #94a3b8; text-align: center; font-size: 0.8rem; margin-top: 20px;">Brak wcześniejszych wiadomości. Napisz coś!</p>';
+                    return;
+                }
+
+                // Generowanie dymków wiadomości (Twoje na prawo, rozmówcy na lewo)
+                body.innerHTML = messages.map(msg => {
+                    const isMine = msg.receiver_id === currentChatReceiverId;
+                    const bg = isMine ? 'var(--cherry)' : 'rgba(255,255,255,0.08)';
+                    const align = isMine ? 'align-self: flex-end; border-bottom-right-radius: 2px;' : 'align-self: flex-start; border-bottom-left-radius: 2px;';
+                    
+                    return `
+                        <div style="max-width: 75%; padding: 8px 12px; border-radius: 12px; color: white; font-size: 0.85rem; line-height: 1.4; ${align} background: ${bg}; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            ${msg.content}
+                        </div>
+                    `;
+                }).join('');
+
+                // Automatyczne przewijanie czatu na sam dół do najnowszej wiadomości
+                body.scrollTop = body.scrollHeight;
+
+            } catch(e) {
+                console.error("Błąd ładowania wiadomości:", e);
+            }
+        }
+
+        async function sendPrivateMessage() {
+            const input = document.getElementById('chat-message-input');
+            const content = input.value.trim();
+            if(!content || !currentChatReceiverId) return;
+
+            input.value = ''; // Czyszczenie pola od razu dla lepszego UX
+
+            try {
+                const res = await fetch(`${API}/api/messages/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ myEmail: userEmail, receiverId: currentChatReceiverId, content: content })
+                });
+                
+                if(res.ok) {
+                    await loadChatHistory(); // Natychmiastowe odświeżenie po wysłaniu
+                } else {
+                    alert("Nie udało się wysłać wiadomości.");
+                }
+            } catch(e) {
+                console.error("Błąd wysyłania:", e);
             }
         }
 
