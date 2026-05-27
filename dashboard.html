@@ -1364,6 +1364,15 @@ async function saveRequiredNickname() {
                 const res = await fetch(`${API}/api/community/members`);
                 const members = await res.json();
                 
+                // --- NOWY KOD: Sortowanie użytkowników (Aktywni na górę) ---
+                members.sort((a, b) => {
+                    const aHasName = a.nickname && a.nickname.trim() !== "";
+                    const bHasName = b.nickname && b.nickname.trim() !== "";
+                    if (aHasName && !bHasName) return -1; // Jeśli 'a' ma imię, daj go wyżej
+                    if (!aHasName && bHasName) return 1;  // Jeśli 'b' ma imię, daj go wyżej
+                    return 0; // Jeśli oboje mają/nie mają, zachowaj oryginalną kolejność
+                });
+                
                 document.getElementById('community-count').innerText = `(${members.length})`;
                 
                 if(members.length === 0) {
