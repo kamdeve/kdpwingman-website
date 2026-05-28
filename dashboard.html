@@ -1670,8 +1670,9 @@ async function updateUnreadCount() {
                     return;
                 }
 
-                // Generowanie kafelków powiadomień
+                // Generowanie kafelków powiadomień (Zunifikowane)
                 list.innerHTML = data.map(n => {
+                    // KAFELEK WIADOMOŚCI (Wiśniowy)
                     if (n.type === 'message') {
                         return `
                         <div onclick="openPrivateChat(${n.sender_id}, '${n.nickname}'); document.getElementById('notifications-dropdown').style.display='none'; updateUnreadCount();" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
@@ -1681,6 +1682,19 @@ async function updateUnreadCount() {
                             <div>
                                 <div style="color: white; font-size: 0.9rem; font-weight: 600;">Wiadomość od: ${n.nickname}</div>
                                 <div style="color: #38bdf8; font-size: 0.75rem; font-weight: 600; margin-top: 2px;">Nieprzeczytane wiadomości: ${n.count}</div>
+                            </div>
+                        </div>`;
+                    } 
+                    // KAFELEK FORUM/SYSTEMOWY (Złoty)
+                    else if (n.type === 'forum') {
+                        return `
+                        <div onclick="window.location.href='forum.html'; document.getElementById('notifications-dropdown').style.display='none';" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #eab308; color: #0f172a; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <div>
+                                <div style="color: white; font-size: 0.9rem; font-weight: 600;">Nowość na Forum!</div>
+                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 2px;">Temat: ${n.topic} (od ${n.author})</div>
                             </div>
                         </div>`;
                     }
