@@ -378,9 +378,19 @@
     <i class="fas fa-comments"></i> Forum
 </a>
 
-<div class="notifications-wrapper" style="position: relative; cursor: pointer; margin-right: 15px;" onclick="toggleNotifications()">
-    <i class="fas fa-bell" style="font-size: 1.2rem; color: #94a3b8;"></i>
-    <span id="unread-badge" style="position: absolute; top: -5px; right: -5px; background: #a0134a; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; display: none;">0</span>
+<div class="notifications-wrapper" style="position: relative; cursor: pointer; margin-right: 15px;">
+    <div onclick="toggleNotifications()">
+        <i class="fas fa-bell" style="font-size: 1.2rem; color: #94a3b8;"></i>
+        <span id="unread-badge" style="position: absolute; top: -5px; right: -5px; background: #a0134a; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; display: none;">0</span>
+    </div>
+    
+    <div id="notifications-dropdown" style="display: none; position: absolute; top: 35px; right: -10px; width: 320px; background: rgba(30, 41, 59, 0.98); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px);">
+        <div style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: white; background: rgba(0,0,0,0.2); font-size: 0.9rem;">
+            Twoje Powiadomienia
+        </div>
+        <div id="notifications-list" style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column;">
+            </div>
+    </div>
 </div>
 
             <div class="logout-btn" id="logout-btn">
@@ -1633,11 +1643,62 @@ async function updateUnreadCount() {
         setInterval(updateUnreadCount, 10000);
         updateUnreadCount();
 
-        function toggleNotifications() {
-            // Na razie otwieramy zakładkę społeczność, gdzie są czaty
-            showCommunity();
-            alert("Sprawdź listę czatów – tam czekają wiadomości!");
+        async function toggleNotifications() {
+            const dropdown = document.getElementById('notifications-dropdown');
+            
+            // Jeśli jest otwarte - zamknij
+            if (dropdown.style.display === 'flex') {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            // Jeśli zamknięte - otwórz i pokaż ładowanie
+            dropdown.style.display = 'flex';
+            const list = document.getElementById('notifications-list');
+            list.innerHTML = '<div style="padding: 15px; text-align: center; color: #94a3b8; font-size: 0.85rem;"><i class="fas fa-spinner fa-spin"></i> Szukam nowości...</div>';
+            
+            try {
+                const res = await fetch(`${API}/api/notifications`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ myEmail: userEmail })
+                });
+                const data = await res.json();
+                
+                if (data.length === 0) {
+                    list.innerHTML = '<div style="padding: 15px; text-align: center; color: #94a3b8; font-size: 0.85rem;">Brak nowych powiadomień.</div>';
+                    return;
+                }
+
+                // Generowanie kafelków powiadomień
+                list.innerHTML = data.map(n => {
+                    if (n.type === 'message') {
+                        return `
+                        <div onclick="openPrivateChat(${n.sender_id}, '${n.nickname}'); document.getElementById('notifications-dropdown').style.display='none'; updateUnreadCount();" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--cherry); color: white; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div>
+                                <div style="color: white; font-size: 0.9rem; font-weight: 600;">Wiadomość od: ${n.nickname}</div>
+                                <div style="color: #38bdf8; font-size: 0.75rem; font-weight: 600; margin-top: 2px;">Nieprzeczytane wiadomości: ${n.count}</div>
+                            </div>
+                        </div>`;
+                    }
+                }).join('');
+                
+            } catch(e) {
+                list.innerHTML = '<div style="padding: 15px; text-align: center; color: #ef4444; font-size: 0.85rem;">Błąd serwera.</div>';
+            }
         }
+
+        // Zamykanie menu, gdy klikniemy gdziekolwiek w tło strony
+        document.addEventListener('click', function(event) {
+            const wrapper = document.querySelector('.notifications-wrapper');
+            const dropdown = document.getElementById('notifications-dropdown');
+            if (wrapper && !wrapper.contains(event.target) && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
 
 // --- SYSTEM AKTYWNOŚCI (Wysyłanie pulsu) ---
         async function sendHeartbeat() {
