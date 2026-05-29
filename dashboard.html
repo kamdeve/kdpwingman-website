@@ -67,8 +67,9 @@
         /* --- DOLNA NAWIGACJA (TYLKO TELEFONY) --- */
         .mobile-bottom-nav { 
             display: none; position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); 
+            background: rgba(255, 255, 255, 0.98); border-top: 1px solid var(--glass-border); 
             z-index: 1000; padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(10px); 
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
         }
         .mobile-bottom-nav-inner { 
             display: flex; justify-content: space-around; align-items: center; padding: 10px 0; 
@@ -85,6 +86,11 @@
             body { padding-bottom: 70px; } /* Miejsce na pasek */
             .desktop-actions { display: none !important; } /* Chowamy ikony z górnego paska na telefonie */
             .skool-tabs-bar { padding: 0 15px; gap: 15px; } 
+            
+            /* Przesunięcie ikony Tidio Chat nad dolny pasek nawigacji */
+            #tidio-chat-iframe {
+                bottom: 80px !important;
+            }
         }
 
 
