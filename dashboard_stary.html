@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Klienta - KDP Wingman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- NOWOCZESNY STYL (Premium Glass) --- */
+        :root {
+            --bg-dark: #0f172a; /* Głęboki granat */
+            --glass-bg: rgba(30, 41, 59, 0.7); /* Półprzezroczyste tło kart */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --cherry-gradient: linear-gradient(135deg, #a0134a 0%, #db2777 100%);
+            --cherry: #a0134a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- TŁO GLOW (Poświata) --- */
+        .background-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(160, 19, 74, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 50;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .logo span { color: #db2777; } /* Jaśniejszy róż dla kontrastu */
+        
+        .logout-btn {
+            color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: 0.3s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .logout-btn:hover { color: white; }
+
+        /* --- UKŁAD (LAYOUT) --- */
+        .container {
+            max-width: 1200px; margin: 40px auto; padding: 0 20px;
+            display: grid; grid-template-columns: 1fr 350px; gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* --- KARTY (GLASSMORPHISM) --- */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h3 { margin-top: 0; font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        
+        /* --- ELEMENTY STATUSU --- */
+        .app-item {
+            display: flex; align-items: center; gap: 15px; margin-top: 20px;
+            padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border);
+        }
+        .app-icon {
+            width: 50px; height: 50px; background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        }
+        .status-wait { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+        .status-active { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        /* --- FORMULARZE I PRZYCISKI --- */
+        input {
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border);
+            border-radius: 8px; color: white; font-family: inherit; font-size: 0.95rem;
+            box-sizing: border-box; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--cherry); box-shadow: 0 0 15px rgba(160, 19, 74, 0.2); }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: 0.3s; text-align: center; font-size: 1rem;
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--cherry-gradient);
+            color: white; box-shadow: 0 4px 15px rgba(160, 19, 74, 0.4);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(160, 19, 74, 0.6); }
+
+        /* --- PORTFEL I ZAKŁADKI --- */
+        .balance { font-size: 2.8rem; font-weight: 800; color: var(--success); margin: 10px 0; text-shadow: 0 0 30px rgba(16, 185, 129, 0.2); }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tabs label { flex: 1; cursor: pointer; }
+        .tabs input { display: none; }
+        .tab-label {
+            display: block; text-align: center; padding: 10px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid transparent; color: var(--text-muted); transition: 0.3s; font-size: 0.9rem;
+        }
+        .tabs input:checked + .tab-label {
+            background: rgba(160, 19, 74, 0.2); border-color: var(--cherry); color: white;
+        }
+
+        /* --- HISTORIA TABELA --- */
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.95rem; }
+        .history-table tr:last-child td { border-bottom: none; }
+        .date-col { font-size: 0.8rem; color: var(--text-muted); display: block; }
+
+        /* --- UTILS --- */
+        .hidden { display: none !important; }
+        
+        /* LOGIN BOX (Wyśrodkowany) */
+        #login-view {
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .login-box { width: 100%; max-width: 400px; text-align: center; }
+
+        /* Poprawka czytelności historii portfela */
+#wallet-history-body td {
+    padding: 18px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtelna linia podziału */
+}
+
+.status-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+    margin-top: 20px; /* Dodatkowa przestrzeń na górze */
+}
+
+.tier-card-new {
+    background: linear-gradient(135deg, rgba(160, 19, 74, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid var(--cherry);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 8px 32px rgba(160, 19, 74, 0.15);
+}
+
+.reputation-card {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.badge-icon {
+    font-size: 2.2rem;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.tier-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.tier-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: white;
+}
+
+.help-pill {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    padding: 2px 10px;
+    border-radius: 50px;
+    font-weight: 700;
+}
+
+/* Responsywność dla urządzeń mobilnych */
+@media (max-width: 600px) {
+    .status-container { grid-template-columns: 1fr; }
+}
+
+.btn-forum {
+    border: 1px solid var(--cherry);
+    padding: 8px 18px;
+    border-radius: 50px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.3s;
+    background: rgba(160, 19, 74, 0.1);
+    margin-right: 15px;
+}
+.btn-forum:hover {
+    background: var(--cherry);
+    box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
+}
+
+/* --- KARNET LOJALNOŚCIOWY KEBAB --- */
+        .kebab-card {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid #fbbf24;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.1);
+        }
+        .stamp-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .stamp-slot {
+            aspect-ratio: 1;
+            background: rgba(0,0,0,0.3);
+            border: 2px dashed #475569;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.05);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .stamp-slot.active {
+            background: #fbbf24;
+            border: 2px solid #d97706;
+            color: #0f172a;
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+        .stamp-slot.bonus {
+            border: 2px solid #10b981;
+            color: #10b981;
+        }
+        .stamp-slot.bonus.active {
+            background: #10b981;
+            border-color: #059669;
+            color: white;
+        }
+@media (max-width: 768px) {
+    /* Naprawa uciętego menu na telefonie */
+    .navbar { padding: 1rem 0.5rem; }
+    .logo { font-size: 1.1rem; } /* Zmniejszamy trochę logo na telefonie */
+    
+    /* TU BYŁ BŁĄD: Musimy użyć nowej nazwy przycisków */
+    .btn-forum-clean { 
+        margin-right: 5px !important; 
+        padding: 6px 8px !important; 
+        font-size: 0.75rem !important; 
+    }
+    .notifications-wrapper { margin-right: 5px !important; }
+    .logout-btn { font-size: 0.75rem; }
+}
+
+.btn-forum-clean {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    transition: 0.3s;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+.btn-forum-clean:hover {
+    color: var(--cherry);
+}
+/* Podświetlenie aktywnej zakładki */
+.btn-forum-clean.active {
+    color: var(--cherry);
+    border-bottom: 2px solid var(--cherry);
+}
+
+    </style>
+
+<script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Mi Ri init Vi Gi Rr Wi Ji Bi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync un identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Xi createPersonProfile setInternalOrTestUser sn Hi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ki debug Lr rn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_oYerNzYJWaJzr6PafVdVLMzb3nwSWsSGgJaNyHyw582D', {
+        api_host: 'https://analityka.kdpwingman.com',
+        defaults: '2026-01-30',
+        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+    })
+</script>
+
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <div id="login-view">
+        <div class="card login-box">
+            <h2 style="color: white; font-size: 2rem; margin-bottom: 10px;">KDP <span>Wingman</span></h2>
+            
+            <div id="login-form-content">
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
+                <input type="email" id="email" placeholder="E-mail">
+                <div style="position: relative; margin-bottom: 15px;">
+                    <input type="password" id="pass" placeholder="Hasło" style="margin-bottom: 0; padding-right: 40px;">
+                    <i class="fas fa-eye" id="toggle-pass" onclick="toggleVisibility('pass', 'toggle-pass')" style="position: absolute; right: 15px; top: 16px; color: var(--text-muted); cursor: pointer;"></i>
+                </div>
+                
+                <button class="btn btn-primary" onclick="login()">Zaloguj się</button>
+                
+                <p style="margin-top: 20px; font-size: 0.85rem;">
+                    <a href="#" onclick="forgotPass()" style="color: var(--text-muted); text-decoration: underline;">Nie pamiętasz hasła?</a>
+                </p>
+                <p id="login-msg" style="color: var(--danger); margin-top:10px; font-size:0.9rem;"></p>
+            </div>
+
+            <div id="reset-password-content" class="hidden">
+                <p style="color: var(--text-muted); margin-bottom: 25px;">Podaj adres e-mail, na który założono konto. Wyślemy Ci link do zmiany hasła.</p>
+                <input type="email" id="reset-email" placeholder="Twój adres e-mail">
+                
+                <button class="btn btn-primary" onclick="sendResetLink()" style="margin-bottom: 10px;">Wyślij link</button>
+                <button class="btn" onclick="cancelForgotPass()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted);">Wróć do logowania</button>
+                
+                <p id="reset-msg" style="margin-top:15px; font-size:0.9rem;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dash-view" class="hidden">
+        
+        <div class="navbar">
+            <a href="index.html" class="logo">
+                <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
+            </a>
+<a href="#" onclick="showDashboard(this)" class="btn-forum-clean active">
+    <i class="fas fa-home"></i> Panel
+</a>
+<a href="#" onclick="showCommunity(this)" class="btn-forum-clean">
+    <i class="fas fa-users"></i> Społeczność
+</a>
+<a href="forum.html" class="btn-forum-clean">
+    <i class="fas fa-comments"></i> Forum
+</a>
+
+<div class="notifications-wrapper" style="position: relative; cursor: pointer; margin-right: 15px;">
+    <div onclick="toggleNotifications()">
+        <i class="fas fa-bell" style="font-size: 1.2rem; color: #94a3b8;"></i>
+        <span id="unread-badge" style="position: absolute; top: -5px; right: -5px; background: #a0134a; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; display: none;">0</span>
+    </div>
+    
+    <div id="notifications-dropdown" style="display: none; position: absolute; top: 35px; right: -10px; width: 320px; background: rgba(30, 41, 59, 0.98); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px);">
+        <div style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: white; background: rgba(0,0,0,0.2); font-size: 0.9rem;">
+            Twoje Powiadomienia
+        </div>
+        <div id="notifications-list" style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column;">
+            </div>
+    </div>
+</div>
+
+            <div class="logout-btn" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Wyloguj
+            </div>
+        </div>
+
+        <div id="main-dashboard-content" class="container">
+           
+            <div>
+                <div class="card">
+                    <h3><i class="fas fa-rocket"></i> Status w tym miesiącu</h3>
+                    
+                    <div class="app-item">
+                        <div class="app-icon">💎</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 1rem; color: white;">Helium 10 Diamond</div>
+                            <div id="current-month-label" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
+                        </div>
+                        <div id="status-badge" class="status-badge status-wait">OCZEKIWANIE</div>
+                    </div>
+
+                    <div id="access-info" class="hidden" style="margin-top: 20px;"></div>
+                    <div id="join-btn-container" style="margin-top: 25px;"></div>
+                </div>
+
+                 <div id="loyalty-status-row" class="status-container"></div>
+
+                 <div class="card" style="margin-top: 0;"> 
+    <h3><i class="fas fa-medal"></i> Twoje Przywileje</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+        
+        <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+            <h4 style="color: var(--cherry); margin: 0 0 10px 0; font-size: 0.9rem;">Obecne bonusy:</h4>
+            <ul id="current-bonuses-list" style="font-size: 0.8rem; color: var(--text-muted); padding-left: 15px; margin: 0;">
+                <li>Standardowy czas zwrotów</li>
+                <li>Dostęp do Forum Społeczności</li>
+            </ul>
+        </div>
+        
+        <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--success);">
+            <h4 style="color: var(--success); margin: 0 0 10px 0; font-size: 0.9rem;">Następny poziom (Ekspert KDP):</h4>
+            <ul style="font-size: 0.8rem; color: var(--text-muted); padding-left: 15px; margin: 0;">
+                <li>Wypłaty bez prowizji systemowej</li> 
+                <li>Dostęp do zamkniętej bazy nisz (PDF)</li> 
+                <li>Wymagane: 25 pkt reputacji</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="lottery-card" style="border: 1px solid #eab308; background-color: #1a1e27; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.05);">
+    <h3 style="color: #eab308; display: flex; align-items: center; font-weight: bold; font-size: 16px; margin-bottom: 10px;">
+        🎟️ LOTERIA: ZŁOTY BILET
+    </h3>
+    <p style="color: #a0aec0; font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
+        Opłać swoją zrzutkę na czas (do <strong>5. dnia miesiąca</strong>), aby automatycznie wziąć udział w losowaniu. Zwycięzca otrzymuje kolejną zrzutkę <strong>całkowicie za darmo!</strong>
+    </p>
+    <div style="background-color: rgba(234, 179, 8, 0.1); padding: 10px 15px; border-radius: 8px; display: inline-block;">
+        <span style="color: #e2e8f0; font-size: 13px;">🏆 Zwycięzca w poprzednim miesiącu: <strong id="lottery-winner-name" style="color: #ffffff;">Oczekujemy na wyniki...</strong></span>
+    </div>
+</div>
+
+
+<div class="kebab-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 style="color: #fbbf24; margin: 0;"><i class="fas fa-ticket-alt"></i> Twój Karnet Lojalnościowy</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 5px 0 0 0;">
+                                Zbierz 6 pieczątek, a <strong>7. zrzutka będzie gratis!</strong> 🎁
+                            </p>
+                        </div>
+                        <div id="stamps-counter" style="background: #fbbf24; color: #0f172a; padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.9rem;">
+                            0 / 6
+                        </div>
+                    </div>
+
+                    <div class="stamp-grid" id="kebab-stamps">
+                        </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-history"></i> Historia Zrzutek</h3>
+                    <table class="history-table">
+                        <tbody id="history-list">
+                            <tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Ładowanie...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card" style="margin-top: 25px; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155;">
+                    <h3 style="margin-top: 0; color: #f8fafc; display: flex; align-items: center; gap: 10px;">
+                        📜 Szczegółowa Historia Portfela
+                    </h3>
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">
+                        Tu sprawdzisz każdą wpłatę, depozyt oraz zwrot nadpłaty po rozliczeniu grupy.
+                    </p>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #cbd5e1;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #334155; text-align: left; color: #94a3b8;">
+                                    <th style="padding: 12px 10px;">Data</th>
+                                    <th style="padding: 12px 10px;">Kwota</th>
+                                    <th style="padding: 12px 10px;">Szczegóły transakcji</th>
+                                    <th style="padding: 12px 10px;">Stan portfela</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wallet-history-body">
+                                <tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;">Ładowanie Twojej historii...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+
+            </div> <div> <div class="card">
+                    <h3><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
+                    <div class="balance" id="balance">0.00 zł</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;">
+                        Gdy koszt narzędzia wyjdzie mniejszy niż 75 zł, różnica wróci tutaj automatycznie.
+                    </p>
+                    
+                    <div style="height: 1px; background: var(--glass-border); margin-bottom: 25px;"></div>
+
+                    <label style="font-size: 0.9rem; color: white; display:block; margin-bottom:10px;">Kwota do wypłaty</label>
+                    <input type="number" id="withdraw-amount" placeholder="np. 10.00">
+
+                    <p style="margin: 15px 0 10px 0; font-size: 0.9rem; color: white;">Metoda zwrotu:</p>
+                    <div class="tabs">
+                        <label>
+                            <input type="radio" name="method" value="pl" checked onchange="switchTab('pl')">
+                            <span class="tab-label">🇵🇱 PL</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="method" value="uk" onchange="switchTab('uk')">
+                            <span class="tab-label">🇬🇧 UK</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="method" value="other" onchange="switchTab('other')">
+                            <span class="tab-label">🌍 Inne</span>
+                        </label>
+                    </div>
+
+                    <div id="form-pl">
+                        <input type="text" id="pl-account" placeholder="Numer konta (PL...)" oninput="formatPL(this)" maxlength="32">
+                    </div>
+                    <div id="form-uk" class="hidden">
+                        <input type="text" id="uk-name" placeholder="Imię i Nazwisko">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="uk-sort" placeholder="Sort Code" maxlength="8">
+                            <input type="text" id="uk-acc" placeholder="Account No" maxlength="10">
+                        </div>
+                    </div>
+                    <div id="form-other" class="hidden">
+                        <input type="text" id="other-data" placeholder="IBAN lub PayPal e-mail">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="withdraw()" style="margin-top: 10px;">
+                        <i class="fas fa-paper-plane"></i> Zleć wypłatę
+                    </button>
+                </div>
+            </div> </div> </div> <div id="success-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+        <div class="card" style="max-width: 500px; width: 90%; text-align: center; border: 2px solid #a0134a; box-shadow: 0 0 50px rgba(160, 19, 74, 0.4); background: #0f172a;">
+            <div style="font-size: 4rem; margin-bottom: 10px;">🎉</div>
+            <h2 style="color: white; font-size: 2rem; margin: 0;">GRATULACJE!</h2>
+            <p style="color: #cbd5e1; margin-bottom: 30px;">Dołączyłeś do zrzutki.</p>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--glass-border);">
+                <p style="text-transform: uppercase; color: #64748b; font-size: 0.8rem; letter-spacing: 1px;">Twój numer na liście</p>
+                <div id="modal-number" style="font-size: 4rem; font-weight: bold; color: white;">#0</div>
+                <div style="width: 100%; height: 2px; background: #334155; margin: 15px 0;"></div>
+                <p style="color: #94a3b8; font-size: 0.9rem;">
+                    Dzięki Tobie cena spadła do: <br>
+                    <strong style="color: #4ade80; font-size: 1.2rem;">ok. <span id="modal-price">...</span> PLN</strong>
+                </p>
+            </div>
+
+            <div style="margin: 20px 0; font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
+                <p>💰 <strong>Co z resztą pieniędzy?</strong></p>
+                <p>Różnica między wpłatą a końcową ceną wróci automatycznie na Twój wirtualny portfel po zamknięciu listy.</p>
+            </div>
+
+            <button onclick="closeModal()" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px;">
+                Lecimy po sukces! 🚀
+            </button>
+        </div>
+    </div>
+
+    <div id="community-section" class="container hidden">
+        <div class="card" style="width: 100%; grid-column: 1 / -1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                <h2 style="color: white; font-size: 1.5rem; margin: 0; font-weight: 800;">Członkowie grupy <span id="community-count" style="color: #94a3b8; font-size: 1rem; font-weight: 400;">(0)</span></h2>
+                <button onclick="loadCommunityMembers()" class="btn" style="background: rgba(255,255,255,0.05); width: auto; color: white; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-sync-alt"></i> Odśwież</button>
+            </div>
+            
+            <div id="members-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                <p style="color: #94a3b8;">Ładowanie społeczności...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-modal" class="hidden" style="position: fixed; bottom: 80px; right: 20px; width: calc(100% - 40px); max-width: 380px; height: 450px; background: rgba(30, 41, 59, 0.95); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; flex-direction: column; backdrop-filter: blur(10px);">
+    <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="chat-avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background: #a0134a; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">?</div>
+            <span id="chat-user-name" style="color: white; font-weight: 600; font-size: 0.95rem;">Rozmowa</span>
+        </div>
+        <button onclick="closePrivateChat()" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 1.1rem;"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div id="chat-messages-body" style="flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+        </div>
+
+    <div style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px; background: rgba(0,0,0,0.1); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+        <input type="text" id="chat-message-input" placeholder="Napisz wiadomość..." style="flex-grow: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.6); color: white; font-size: 0.9rem; outline: none;">
+        <button onclick="sendPrivateMessage()" style="background: var(--cherry); border: none; color: white; padding: 0 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s;">Wyślij</button>
+    </div>
+</div>
+
+<!-- Ukryta sekcja z nagrodą (Level 3) -->
+<div id="reward-level-3" style="display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 12px; margin-top: 25px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); border: 1px solid #34d399;">
+    <h3 style="margin-top: 0; font-size: 1.4rem;">🎉 Odblokowano Nagrodę: Level 3!</h3>
+    <p style="font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+        Dziękujemy za Twoją niesamowitą aktywność na forum. Jako podziękowanie, odbierz swój darmowy <strong>Starter Pack dla Twórców (Wektory SVG + Szablony Activity Book)</strong>.
+    </p>
+    <!-- Na razie pusty link '#' -->
+    <a href="#" style="display: inline-block; background: white; color: #059669; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <i class="fas fa-download"></i> Pobierz Starter Pack
+    </a>
+    <p style="font-size: 0.75rem; margin-top: 15px; opacity: 0.8;">(Link wkrótce zostanie zaktualizowany o pliki robocze)</p>
+</div>
+
+    <script>
+        const API = "https://kdpwingmanv2backend-production.up.railway.app";
+        let userEmail = "";
+
+        // Przełączanie zakładek
+        function switchTab(type) {
+            document.getElementById('form-pl').classList.add('hidden');
+            document.getElementById('form-uk').classList.add('hidden');
+            document.getElementById('form-other').classList.add('hidden');
+            document.getElementById('form-' + type).classList.remove('hidden');
+        }
+
+        function formatPL(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 26);
+            input.value = v.replace(/(^.{2})|(.{4})/g, '$& ').trim();
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            try {
+                const res = await fetch(`${API}/api/login`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ email, password: pass })
+                });
+                if(!res.ok) throw new Error("Błąd logowania");
+                
+                // ZAPISUJEMY SESJĘ!
+                localStorage.setItem('wingman_user', email);
+                userEmail = email;
+                
+                initDashboard(); // Uruchom widok
+            } catch(e) { document.getElementById('login-msg').innerText = "Błędne dane"; }
+        }
+
+        // --- 2. FUNKCJA INICJUJĄCA ---
+        function initDashboard() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dash-view').classList.remove('hidden');
+            loadDashboardData();
+            loadHistory();
+        }
+
+        // --- 3. AUTOMATYCZNY START ---
+        const savedUser = localStorage.getItem('wingman_user');
+        if(savedUser) {
+            userEmail = savedUser;
+            initDashboard();
+        }
+
+        async function loadDashboardData() {
+    // 1. Pobieranie danych z backendu
+    const res = await fetch(`${API}/api/user/status`, {
+        method: 'POST', 
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email: userEmail })
+    });
+    
+    // BEZPIECZNIK: Jeśli serwer zwróci błąd, przerywamy funkcję, by nie wywalić strony
+    if (!res.ok) {
+        console.error("Błąd pobierania statusu");
+        return; 
+    }
+
+    const data = await res.json();
+    checkUserNickname(data);
+    
+    // 2. Aktualizacja podstawowych informacji (Saldo i Edycja)
+    const balanceEl = document.getElementById('balance');
+    if (balanceEl && data.wallet_balance !== undefined) {
+        balanceEl.innerText = data.wallet_balance.toFixed(2) + " zł";
+    }
+
+  
+    document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
+
+// Aktualizacja imienia zwycięzcy loterii
+if (data.lottery_winner) {
+    document.getElementById('lottery-winner-name').innerText = data.lottery_winner;
+}
+
+// Dodawanie zielonej odznaki o darmowej zrzutce, jeśli wygrał loterię
+if (data.has_free_ticket) {
+    const bonusList = document.getElementById('current-bonuses-list');
+    if (bonusList) {
+        bonusList.innerHTML += `<li style="color: #22c55e; font-weight: bold; margin-top: 5px;">🎁 Masz darmową zrzutkę w tym miesiącu!</li>`;
+    }
+}
+
+    // --- NOWOŚĆ: WSTRZYKIWANIE ODZNAK LOJALNOŚCIOWYCH ---
+    const loyaltyRow = document.getElementById('loyalty-status-row');
+    if (loyaltyRow && data.buyerTier) {
+        loyaltyRow.innerHTML = `
+            <div class="tier-card-new">
+                <div class="badge-icon">${data.buyerTier.icon}</div>
+                <div>
+                    <div class="tier-label">Ranga Wydawcy</div>
+                    <div class="tier-name">${data.buyerTier.name}</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;">
+                        Udział w ${data.buyCount} edycjach
+                    </div>
+                </div>
+            </div>
+
+            <div class="reputation-card">
+                <div class="badge-icon">🤝</div>
+                <div>
+                    <div class="tier-label">Reputacja Forum</div>
+                    <div class="tier-name">${data.forumRank}</div>
+                    <div class="help-pill">
+                        <i class="fas fa-thumbs-up"></i> ${data.reputationPoints} pkt
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+// --- GAMIFIKACJA: ODBLOKOWANIE NAGRODY (LEVEL 3) ---
+    const repPoints = data.reputationPoints || 0;
+    const rewardBanner = document.getElementById('reward-level-3');
+    
+    if (rewardBanner) {
+        if (repPoints >= 15) {
+            rewardBanner.style.display = 'block';
+        } else {
+            rewardBanner.style.display = 'none';
+        }
+    }
+    const container = document.getElementById('join-btn-container');
+    const accessInfo = document.getElementById('access-info');
+
+    // --- SEKCJA AUTOPILOTA (Plan Diamond: 75 zł) ---
+    let subHtml = "";
+    if (data.is_subscriber) {
+        subHtml = `
+            <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+                <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px solid #059669;">
+                    <h4 style="margin: 0; color: #10b981;">✈️ Autopilot Aktywny</h4>
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin: 10px 0;">
+                        Co miesiąc pobieramy <strong>75 zł</strong> z Twojej karty.<br>
+                        Ewentualne nadpłaty wracają na Twój portfel i możesz je wypłacić.
+                    </p>
+                    <button id="cancel-sub-btn" class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; width: auto; font-size: 0.85rem; padding: 8px 20px; margin-top:5px;">
+                        Anuluj Subskrypcję
+                    </button>
+                </div>
+            </div>
+        `;
+    } else {
+        subHtml = `
+            <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">Nie chcesz klikać co miesiąc?</p>
+                <button id="sub-btn" class="btn" onclick="startSubscription()" style="background: transparent; border: 1px solid #a0134a; color: #a0134a; font-size: 0.9rem;">
+                    ✈️ Włącz Autopilota (75 zł / mc)
+                </button>
+            </div>
+        `;
+    }
+
+            // --- SCENARIUSZ 1: UCZESTNICZYSZ ---
+            if (data.has_joined) {
+                document.getElementById('status-badge').innerText = "UCZESTNICZYSZ";
+                document.getElementById('status-badge').className = "status-badge status-active";
+                
+                container.classList.add('hidden'); 
+                accessInfo.classList.remove('hidden');
+
+                if (data.stats) {
+                    accessInfo.innerHTML = `
+                        <div id="dash-countdown" style="font-size:1.5rem; font-weight:800; text-align:center; color:#db2777; margin-bottom:20px; text-shadow:0 0 20px rgba(219, 39, 119, 0.4);">Ładowanie...</div>
+
+                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                                <div style="text-align:left;">
+                                    <span style="color:#94a3b8; font-size:0.8rem; text-transform:uppercase;">Twój Numer</span>
+                                    <div style="font-size:1.8rem; font-weight:bold; color:white;">#${data.stats.my_number}</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <span style="color:#94a3b8; font-size:0.8rem; text-transform:uppercase;">Dołączyło po Tobie</span>
+                                    <div style="font-size:1.8rem; font-weight:bold; color:#fbbf24;">+${data.stats.people_behind}</div>
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:#94a3b8;">Twój Depozyt</div>
+                                    <div style="font-size:1.1rem; font-weight:bold;">${data.stats.deposit} zł</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:#94a3b8;">Cena na wejściu</div>
+                                    <div style="font-size:1.1rem; font-weight:bold; color:#cbd5e1;">${data.stats.price_when_joined} zł</div>
+                                </div>
+                                <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #059669; padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:#10b981;">📉 Spójrz jak spada!</div>
+                                    <div style="font-size:1.2rem; font-weight:bold; color:#10b981;">ok. ${data.stats.current_price} zł</div>
+                                </div>
+                                <div style="background:rgba(236, 72, 153, 0.1); border:1px solid #db2777; padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:#ec4899;">Przewidywany Zwrot</div>
+                                    <div style="font-size:1.2rem; font-weight:bold; color:#ec4899;">ok. ${data.stats.projected_refund} zł</div>
+                                </div>
+                            </div>
+                            <p style="margin-top:15px; font-size:0.75rem; color:#64748b; text-align:center;">
+                                *Zwrot = Depozyt - (Cena + 10zł opłaty). Kwota wróci na portfel po zakończeniu zrzutki.
+                            </p>
+                        </div>
+
+                        ${subHtml} 
+                    `;
+                    startDashCountdown();
+                } else {
+                     accessInfo.innerHTML = '<strong style="color: var(--success)">✅ Dostęp aktywny!</strong>' + subHtml;
+                }
+
+            } 
+            
+           // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ ŚRODKI LUB ZŁOTY BILET ---
+            else if (data.wallet_balance >= 75 || data.has_free_ticket) {
+                 container.classList.remove('hidden'); 
+                 
+                 let headerText = data.has_free_ticket ? "🎟️ Masz Złoty Bilet!" : "Masz środki w portfelu!";
+                 let subText = data.has_free_ticket ? "Wygrałeś loterię. Dołączasz do tej edycji za 0 zł." : "Możesz dołączyć do obecnej edycji bez dopłacania.";
+
+                 container.innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
+                        <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">${headerText}</h3>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">${subText}</p>
+                        <button id="instant-join-btn" class="btn btn-primary" style="width: 100%; background: #10b981; border: none; margin-top: 0;">
+                            🚀 Dołącz teraz (kliknij raz)
+                        </button>
+                    </div>
+                    ${subHtml}
+                `;
+
+                // Obsługa AUTO-JOIN
+                document.getElementById('instant-join-btn').onclick = async function() {
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerText = "Przetwarzanie...";
+
+                    try {
+                        const joinRes = await fetch(`${API}/api/group-buy/join`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail })
+                        });
+
+                        if (joinRes.ok) {
+                            const joinData = await joinRes.json();
+                            const statusRes = await fetch(`${API}/api/group-buy/status`);
+                            const statusData = await statusRes.json();
+
+                            document.getElementById('modal-number').innerText = "#" + joinData.number;
+                            document.getElementById('modal-price').innerText = statusData.pricePLN;
+
+                            const modal = document.getElementById('success-modal');
+                            modal.classList.remove('hidden');
+                            modal.style.display = 'flex'; 
+                            
+                            loadDashboardData(); 
+                        } else {
+                            const errData = await joinRes.json();
+                            alert("Błąd: " + (errData.error || "Nie udało się dołączyć"));
+                            btn.disabled = false;
+                            btn.innerText = "🚀 Dołącz teraz";
+                        }
+                    } catch (e) {
+                        alert("Błąd połączenia: " + e.message);
+                        btn.disabled = false;
+                        btn.innerText = "🚀 Dołącz teraz";
+                    }
+                };
+
+            } 
+            
+            // --- SCENARIUSZ 3: BRAKUJE ŚRODKÓW (DOPŁATA) ---
+            else {
+                container.classList.remove('hidden');
+                
+                const missing = (75.00 - data.wallet_balance).toFixed(2);
+                let payAmount = parseFloat(missing);
+                if(payAmount < 5) payAmount = 5.00;
+
+                container.innerHTML = `
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 10px; text-align: center;">
+                        <h3 style="color: #ef4444; margin: 0 0 10px 0; font-size: 1rem;">Dołącz do zrzutki</h3>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 5px;">
+                            W portfelu: <strong>${data.wallet_balance.toFixed(2)} zł</strong>
+                        </p>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
+                            Brakuje: <strong>${missing} zł</strong>
+                        </p>
+                        <button id="stripe-pay-btn" class="btn btn-primary" style="width: 100%; margin-top: 0;">
+                            💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)
+                        </button>
+                    </div>
+                    ${subHtml}
+                `;
+
+                document.getElementById('stripe-pay-btn').onclick = async function() {
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerText = "Łączenie z bankiem...";
+
+                    try {
+                        const payRes = await fetch(`${API}/api/create-checkout-session`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail, amount: payAmount }) 
+                        });
+                        const payData = await payRes.json();
+                        
+                        if(payData.url) window.location.href = payData.url;
+                        else {
+                            alert("Błąd płatności");
+                            btn.disabled = false;
+                            btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                        }
+                    } catch(err) {
+                        alert("Błąd: " + err.message);
+                        btn.disabled = false;
+                        btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
+                    }
+                };
+            }
+
+            // --- 4. AKTYWACJA PRZYCISKU ANULOWANIA (Jeśli istnieje) ---
+            // Używamy setTimeout, aby upewnić się, że element istnieje w DOM po wstrzyknięciu HTML
+            setTimeout(() => {
+                const cancelBtn = document.getElementById('cancel-sub-btn');
+                if(cancelBtn) {
+                    cancelBtn.onclick = async function() {
+                        if(!confirm("Czy na pewno chcesz wyłączyć Autopilota? W przyszłym miesiącu będziesz musiał dołączyć ręcznie.")) return;
+                        this.innerText = "Anulowanie...";
+                        try {
+                            const res = await fetch(`${API}/api/cancel-subscription`, {
+                                method: 'POST', headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({ email: userEmail })
+                            });
+                            const d = await res.json();
+                            alert(d.message);
+                            loadDashboardData(); // Odśwież widok
+                        } catch(e) { alert("Błąd połączenia"); }
+                    };
+                }
+            }, 100);
+            loadForum();
+
+            // --- WIZUALIZACJA PIECZĄTEK (SYSTEM KEBAB) ---
+            const stamps = data.loyalty_stamps || 0;
+            const stampsContainer = document.getElementById('kebab-stamps');
+            const stampsCounter = document.getElementById('stamps-counter');
+            
+            if (stampsContainer) {
+                let stampsHtml = '';
+                for (let i = 1; i <= 7; i++) {
+                    let className = "stamp-slot";
+                    let icon = '<i class="fas fa-stamp"></i>';
+                    
+                    if (i === 7) {
+                        className += " bonus";
+                        icon = '<i class="fas fa-gift"></i>';
+                    }
+                    
+                    if (i <= stamps) {
+                        className += " active";
+                        icon = '<i class="fas fa-check-circle"></i>';
+                    }
+                    
+                    stampsHtml += `<div class="${className}">${icon}</div>`;
+                }
+                stampsContainer.innerHTML = stampsHtml;
+                if (stampsCounter) {
+                    stampsCounter.innerText = `${stamps} / 6`;
+                    if (stamps >= 6) {
+                        stampsCounter.style.background = "#10b981";
+                        stampsCounter.innerText = "GOTOWE! 🎉";
+                    }
+                }
+            }
+
+        }
+
+        // --- FUNKCJA ODLICZANIA ---
+        function startDashCountdown() {
+            const el = document.getElementById('dash-countdown');
+            if(!el) return;
+
+            function update() {
+                const now = new Date();
+                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+                const diff = lastDay - now;
+
+                if (diff < 0) { el.innerText = "KONIEC ZAPISÓW"; return; }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                el.innerText = `Koniec za: ${days}d ${hours}h ${minutes}m`;
+            }
+            update();
+            setInterval(update, 60000); 
+        }
+
+
+async function loadForum() {
+    try {
+        const res = await fetch(`${API}/api/forum/posts`);
+        const posts = await res.json();
+        const feed = document.getElementById('forum-feed');
+        
+        if (posts.length === 0) {
+            feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">Brak pytań. Bądź pierwszy!</p>`;
+            return;
+        }
+
+        feed.innerHTML = posts.map(p => `
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 0.7rem; background: var(--cherry); color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase;">
+                            ${p.topic}
+                        </span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">
+                            ${p.email.split('@')[0]} 
+                            <span style="margin-left: 5px; opacity: 0.6;">• ${new Date(p.created_at).toLocaleDateString()}</span>
+                        </span>
+                    </div>
+                    <button onclick="likePost(${p.id})" class="help-pill" style="cursor: pointer; border: none; transition: 0.3s;">
+                        👍 ${p.likes}
+                    </button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 1rem; line-height: 1.6; white-space: pre-wrap;">${p.content}</div>
+            </div>
+        `).join('');
+    } catch (e) { console.error("Błąd ładowania forum:", e); }
+}
+
+async function submitPost() {
+    const topic = document.getElementById('forum-topic').value;
+    const content = document.getElementById('forum-content').value;
+    
+    if(!content || content.length < 5) return alert("Napisz coś więcej!");
+
+    const res = await fetch(`${API}/api/forum/post`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, topic, content })
+    });
+
+    if(res.ok) {
+        document.getElementById('post-modal').style.display = 'none';
+        document.getElementById('forum-content').value = '';
+        loadForum(); // Odśwież listę
+        loadDashboardData(); // Odśwież punkty reputacji w odznakach!
+    }
+}
+
+async function likePost(id) {
+    const res = await fetch(`${API}/api/forum/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, postId: id })
+    });
+    
+    if(res.ok) {
+        loadForum();
+        loadDashboardData(); // Odśwież punkty lajków w badge'u
+    } else {
+        const err = await res.json();
+        alert(err.error || "Nie można polubić");
+    }
+}
+
+
+
+        async function loadHistory() {
+            try {
+                const res = await fetch(`${API}/api/user/history`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const data = await res.json();
+                const list = document.getElementById('history-list');
+                
+                if(data.history && data.history.length > 0) {
+                    list.innerHTML = data.history.map(h => `
+                        <tr>
+                            <td>
+                                <strong>Helium 10</strong><br>
+                                <span class="date-col">Edycja: ${h.month_target}</span>
+                            </td>
+                            <td style="text-align:right; font-weight:bold; color: var(--success);">
+                                -${h.amount_paid} zł
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Brak historii wpłat.</td></tr>';
+                }
+            } catch(e) { console.log(e); }
+        }
+
+        async function withdraw() {
+            const amount = document.getElementById('withdraw-amount').value;
+            const type = document.querySelector('input[name="method"]:checked').value;
+            let accountStr = "";
+
+            if (type === 'pl') accountStr = "[PL] " + document.getElementById('pl-account').value;
+            else if (type === 'uk') accountStr = `[UK] ${document.getElementById('uk-name').value} | SC:${document.getElementById('uk-sort').value} ACC:${document.getElementById('uk-acc').value}`;
+            else accountStr = "[INNE] " + document.getElementById('other-data').value;
+
+            if(!amount || accountStr.length < 8) return alert("Uzupełnij dane!");
+            if(!confirm(`Wypłacić ${amount} zł?`)) return;
+
+            try {
+                const res = await fetch(`${API}/api/wallet/withdraw`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ email: userEmail, amount, accountNumber: accountStr })
+                });
+                if(res.ok) { alert("Zlecenie przyjęte! 24h."); loadDashboardData(); } 
+                else { const d = await res.json(); alert("Błąd: " + d.error); }
+            } catch(e) { alert("Błąd sieci"); }
+        }
+
+        function forgotPass() {
+            document.getElementById('login-form-content').classList.add('hidden');
+            document.getElementById('reset-password-content').classList.remove('hidden');
+        }
+
+        function cancelForgotPass() {
+            document.getElementById('reset-password-content').classList.add('hidden');
+            document.getElementById('login-form-content').classList.remove('hidden');
+            document.getElementById('reset-msg').innerText = "";
+            document.getElementById('reset-email').value = "";
+        }
+
+        async function sendResetLink() {
+            const email = document.getElementById('reset-email').value;
+            const msgEl = document.getElementById('reset-msg');
+            
+            if(!email) {
+                msgEl.innerText = "Podaj adres e-mail!";
+                msgEl.style.color = "var(--danger)";
+                return;
+            }
+            
+            msgEl.innerText = "Wysyłanie...";
+            msgEl.style.color = "white";
+            
+            try {
+                // Zapytanie do naszego nowego endpointu w index.js
+                const res = await fetch(`${API}/api/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    msgEl.innerText = "✅ Link wysłany! Sprawdź swoją skrzynkę (oraz folder SPAM).";
+                    msgEl.style.color = "var(--success)";
+                } else {
+                    msgEl.innerText = data.error || "Wystąpił błąd.";
+                    msgEl.style.color = "var(--danger)";
+                }
+            } catch (err) {
+                msgEl.innerText = "Błąd połączenia z serwerem.";
+                msgEl.style.color = "var(--danger)";
+            }
+        }
+        
+        // Obsługa wylogowania
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('wingman_user');
+            window.location.href = "index.html";
+        });
+
+        async function startSubscription() {
+            const btn = document.getElementById('sub-btn');
+            if(btn) {
+                btn.disabled = true;
+                btn.innerText = "Łączenie ze Stripe...";
+            }
+            
+            try {
+                const res = await fetch(`${API}/api/create-subscription-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const d = await res.json();
+                
+                if(d.url) {
+                    window.location.href = d.url; 
+                } else {
+                    alert("Błąd tworzenia subskrypcji: " + (d.error || "Nieznany błąd"));
+                    if(btn) {
+                        btn.disabled = false;
+                        btn.innerText = "✈️ Włącz Autopilota (75 zł / mc)";
+                    }
+                }
+            } catch(e) { 
+                alert("Błąd połączenia z serwerem"); 
+                console.error(e);
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerText = "✈️ Włącz Autopilota (75 zł / mc)";
+                }
+            }
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            // Odśwież dane bez przeładowania całej strony
+            loadDashboardData();
+        }
+
+        // --- OBSŁUGA OKNA SUKCESU AUTOPILOTA ---
+        function checkUrlForActions() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+
+            if (action === 'autopilot_enabled') {
+                const modal = document.getElementById('success-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+
+                    modal.querySelector('.card').innerHTML = `
+                        <div style="font-size: 4rem; margin-bottom: 10px;">✈️</div>
+                        <h2 style="color: white; font-size: 2rem; margin: 0;">AUTOPILOT WŁĄCZONY!</h2>
+                        <p style="color: #4ade80; margin-bottom: 30px; font-weight:bold;">Twoja subskrypcja jest aktywna.</p>
+
+                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--glass-border); text-align: left;">
+                            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 10px;">
+                                ✅ <strong>Płatność przyjęta:</strong> Środki będą pobierane automatycznie co miesiąc.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 0;">
+                                🔑 <strong>Dostęp:</strong> Dopóki subskrypcja jest aktywna, 
+                                <span style="color: #a0134a; font-weight: bold;">każdego 5-go dnia miesiąca</span> 
+                                otrzymasz dane logowania do Helium 10 na swojego maila.
+                            </p>
+                        </div>
+
+                        <button onclick="closeModalCleanUrl()" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px;">
+                            Wchodzę do Panelu 🚀
+                        </button>
+                    `;
+                }
+            }
+            
+            // Obsługa standardowego sukcesu (zrzutka jednorazowa)
+            if (urlParams.get('success')) {
+                 const modal = document.getElementById('success-modal');
+                 if(modal) {
+                     modal.classList.remove('hidden');
+                     modal.style.display = 'flex';
+                     // Dane (numer i cena) zostaną uzupełnione przez funkcję auto-join lub pobranie statusu
+                     // Tutaj pobieramy aktualny status, żeby uzupełnić modal
+                     fetch(`${API}/api/group-buy/status`)
+                        .then(r => r.json())
+                        .then(statusData => {
+                             // Jeśli backend nie zwraca mojego numeru w tym endpoincie, 
+                             // to numer i tak zostanie pobrany przy "loadDashboardData" jeśli user dołączył.
+                             // Tutaj tylko upewniamy się, że cena jest aktualna.
+                             const priceSpan = document.getElementById('modal-price');
+                             if(priceSpan) priceSpan.innerText = statusData.pricePLN;
+                        });
+                 }
+                 // Wyczyść URL
+                 window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        async function loadDetailedWalletHistory() {
+    const historyBody = document.getElementById('wallet-history-body');
+    
+    // Pobieramy e-mail zalogowanego użytkownika (masz go już w zmiennej na stronie)
+    const userEmail = localStorage.getItem('wingman_user'); 
+
+    try {
+        const res = await fetch(`${API}/api/user/wallet-history`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error || !data.transactions || data.transactions.length === 0) {
+            historyBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Brak zarejestrowanych transakcji w historii.</td></tr>`;
+            return;
+        }
+
+        historyBody.innerHTML = ''; // Czyścimy komunikat ładowania
+
+        data.transactions.forEach(t => {
+            const date = new Date(t.created_at).toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            // Stylizacja kolorów dla kwot
+            const isPositive = parseFloat(t.amount) > 0;
+            const amountColor = isPositive ? '#10b981' : '#f43f5e';
+            const amountSign = isPositive ? '+' : '';
+
+            const row = document.createElement('tr');
+            row.style.borderBottom = "1px solid #334155";
+            row.innerHTML = `
+                <td style="padding: 15px 10px; color: #94a3b8;">${date}</td>
+                <td style="padding: 15px 10px; font-weight: bold; color: ${amountColor};">
+                    ${amountSign}${parseFloat(t.amount).toFixed(2)} zł
+                </td>
+                <td style="padding: 15px 10px;">
+                    <div style="font-weight: bold; color: #f1f5f9;">${t.transaction_type}</div>
+                    <div style="font-size: 0.75rem; color: #64748b;">${t.description}</div>
+                </td>
+                <td style="padding: 15px 10px; font-weight: bold; color: #cbd5e1;">
+                    ${parseFloat(t.balance_after).toFixed(2)} zł
+                </td>
+            `;
+            historyBody.appendChild(row);
+        });
+
+    } catch (e) {
+        console.error("Błąd ładowania historii portfela:", e);
+        historyBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #f43f5e;">Błąd połączenia z serwerem.</td></tr>`;
+    }
+}
+
+// Wywołaj funkcję przy starcie strony (obok innych funkcji ładujących)
+document.addEventListener('DOMContentLoaded', () => {
+    loadDetailedWalletHistory();
+});
+
+        function closeModalCleanUrl() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            window.history.replaceState({}, document.title, window.location.pathname);
+            loadDashboardData();
+        }
+
+        checkUrlForActions();
+
+        // Funkcja sprawdzająca czy użytkownik ma już ustawione imię
+// Funkcja sprawdzająca czy użytkownik ma już ustawione imię
+function checkUserNickname(userData) {
+
+
+    // Jeśli w bazie pole nickname jest puste lub nie istnieje
+    if (!userData.nickname || userData.nickname.trim() === "") {
+        // Pokazujemy okienko i blokujemy resztę strony
+        document.getElementById('nickname-modal').style.display = 'flex';
+    }
+}
+
+// Funkcja wysyłająca wpisane imię do bazy danych
+async function saveRequiredNickname() {
+    const nickname = document.getElementById('new-nickname-input').value.trim();
+    const email = userEmail; // Pobieramy email zalogowanej osoby
+
+    if (nickname.length < 3) {
+        return alert("Imię musi mieć minimum 3 znaki!");
+    }
+
+    try {
+        const res = await fetch(`${API}/api/user/update-nickname`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, nickname })
+        });
+
+        if (res.ok) {
+            // Jeśli zapis się udał, chowamy okienko i odświeżamy stronę
+            document.getElementById('nickname-modal').style.display = 'none';
+            window.location.reload();
+        } else {
+            alert("Wystąpił błąd podczas zapisywania. Spróbuj ponownie.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Błąd połączenia z serwerem.");
+    }
+}
+
+// --- ZAKŁADKA SPOŁECZNOŚĆ I PANEL (PRZEŁĄCZANIE) ---
+        function setActiveButton(clickedElement) {
+            if(!clickedElement) return;
+            // Usuwa podświetlenie ze wszystkich przycisków w menu
+            document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
+            // Dodaje podświetlenie tylko do klikniętego
+            clickedElement.classList.add('active');
+        }
+
+        function showCommunity(element) {
+            document.getElementById('main-dashboard-content').classList.add('hidden');
+            document.getElementById('community-section').classList.remove('hidden');
+            setActiveButton(element); // Odpalamy podświetlenie
+            loadCommunityMembers(); 
+        }
+
+        function showDashboard(element) {
+            document.getElementById('community-section').classList.add('hidden');
+            document.getElementById('main-dashboard-content').classList.remove('hidden');
+            setActiveButton(element); // Odpalamy podświetlenie
+        }
+
+        
+
+        async function loadCommunityMembers() {
+            const list = document.getElementById('members-list');
+            try {
+                const res = await fetch(`${API}/api/community/members`);
+                const members = await res.json();
+                
+                // --- NOWY KOD: Sortowanie użytkowników (Aktywni na górę) ---
+                members.sort((a, b) => {
+                    const aHasName = a.nickname && a.nickname.trim() !== "";
+                    const bHasName = b.nickname && b.nickname.trim() !== "";
+                    if (aHasName && !bHasName) return -1; // Jeśli 'a' ma imię, daj go wyżej
+                    if (!aHasName && bHasName) return 1;  // Jeśli 'b' ma imię, daj go wyżej
+                    return 0; // Jeśli oboje mają/nie mają, zachowaj oryginalną kolejność
+                });
+                
+                document.getElementById('community-count').innerText = `(${members.length})`;
+                
+                if(members.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-muted);">Brak użytkowników z ustawionym imieniem.</p>';
+                    return;
+                }
+
+                // Generowanie kafelków HTML
+                list.innerHTML = members.map(m => {
+                    // Logika Opcji A: Jeśli brak imienia, dajemy domyślne
+                    const hasNickname = m.nickname && m.nickname.trim() !== "";
+                    const displayName = hasNickname ? m.nickname : "Anonimowy Wingman";
+                    const letter = hasNickname ? displayName.charAt(0).toUpperCase() : "?";
+                    
+                    const colors = ['#f43f5e', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#14b8a6'];
+                    
+                    // Jeśli ktoś jest anonimowy, dostaje elegancki, szary awatar
+                    let avatarColor = '#475569';
+                    // Obliczanie statusu Online (aktywny w ciągu ostatnich 5 minut)
+                    const lastSeenDate = new Date(m.last_seen || 0);
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - lastSeenDate) / 60000);
+                    const isOnline = diffMinutes < 5; // Uznajemy za online do 5 min braku pulsu
+
+                    const statusDot = isOnline 
+                        ? '<div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #10b981; border: 3px solid rgba(30, 41, 59, 1); border-radius: 50%; z-index: 10;"></div>'
+                        : '<div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #64748b; border: 3px solid rgba(30, 41, 59, 1); border-radius: 50%; z-index: 10;"></div>'; 
+                    if(hasNickname) { 
+                        let hash = 0;
+                        for (let i = 0; i < m.nickname.length; i++) hash += m.nickname.charCodeAt(i);
+                        avatarColor = colors[hash % colors.length];
+                    }
+
+                    const joinDate = new Date(m.created_at || Date.now()).toLocaleDateString('pl-PL', {month: 'long', year: 'numeric'});
+                    const adminBadge = m.role === 'admin' ? '<span style="background: #a0134a; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">ADMIN</span>' : '';
+
+                    return `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; opacity: ${hasNickname ? '1' : '0.6'};">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="position: relative; width: 48px; height: 48px; border-radius: 50%; background: ${avatarColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                                ${letter}
+                                ${statusDot}
+                            </div>
+                            <div>
+                                <div style="color: white; font-weight: 600; font-size: 1rem; display: flex; align-items: center;">
+                                    ${displayName} ${adminBadge}
+                                </div>
+                                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 2px;">
+                                    <i class="fas fa-calendar-alt" style="opacity: 0.7;"></i> Dołączył(a): ${joinDate}
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="openPrivateChat(${m.id}, '${displayName}')" style="background: transparent; border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
+    Czat <i class="far fa-comment"></i>
+</button>
+                    </div>
+                    `;
+                }).join('');
+                
+            } catch(e) {
+                console.error(e);
+                list.innerHTML = '<p style="color: #ef4444;">Błąd ładowania danych ze społeczności.</p>';
+            }
+        }
+
+
+        // --- OBSŁUGA CZATU PRYWATNEGO ---
+        let currentChatReceiverId = null;
+        let chatInterval = null;
+
+        async function openPrivateChat(receiverId, nickname) {
+            currentChatReceiverId = receiverId;
+            
+            // Ustawienia nagłówka okna czatu
+            document.getElementById('chat-user-name').innerText = nickname;
+            document.getElementById('chat-avatar-placeholder').innerText = nickname.charAt(0).toUpperCase();
+            
+            // Pokazujemy okienko (usuwamy klasę hidden i wymuszamy styl flex)
+            const modal = document.getElementById('chat-modal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            // Ładujemy wiadomości z bazy
+            await loadChatHistory();
+            
+            // Automatyczne odświeżanie czatu co 3 sekundy (aby rozmowa była płynna)
+            clearInterval(chatInterval);
+            chatInterval = setInterval(loadChatHistory, 3000);
+
+            // Obsługa wysyłania klawiszem Enter
+            document.getElementById('chat-message-input').onkeydown = function(e) {
+                if(e.key === 'Enter') sendPrivateMessage();
+            };
+        }
+
+        function closePrivateChat() {
+            const modal = document.getElementById('chat-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            currentChatReceiverId = null;
+            clearInterval(chatInterval); // Wyłączamy pobieranie w tle po zamknięciu
+        }
+
+        async function loadChatHistory() {
+            if (!currentChatReceiverId) return;
+            const body = document.getElementById('chat-messages-body');
+            
+            try {
+                const res = await fetch(`${API}/api/messages/history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ myEmail: userEmail, otherUserId: currentChatReceiverId })
+                });
+                const messages = await res.json();
+                
+                // Jeśli okno jest zamknięte w trakcie ładowania, przerywamy
+                if (!currentChatReceiverId) return;
+
+                if (messages.length === 0) {
+                    body.innerHTML = '<p style="color: #94a3b8; text-align: center; font-size: 0.8rem; margin-top: 20px;">Brak wcześniejszych wiadomości. Napisz coś!</p>';
+                    return;
+                }
+
+                // Generowanie dymków wiadomości (Twoje na prawo, rozmówcy na lewo)
+                body.innerHTML = messages.map(msg => {
+                    const isMine = msg.receiver_id === currentChatReceiverId;
+                    const bg = isMine ? 'var(--cherry)' : 'rgba(255,255,255,0.08)';
+                    const align = isMine ? 'align-self: flex-end; border-bottom-right-radius: 2px;' : 'align-self: flex-start; border-bottom-left-radius: 2px;';
+                    
+                    return `
+                        <div style="max-width: 75%; padding: 8px 12px; border-radius: 12px; color: white; font-size: 0.85rem; line-height: 1.4; ${align} background: ${bg}; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            ${msg.content}
+                        </div>
+                    `;
+                }).join('');
+
+                // Automatyczne przewijanie czatu na sam dół do najnowszej wiadomości
+                body.scrollTop = body.scrollHeight;
+
+            } catch(e) {
+                console.error("Błąd ładowania wiadomości:", e);
+            }
+        }
+
+        async function sendPrivateMessage() {
+            const input = document.getElementById('chat-message-input');
+            const content = input.value.trim();
+            if(!content || !currentChatReceiverId) return;
+
+            input.value = ''; // Czyszczenie pola od razu dla lepszego UX
+
+            try {
+                const res = await fetch(`${API}/api/messages/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ myEmail: userEmail, receiverId: currentChatReceiverId, content: content })
+                });
+                
+                if(res.ok) {
+                    await loadChatHistory(); // Natychmiastowe odświeżenie po wysłaniu
+                } else {
+                    alert("Nie udało się wysłać wiadomości.");
+                }
+            } catch(e) {
+                console.error("Błąd wysyłania:", e);
+            }
+        }
+
+async function updateUnreadCount() {
+            try {
+                const res = await fetch(`${API}/api/messages/unread-count`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ myEmail: userEmail })
+                });
+                const data = await res.json();
+                const badge = document.getElementById('unread-badge');
+                
+                if (data.count > 0) {
+                    badge.innerText = data.count;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch(e) { console.error("Błąd sprawdzania powiadomień"); }
+        }
+
+        // Sprawdzaj co 10 sekund
+        setInterval(updateUnreadCount, 10000);
+        updateUnreadCount();
+
+        async function toggleNotifications() {
+            const dropdown = document.getElementById('notifications-dropdown');
+            
+            // Jeśli jest otwarte - zamknij
+            if (dropdown.style.display === 'flex') {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            // Jeśli zamknięte - otwórz i pokaż ładowanie
+            dropdown.style.display = 'flex';
+            const list = document.getElementById('notifications-list');
+            list.innerHTML = '<div style="padding: 15px; text-align: center; color: #94a3b8; font-size: 0.85rem;"><i class="fas fa-spinner fa-spin"></i> Szukam nowości...</div>';
+            
+            try {
+                const res = await fetch(`${API}/api/notifications`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ myEmail: userEmail })
+                });
+                const data = await res.json();
+                
+                if (data.length === 0) {
+                    list.innerHTML = '<div style="padding: 15px; text-align: center; color: #94a3b8; font-size: 0.85rem;">Brak nowych powiadomień.</div>';
+                    return;
+                }
+
+                // Generowanie kafelków powiadomień (Zunifikowane)
+                list.innerHTML = data.map(n => {
+                    // KAFELEK WIADOMOŚCI (Wiśniowy)
+                    if (n.type === 'message') {
+                        return `
+                        <div onclick="openPrivateChat(${n.sender_id}, '${n.nickname}'); document.getElementById('notifications-dropdown').style.display='none'; updateUnreadCount();" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--cherry); color: white; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div>
+                                <div style="color: white; font-size: 0.9rem; font-weight: 600;">Wiadomość od: ${n.nickname}</div>
+                                <div style="color: #38bdf8; font-size: 0.75rem; font-weight: 600; margin-top: 2px;">Nieprzeczytane wiadomości: ${n.count}</div>
+                            </div>
+                        </div>`;
+                    } 
+                    // KAFELEK FORUM/SYSTEMOWY (Złoty)
+                    else if (n.type === 'forum') {
+                        return `
+                        <div onclick="window.location.href='forum.html'; document.getElementById('notifications-dropdown').style.display='none';" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #eab308; color: #0f172a; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <div>
+                                <div style="color: white; font-size: 0.9rem; font-weight: 600;">Nowość na Forum!</div>
+                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 2px;">Temat: ${n.topic} (od ${n.author})</div>
+                            </div>
+                        </div>`;
+                    }
+                }).join('');
+                
+            } catch(e) {
+                list.innerHTML = '<div style="padding: 15px; text-align: center; color: #ef4444; font-size: 0.85rem;">Błąd serwera.</div>';
+            }
+        }
+
+        // Zamykanie menu, gdy klikniemy gdziekolwiek w tło strony
+        document.addEventListener('click', function(event) {
+            const wrapper = document.querySelector('.notifications-wrapper');
+            const dropdown = document.getElementById('notifications-dropdown');
+            if (wrapper && !wrapper.contains(event.target) && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+// --- SYSTEM AKTYWNOŚCI (Wysyłanie pulsu) ---
+        async function sendHeartbeat() {
+            if (!userEmail) return;
+            try {
+                await fetch(`${API}/api/user/heartbeat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail })
+                });
+            } catch (e) { console.error("Błąd systemu aktywności"); }
+        }
+        
+        // Wyślij sygnał od razu przy wejściu, a potem powtarzaj co minutę
+        sendHeartbeat();
+        setInterval(sendHeartbeat, 60000);
+
+
+
+    </script>
+
+    <script>
+    function toggleVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+            icon.style.color = "white"; // Podświetla ikonkę po kliknięciu
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+            icon.style.color = "var(--text-muted)";
+        }
+    }
+</script>
+<div id="post-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; backdrop-filter: blur(8px);">
+    <div class="card" style="width: 90%; max-width: 500px; border: 1px solid var(--cherry); background: #0f172a;">
+        <h3 style="color:white; margin-bottom: 20px;">Nowy temat na forum</h3>
+        <select id="forum-topic" style="width:100%; padding:12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius:8px; color:white; margin-bottom: 15px;">
+            <option value="Research">🔍 Research & Nisze</option>
+            <option value="Design">🎨 Design & Ilustracje</option>
+            <option value="Reklamy">📈 Reklamy KDP (AMS)</option>
+            <option value="Techniczne">⚙️ Sprawy techniczne</option>
+        </select>
+        <textarea id="forum-content" placeholder="Opisz swój problem..." style="width:100%; height:150px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:10px; color:white; padding:15px; margin-bottom:20px; font-family: inherit; resize: none;"></textarea>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" onclick="submitPost()">Opublikuj 🚀</button>
+            <button class="btn" style="background:transparent; border: 1px solid var(--glass-border); color: var(--text-muted);" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
+        </div>
+    </div>
+</div>
+
+<script src="//code.tidio.co/q6vbfqclwkzfcgohcacijiwzgaqcvhrz.js" async></script>
+
+
+<div id="admin-lottery-panel" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 20px; border: 2px solid #eab308; border-radius: 12px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h3 style="color: #eab308; margin-top: 0;">👑 Zarządzaj Loterią</h3>
+    <input type="text" id="admin-winner-name" placeholder="Imię (np. Michał K.)" style="width: 100%; margin-bottom: 10px; padding: 10px;">
+    <input type="email" id="admin-winner-email" placeholder="Email zwycięzcy" style="width: 100%; margin-bottom: 10px; padding: 10px;">
+    <input type="password" id="admin-secret" placeholder="Hasło admina" style="width: 100%; margin-bottom: 10px; padding: 10px;">
+    <button onclick="setLotteryWinner()" class="btn btn-primary" style="background: #eab308; color: #0f172a;">Zapisz Zwycięzcę i daj darmowy bilet</button>
+    <button onclick="document.getElementById('admin-lottery-panel').style.display='none'" class="btn" style="background: transparent; color: white; margin-top: 5px;">Zamknij</button>
+</div>
+
+<script>
+    // Wpisz w konsoli przeglądarki "showAdmin()" aby wysunąć panel
+    function showAdmin() { document.getElementById('admin-lottery-panel').style.display = 'block'; }
+    
+    async function setLotteryWinner() {
+        const name = document.getElementById('admin-winner-name').value;
+        const email = document.getElementById('admin-winner-email').value;
+        const secret = document.getElementById('admin-secret').value;
+        
+        const res = await fetch(`${API}/api/admin/set-winner`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ secret, winnerName: name, winnerEmail: email })
+        });
+        if(res.ok) { alert("Gotowe! System zapisał zwycięzcę."); location.reload(); } 
+        else { alert("Błąd!"); }
+    }
+</script>
+
+<div id="nickname-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; padding: 30px; border-radius: 16px; border: 2px solid #a0134a; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <h2 style="color: white; margin-bottom: 10px; font-weight: 800;">Powiedz jak Cię nazywać :)</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">Tak będą widzieć Cię inni użytkownicy na naszym forum i czacie. Wpisz swoje imię lub pseudonim.</p>
+        <input type="text" id="new-nickname-input" placeholder="np. Tomek, KasiaKDP" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #374151; background: #0f172a; color: white; margin-bottom: 20px; font-size: 1rem; text-align: center;">
+        <button onclick="saveRequiredNickname()" style="background: linear-gradient(135deg, #a0134a 0%, #db2777 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">Zatwierdź i wejdź</button>
+    </div>
+</div>
+
+</body>
+</html>

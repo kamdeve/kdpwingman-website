@@ -6,17 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+
+
     <style>
-        /* --- NOWOCZESNY STYL (Premium Glass) --- */
+        /* --- JASNY MOTYW (Ujednolicony z Indexem) --- */
         :root {
-            --bg-dark: #0f172a; /* Głęboki granat */
-            --glass-bg: rgba(30, 41, 59, 0.7); /* Półprzezroczyste tło kart */
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --bg-dark: #f8fafc; 
+            --bg-white: #ffffff; /* Naprawia przezroczyste okienka! */
+            --glass-bg: #ffffff; 
+            --glass-border: #e2e8f0; 
             --cherry-gradient: linear-gradient(135deg, #a0134a 0%, #db2777 100%);
             --cherry: #a0134a;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --cherry-light: rgba(160, 19, 74, 0.1); /* Wiśniowe tło dla przycisków */
+            --text-main: #0f172a; 
+            --text-muted: #64748b; 
             --success: #10b981;
             --danger: #ef4444;
         }
@@ -30,33 +35,58 @@
             overflow-x: hidden;
             position: relative;
         }
-
-        /* --- TŁO GLOW (Poświata) --- */
-        .background-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 20%, rgba(160, 19, 74, 0.25) 0%, transparent 40%),
-                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
-            pointer-events: none;
-        }
-
-        /* --- NAVBAR --- */
-        .navbar {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 2rem;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 50;
-        }
-        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;}
-        .logo span { color: #db2777; } /* Jaśniejszy róż dla kontrastu */
         
-        .logout-btn {
-            color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: 0.3s;
-            display: flex; align-items: center; gap: 5px;
+        .background-glow { display: none; } /* Wyłączamy starą poświatę tła */
+
+
+/* --- NOWA NAWIGACJA (SKOOL STYLE) --- */
+        .skool-top-bar { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 20px; background: #ffffff; /* Biały pasek */
+            border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000; 
         }
-        .logout-btn:hover { color: white; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .logo span { color: var(--cherry); }
+        .logout-btn { color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+        .logout-btn:hover { color: var(--cherry); }
+        
+        .skool-tabs-bar { 
+            display: flex; gap: 25px; padding: 0 20px; 
+            border-bottom: 1px solid var(--glass-border); overflow-x: auto; 
+            white-space: nowrap; background: #ffffff; /* Białe tło zakładek */
+        }
+        .skool-tabs-bar::-webkit-scrollbar { display: none; }
+        
+        .skool-tab { 
+            padding: 15px 5px; color: var(--text-muted); font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; 
+        }
+        /* Naprawa znikającego tekstu: */
+        .skool-tab:hover { color: var(--cherry); } 
+        .skool-tab.active { color: var(--cherry); border-bottom-color: var(--cherry); }
+        /* --- DOLNA NAWIGACJA (TYLKO TELEFONY) --- */
+        .mobile-bottom-nav { 
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); 
+            z-index: 1000; padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(10px); 
+        }
+        .mobile-bottom-nav-inner { 
+            display: flex; justify-content: space-around; align-items: center; padding: 10px 0; 
+        }
+        .bottom-nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            color: var(--text-muted); font-size: 1.3rem; cursor: pointer; width: 25%; transition: 0.2s;
+        }
+        .bottom-nav-item.active { color: var(--cherry); }
+        .bottom-nav-item span { font-size: 0.65rem; margin-top: 4px; font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .mobile-bottom-nav { display: block; }
+            body { padding-bottom: 70px; } /* Miejsce na pasek */
+            .desktop-actions { display: none !important; } /* Chowamy ikony z górnego paska na telefonie */
+            .skool-tabs-bar { padding: 0 15px; gap: 15px; } 
+        }
+
 
         /* --- UKŁAD (LAYOUT) --- */
         .container {
@@ -85,18 +115,18 @@
         /* --- ELEMENTY STATUSU --- */
         .app-item {
             display: flex; align-items: center; gap: 15px; margin-top: 20px;
-            padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border);
+            padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--glass-border);
         }
         .app-icon {
-            width: 50px; height: 50px; background: linear-gradient(135deg, #1e293b, #334155);
+            width: 50px; height: 50px; background: var(--cherry-light); color: var(--cherry);
             border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
         }
 
         .status-badge {
             padding: 6px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
         }
-        .status-wait { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
-        .status-active { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-wait { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-active { background: var(--cherry-light); color: var(--cherry); border: 1px solid var(--cherry); }
 
         /* --- FORMULARZE I PRZYCISKI --- */
         input {
@@ -163,25 +193,26 @@
 }
 
 .tier-card-new {
-    background: linear-gradient(135deg, rgba(160, 19, 74, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
-    border: 1px solid var(--cherry);
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 8px 32px rgba(160, 19, 74, 0.15);
-}
+            background: #ffffff;
+            border: 1px solid var(--cherry); /* Dodana wiśniowa ramka */
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
 
-.reputation-card {
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+        .reputation-card {
+            background: #ffffff;
+            border: 1px solid var(--cherry); /* Dodana wiśniowa ramka */
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
 
 .badge-icon {
     font-size: 2.2rem;
@@ -197,10 +228,10 @@
 }
 
 .tier-name {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: white;
-}
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main); /* Podmienione na ciemny */
+        }
 
 .help-pill {
     display: inline-block;
@@ -218,31 +249,16 @@
     .status-container { grid-template-columns: 1fr; }
 }
 
-.btn-forum {
-    border: 1px solid var(--cherry);
-    padding: 8px 18px;
-    border-radius: 50px;
-    color: white;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: 0.3s;
-    background: rgba(160, 19, 74, 0.1);
-    margin-right: 15px;
-}
-.btn-forum:hover {
-    background: var(--cherry);
-    box-shadow: 0 0 15px rgba(160, 19, 74, 0.4);
-}
 
 /* --- KARNET LOJALNOŚCIOWY KEBAB --- */
         .kebab-card {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
-            border: 1px solid #fbbf24;
+            background: #ffffff;
+            border: 1px solid var(--glass-border);
+            border-top: 4px solid var(--cherry);
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
         .stamp-grid {
             display: grid;
@@ -252,67 +268,108 @@
         }
         .stamp-slot {
             aspect-ratio: 1;
-            background: rgba(0,0,0,0.3);
-            border: 2px dashed #475569;
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: rgba(255,255,255,0.05);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: #e2e8f0;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;
         }
         .stamp-slot.active {
-            background: #fbbf24;
-            border: 2px solid #d97706;
-            color: #0f172a;
-            transform: scale(1.05) rotate(5deg);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            background: var(--cherry); border: 2px solid #8a0f3e; color: white;
+            transform: scale(1.05) rotate(5deg); box-shadow: 0 0 15px rgba(160, 19, 74, 0.3);
         }
         .stamp-slot.bonus {
-            border: 2px solid #10b981;
-            color: #10b981;
+            border: 2px dashed var(--cherry); color: var(--cherry); background: var(--cherry-light);
         }
         .stamp-slot.bonus.active {
-            background: #10b981;
-            border-color: #059669;
-            color: white;
+            background: var(--cherry); border-color: #8a0f3e; color: white;
         }
-@media (max-width: 768px) {
-    /* Naprawa uciętego menu na telefonie */
-    .navbar { padding: 1rem 0.5rem; }
-    .logo { font-size: 1.1rem; } /* Zmniejszamy trochę logo na telefonie */
-    
-    /* TU BYŁ BŁĄD: Musimy użyć nowej nazwy przycisków */
-    .btn-forum-clean { 
-        margin-right: 5px !important; 
-        padding: 6px 8px !important; 
-        font-size: 0.75rem !important; 
-    }
-    .notifications-wrapper { margin-right: 5px !important; }
-    .logout-btn { font-size: 0.75rem; }
-}
 
-.btn-forum-clean {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 8px 15px;
-    transition: 0.3s;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-}
-.btn-forum-clean:hover {
-    color: var(--cherry);
-}
-/* Podświetlenie aktywnej zakładki */
-.btn-forum-clean.active {
-    color: var(--cherry);
-    border-bottom: 2px solid var(--cherry);
-}
+/* TABS */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 25px; background: var(--bg-white); padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-light); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .tab-btn.active { background: var(--cherry-light); color: var(--cherry); }
+
+        /* POSTY FACEBOOK STYLE */
+        .post-card { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s; position: relative; }
+        .post-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .author-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; background: var(--cherry-light); color: var(--cherry); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        .author-name { font-weight: 700; color: var(--text-main); font-size: 1.05rem; margin-bottom: 2px;}
+        .post-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .tag { font-size: 0.7rem; background: #e2e8f0; color: var(--text-muted); padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase; }
+        .post-title { font-size: 1.3rem; font-weight: 800; margin: 15px 0 10px 0; color: var(--text-main); }
+        .post-content { color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem; }
+        .post-image { width: 100%; border-radius: 10px; margin-top: 15px; object-fit: cover; max-height: 400px; border: 1px solid var(--border-light); }
+        .post-actions { display: flex; gap: 15px; margin-top: 20px; border-top: 1px solid var(--border-light); padding-top: 15px; }
+        .action-btn { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+        .action-btn:hover, .action-btn.liked { color: var(--cherry); }
+
+        /* --- MODAL (Okienka popup) --- */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); z-index:2000; justify-content:center; align-items:center; backdrop-filter: blur(5px); }
+        .modal-box { background: #ffffff; width: 90%; max-width: 600px; border-radius: 16px; padding: 30px; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
+        .modal-box h3 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; font-weight: 800; }
+        
+        textarea, select, input { width:100%; background:#f8fafc; border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); padding:15px; margin-bottom:15px; font-family: inherit; font-size: 1rem; box-sizing: border-box; transition: 0.2s; }
+        textarea:focus, select:focus, input:focus { outline: none; border-color: var(--cherry); box-shadow: 0 0 0 3px var(--cherry-light); }
+        
+        /* Drag & Drop i Komentarze */
+        .drop-zone { border: 2px dashed var(--glass-border); border-radius: 8px; padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; background: #f8fafc; margin-bottom: 15px; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--cherry); background: var(--cherry-light); }
+        .drop-zone i { font-size: 2rem; color: var(--cherry); margin-bottom: 10px; }
+        
+        .comment-box { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--glass-border); }
+        .comment-author { font-weight: 700; color: var(--text-main); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .comment-text { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; line-height: 1.5; white-space: pre-wrap; }
+
+/* --- SKOOL FORUM UI --- */
+        .write-post-box {
+            background: #ffffff; border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 20px; transition: 0.2s;
+        }
+        .write-post-box:hover { border-color: #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .forum-filters { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .filter-pill {
+            background: #f1f5f9; border: 1px solid transparent; color: var(--text-muted);
+            padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+        }
+        .filter-pill:hover { background: #e2e8f0; }
+        .filter-pill.active { background: #e2e8f0; color: var(--text-main); border-color: #cbd5e1; }
+
+        /* Karta Profilu po najechaniu (Hover Chat) */
+        .avatar-wrapper { position: relative; display: inline-block; cursor: pointer; }
+        .profile-popover {
+            display: none; position: absolute; top: 110%; left: 0; z-index: 1000;
+            background: #ffffff; border: 1px solid var(--glass-border); border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 280px; padding: 20px;
+            cursor: default; text-align: left;
+        }
+        /* Zabezpieczenie przed znikaniem popovera przy przesuwaniu myszki */
+        .profile-popover::before { content: ''; position: absolute; top: -15px; left: 0; width: 100%; height: 15px; }
+        .avatar-wrapper:hover .profile-popover { display: block; animation: fadeIn 0.2s ease; }
+
+
+/* --- SKOOL POST MODAL --- */
+        /* Ukrywamy domyślny górny pasek edytora */
+        #post-modal .ql-toolbar { display: none; }
+        
+        /* Czysty wygląd pola tekstowego */
+        #post-modal .ql-container { border: none !important; font-size: 1.1rem; font-family: 'Inter', sans-serif; }
+        #post-modal .ql-editor { padding: 10px 0; min-height: 120px; }
+        #post-modal .ql-editor.ql-blank::before { color: #94a3b8; font-style: normal; left: 0; }
+
+        /* Stylizacja inputu dla Tytułu posta */
+        #forum-post-title {
+            width: 100%; border: none; background: transparent; padding: 0 0 10px 0;
+            font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 0;
+            border-radius: 0; box-shadow: none;
+        }
+        #forum-post-title:focus { box-shadow: none; border-color: transparent; }
 
     </style>
 
@@ -332,7 +389,7 @@
 
     <div id="login-view">
         <div class="card login-box">
-            <h2 style="color: white; font-size: 2rem; margin-bottom: 10px;">KDP <span>Wingman</span></h2>
+            <h2 style="color: rgb(0, 0, 0); font-size: 2rem; margin-bottom: 10px;">KDP <span>Wingman</span></h2>
             
             <div id="login-form-content">
                 <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
@@ -348,6 +405,10 @@
                     <a href="#" onclick="forgotPass()" style="color: var(--text-muted); text-decoration: underline;">Nie pamiętasz hasła?</a>
                 </p>
                 <p id="login-msg" style="color: var(--danger); margin-top:10px; font-size:0.9rem;"></p>
+
+                <p style="margin-top: 20px; font-size: 0.9rem;">
+        Nie masz konta? <a href="#" onclick="showRegisterPanel()" style="color: var(--cherry); font-weight: 600;">Zarejestruj się</a>
+    </p>
             </div>
 
             <div id="reset-password-content" class="hidden">
@@ -359,42 +420,74 @@
                 
                 <p id="reset-msg" style="margin-top:15px; font-size:0.9rem;"></p>
             </div>
+
+<div id="register-form-content" class="hidden">
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Załóż darmowe konto Wingmana</p>
+        <input type="text" id="reg-nickname" placeholder="Twoje imię / Nickname">
+        <input type="email" id="reg-email" placeholder="Twój adres e-mail">
+        <input type="password" id="reg-pass" placeholder="Stwórz hasło (min. 6 znaków)">
+        <input type="password" id="reg-pass-confirm" placeholder="Powtórz hasło">
+        
+        <button class="btn btn-primary" onclick="registerFromDashboard()" id="reg-btn" style="margin-bottom: 10px;">Zarejestruj się</button>
+        <button class="btn" onclick="showLoginFromRegister()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted);">Wróć do logowania</button>
+        
+        <p id="reg-msg" style="margin-top:15px; font-size:0.9rem;"></p>
+    </div>
+
         </div>
     </div>
 
     <div id="dash-view" class="hidden">
         
-        <div class="navbar">
+        <div class="skool-top-bar">
             <a href="index.html" class="logo">
                 <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
             </a>
-<a href="#" onclick="showDashboard(this)" class="btn-forum-clean active">
-    <i class="fas fa-home"></i> Panel
-</a>
-<a href="#" onclick="showCommunity(this)" class="btn-forum-clean">
-    <i class="fas fa-users"></i> Społeczność
-</a>
-<a href="forum.html" class="btn-forum-clean">
-    <i class="fas fa-comments"></i> Forum
-</a>
 
-<div class="notifications-wrapper" style="position: relative; cursor: pointer; margin-right: 15px;">
-    <div onclick="toggleNotifications()">
-        <i class="fas fa-bell" style="font-size: 1.2rem; color: #94a3b8;"></i>
-        <span id="unread-badge" style="position: absolute; top: -5px; right: -5px; background: #a0134a; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; display: none;">0</span>
-    </div>
-    
-    <div id="notifications-dropdown" style="display: none; position: absolute; top: 35px; right: -10px; width: 320px; background: rgba(30, 41, 59, 0.98); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px);">
-        <div style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: white; background: rgba(0,0,0,0.2); font-size: 0.9rem;">
-            Twoje Powiadomienia
-        </div>
-        <div id="notifications-list" style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column;">
+            <div class="desktop-actions" style="display: flex; align-items: center; gap: 20px;">
+                <div style="cursor: pointer; color: #64748b; font-size: 1.3rem; transition: 0.2s;" onclick="alert('Skrzynka odbiorcza wkrótce!')" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='#64748b'">
+                    <i class="far fa-comment-dots"></i>
+                </div>
+                
+                <div class="notifications-wrapper" style="position: relative; cursor: pointer;" onclick="toggleNotifications()">
+                    <i class="fas fa-bell" style="font-size: 1.3rem; color: #64748b; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='#64748b'"></i>
+                    <span id="unread-badge" style="position: absolute; top: -5px; right: -8px; background: #a0134a; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; display: none; font-weight: bold;">0</span>
+                    
+                    <div id="notifications-dropdown" style="display: none; position: absolute; top: 35px; right: -10px; width: 320px; background: #ffffff; border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10000; flex-direction: column; overflow: hidden;">
+                        <div style="padding: 12px 15px; border-bottom: 1px solid var(--glass-border); font-weight: 600; color: var(--text-main); background: #f8fafc; font-size: 0.9rem;">
+                            Twoje Powiadomienia
+                        </div>
+                        <div id="notifications-list" style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column;"></div>
+                    </div>
+                </div>
+
+                <div class="logout-btn" id="logout-btn" style="margin-left: 10px;">
+                    <i class="fas fa-sign-out-alt"></i> Wyloguj
+                </div>
             </div>
-    </div>
-</div>
+        </div>
 
-            <div class="logout-btn" id="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Wyloguj
+        <div class="skool-tabs-bar">
+            <div class="skool-tab active" onclick="switchAppTab('community', this)">Społeczność</div>
+            <div class="skool-tab" onclick="switchAppTab('classroom', this)">Szkoła</div>
+            <div class="skool-tab" onclick="switchAppTab('calendar', this)">Kalendarz</div>
+            <div class="skool-tab" onclick="switchAppTab('members', this)">Członkowie</div>
+            <div class="skool-tab" onclick="switchAppTab('leaderboards', this)">Ranking</div>
+            <div class="skool-tab" onclick="switchAppTab('panel', this)">Mój Panel</div>
+        </div>
+
+        <div class="mobile-bottom-nav">
+            <div class="mobile-bottom-nav-inner">
+                <div class="bottom-nav-item active" onclick="switchAppTab('community', this)"><i class="fas fa-home"></i><span>Home</span></div>
+                <div class="bottom-nav-item" onclick="alert('Skrzynka odbiorcza wkrótce!')"><i class="far fa-comment-dots"></i><span>Czaty</span></div>
+                
+                <div class="bottom-nav-item" style="position: relative;" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span id="mobile-unread-badge" style="position: absolute; top: -5px; right: 15px; background: #a0134a; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; display: none;">0</span>
+                    <span>Powiadomienia</span>
+                </div>
+                
+                <div class="bottom-nav-item" onclick="switchAppTab('panel', this)"><i class="fas fa-user-circle"></i><span>Profil</span></div>
             </div>
         </div>
 
@@ -402,15 +495,15 @@
            
             <div>
                 <div class="card">
-                    <h3><i class="fas fa-rocket"></i> Status w tym miesiącu</h3>
+                    <h3 style="color: var(--cherry);"><i class="fas fa-rocket"></i> Status w tym miesiącu</h3>
                     
                     <div class="app-item">
                         <div class="app-icon">💎</div>
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 1rem; color: white;">Helium 10 Diamond</div>
+                            <div style="font-weight: bold; font-size: 1rem; color: var(--text-main);">Helium 10 Diamond</div>
                             <div id="current-month-label" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
                         </div>
-                        <div id="status-badge" class="status-badge status-wait">OCZEKIWANIE</div>
+                        <div id="status-badge" class="status-badge status-wait">NIE DOŁĄCZYŁEŚ</div>
                     </div>
 
                     <div id="access-info" class="hidden" style="margin-top: 20px;"></div>
@@ -420,7 +513,28 @@
                  <div id="loyalty-status-row" class="status-container"></div>
 
                  <div class="card" style="margin-top: 0;"> 
-    <h3><i class="fas fa-medal"></i> Twoje Przywileje</h3>
+    <h3 style="color: var(--cherry);"><i class="fas fa-medal"></i> Twoje Przywileje</h3>
+
+    <!-- Ukryta sekcja z nagrodą (Level 3) -->
+<div id="reward-level-3" style="display: none; background: #ffffff; padding: 25px; border-radius: 12px; margin-top: 25px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--glass-border); border-top: 4px solid var(--success);">
+    
+    <h3 style="margin-top: 0; font-size: 1.4rem; color: var(--success); justify-content: center; font-weight: 800;">
+        <i class="fas fa-gift"></i> Odblokowano Nagrodę: Level 3!
+    </h3>
+    
+    <p style="font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; color: var(--text-main);">
+        Dziękujemy za Twoją niesamowitą aktywność na forum. Jako podziękowanie, odbierz swój darmowy <strong>Starter Pack dla Twórców (Wektory SVG + Szablony Activity Book)</strong>.
+    </p>
+    
+    <a href="#" style="display: inline-block; background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+        <i class="fas fa-download"></i> Pobierz Starter Pack
+    </a>
+    
+    <p style="font-size: 0.75rem; margin-top: 15px; color: var(--text-muted);">
+        (Link wkrótce zostanie zaktualizowany o pliki robocze)
+    </p>
+</div>
+
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
         
         <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -444,15 +558,15 @@
 </div>
 
 
-<div class="lottery-card" style="border: 1px solid #eab308; background-color: #1a1e27; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.05);">
-    <h3 style="color: #eab308; display: flex; align-items: center; font-weight: bold; font-size: 16px; margin-bottom: 10px;">
+<div class="lottery-card" style="background: #ffffff; border: 2px solid var(--cherry); border-radius: 16px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; overflow: hidden;">
+    <h3 style="color: #b45309; display: flex; align-items: center; font-weight: 800; font-size: 1.5rem; margin-bottom: 10px;">
         🎟️ LOTERIA: ZŁOTY BILET
     </h3>
-    <p style="color: #a0aec0; font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
         Opłać swoją zrzutkę na czas (do <strong>5. dnia miesiąca</strong>), aby automatycznie wziąć udział w losowaniu. Zwycięzca otrzymuje kolejną zrzutkę <strong>całkowicie za darmo!</strong>
     </p>
-    <div style="background-color: rgba(234, 179, 8, 0.1); padding: 10px 15px; border-radius: 8px; display: inline-block;">
-        <span style="color: #e2e8f0; font-size: 13px;">🏆 Zwycięzca w poprzednim miesiącu: <strong id="lottery-winner-name" style="color: #ffffff;">Oczekujemy na wyniki...</strong></span>
+    <div style="background-color: var(--cherry-light); padding: 10px 15px; border-radius: 8px; display: inline-block;">
+        <span style="color: var(--text-main); font-size: 13px; font-weight: 600;">🏆 Zwycięzca w poprzednim miesiącu: <strong id="lottery-winner-name" style="color: var(--cherry);">Oczekujemy na wyniki...</strong></span>
     </div>
 </div>
 
@@ -460,12 +574,12 @@
 <div class="kebab-card">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h3 style="color: #fbbf24; margin: 0;"><i class="fas fa-ticket-alt"></i> Twój Karnet Lojalnościowy</h3>
+                            <h3 style="color: var(--text-main); margin: 0;"><i class="fas fa-ticket-alt" style="color: #fbbf24;"></i> Twój Karnet Lojalnościowy</h3>
                             <p style="color: var(--text-muted); font-size: 0.85rem; margin: 5px 0 0 0;">
                                 Zbierz 6 pieczątek, a <strong>7. zrzutka będzie gratis!</strong> 🎁
                             </p>
                         </div>
-                        <div id="stamps-counter" style="background: #fbbf24; color: #0f172a; padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.9rem;">
+                        <div id="stamps-counter" style="background: var(--cherry-light); color: var(--cherry); padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.9rem;">
                             0 / 6
                         </div>
                     </div>
@@ -475,7 +589,7 @@
                 </div>
 
                 <div class="card">
-                    <h3><i class="fas fa-history"></i> Historia Zrzutek</h3>
+                    <h3 style="color: var(--cherry);"><i class="fas fa-history"></i> Historia Zrzutek</h3>
                     <table class="history-table">
                         <tbody id="history-list">
                             <tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Ładowanie...</td></tr>
@@ -483,18 +597,18 @@
                     </table>
                 </div>
 
-                <div class="card" style="margin-top: 25px; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155;">
-                    <h3 style="margin-top: 0; color: #f8fafc; display: flex; align-items: center; gap: 10px;">
+                <div class="card" style="margin-top: 25px; background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                    <h3 style="margin-top: 0; color: var(--cherry); display: flex; align-items: center; gap: 10px;">
                         📜 Szczegółowa Historia Portfela
                     </h3>
-                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
                         Tu sprawdzisz każdą wpłatę, depozyt oraz zwrot nadpłaty po rozliczeniu grupy.
                     </p>
                     
                     <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #cbd5e1;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: var(--text-main);">
                             <thead>
-                                <tr style="border-bottom: 2px solid #334155; text-align: left; color: #94a3b8;">
+                                <tr style="border-bottom: 2px solid var(--glass-border); text-align: left; color: var(--text-muted);">
                                     <th style="padding: 12px 10px;">Data</th>
                                     <th style="padding: 12px 10px;">Kwota</th>
                                     <th style="padding: 12px 10px;">Szczegóły transakcji</th>
@@ -511,7 +625,7 @@
                 
 
             </div> <div> <div class="card">
-                    <h3><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
+                    <h3 style="color: var(--cherry);"><i class="fas fa-wallet"></i> Twój Portfel (Zwroty)</h3>
                     <div class="balance" id="balance">0.00 zł</div>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;">
                         Gdy koszt narzędzia wyjdzie mniejszy niż 75 zł, różnica wróci tutaj automatycznie.
@@ -519,10 +633,10 @@
                     
                     <div style="height: 1px; background: var(--glass-border); margin-bottom: 25px;"></div>
 
-                    <label style="font-size: 0.9rem; color: white; display:block; margin-bottom:10px;">Kwota do wypłaty</label>
+                    <label style="font-size: 0.9rem; color: var(--text-main); display:block; margin-bottom:10px;">Kwota do wypłaty</label>
                     <input type="number" id="withdraw-amount" placeholder="np. 10.00">
 
-                    <p style="margin: 15px 0 10px 0; font-size: 0.9rem; color: white;">Metoda zwrotu:</p>
+                    <p style="margin: 15px 0 10px 0; font-size: 0.9rem; color: var(--text-main);">Metoda zwrotu:</p>
                     <div class="tabs">
                         <label>
                             <input type="radio" name="method" value="pl" checked onchange="switchTab('pl')">
@@ -586,18 +700,159 @@
     <div id="community-section" class="container hidden">
         <div class="card" style="width: 100%; grid-column: 1 / -1;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
-                <h2 style="color: white; font-size: 1.5rem; margin: 0; font-weight: 800;">Członkowie grupy <span id="community-count" style="color: #94a3b8; font-size: 1rem; font-weight: 400;">(0)</span></h2>
+                <h2 style="color: var(--text-main); font-size: 1.5rem; margin: 0; font-weight: 800;">Członkowie grupy <span id="community-count" style="color: #94a3b8; font-size: 1rem; font-weight: 400;">(0)</span></h2>
                 <button onclick="loadCommunityMembers()" class="btn" style="background: rgba(255,255,255,0.05); width: auto; color: white; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-sync-alt"></i> Odśwież</button>
             </div>
             
+
+
+
             <div id="members-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
                 <p style="color: #94a3b8;">Ładowanie społeczności...</p>
             </div>
         </div>
     </div>
 
-    <div id="chat-modal" class="hidden" style="position: fixed; bottom: 80px; right: 20px; width: calc(100% - 40px); max-width: 380px; height: 450px; background: rgba(30, 41, 59, 0.95); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; flex-direction: column; backdrop-filter: blur(10px);">
-    <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+    <div id="forum-section" class="hidden" style="max-width: 800px; margin: 0 auto; padding: 20px 20px 80px 20px;">
+        <div id="unified-posts-container">
+            <p style="text-align: center; color: var(--text-muted); padding: 40px;">Ładowanie społeczności...</p>
+        </div>
+    </div>
+
+    <div id="post-modal" class="modal">
+        <div class="modal-box" style="padding: 25px; max-width: 650px;">
+            
+            <!-- Górna belka z awatarem (Opcjonalnie, dla klimatu Skool) -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--cherry); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">
+                    Twój post na <span style="font-weight: 800;">KDP Wingman</span>
+                </div>
+            </div>
+
+            <!-- Tytuł i Treść -->
+            <input type="text" id="forum-post-title" placeholder="Tytuł">
+            <div id="user-editor-container"></div>
+            
+            <!-- Dolny pasek z narzędziami -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 15px; flex-wrap: wrap; gap: 15px;">
+                
+                <!-- Ikonki narzędzi -->
+                <div style="display: flex; gap: 15px; color: var(--text-muted); font-size: 1.2rem;">
+                    <i class="fas fa-paperclip" title="Załącz obrazek" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'" onclick="customQuillAction('image')"></i>
+                    <i class="fas fa-link" title="Dodaj link" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'" onclick="customQuillAction('link')"></i>
+                    <i class="fab fa-youtube" title="Wideo" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'" onclick="customQuillAction('video')"></i>
+                    <i class="fas fa-poll" title="Ankieta" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'" onclick="alert('Ankiety w przygotowaniu! Wkrótce dodamy nową funkcję do bazy danych.')"></i>
+                    <i class="far fa-smile" title="Emoji" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'" onclick="alert('Wskazówka: Aby dodać Emoji, wciśnij skrót klawiszowy (Klawisz Windows + Kropka) na klawiaturze!')"></i>
+                </div>
+
+                <!-- Kategoria i Przyciski -->
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <select id="forum-topic" style="width: auto; padding: 8px 12px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; background: #f1f5f9; border: none; color: var(--text-muted); cursor: pointer; margin-bottom: 0;">
+                        <option value="Ogłoszenia">📢 Ogłoszenia</option>
+                        <option value="Dyskusja">💬 Dyskusja</option>
+                        <option value="Wtyczka Wingman">🧩 Wtyczka Wingman</option>
+                        <option value="Wiedza">💡 Wiedza</option>
+                    </select>
+                    
+                    <button class="tab-btn" style="background: transparent; color: var(--text-muted); padding: 8px 12px; font-weight: 700; border: none;" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
+                    <button class="btn-primary" style="padding: 8px 24px; font-size: 0.95rem; border-radius: 8px;" onclick="submitUserPost()">Udostępnij</button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    </div> <div id="classroom-section" class="hidden" style="max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; animation: fadeIn 0.3s ease;">
+            <div style="background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; padding: 50px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <div style="width: 80px; height: 80px; background: var(--cherry-light); color: var(--cherry); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px auto;">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h2 style="color: var(--text-main); font-weight: 800; font-size: 1.8rem; margin-bottom: 10px;">Szkoła Wingmana (Classroom)</h2>
+                <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6; font-size: 0.95rem;">
+                    Miejsce, w którym znajdziesz kompletne kursy wideo, poradniki krok po kroku oraz strategie szukania zyskownych nisz KDP przy użyciu naszej wtyczki.
+                </p>
+                <span style="background: #f1f5f9; color: var(--text-muted); padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lock" style="color: var(--cherry);"></i> Moduł w przygotowaniu
+                </span>
+            </div>
+        </div>
+
+        <div id="calendar-section" class="hidden" style="max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; animation: fadeIn 0.3s ease;">
+            <div style="background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; padding: 50px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <div style="width: 80px; height: 80px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px auto;">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h2 style="color: var(--text-main); font-weight: 800; font-size: 1.8rem; margin-bottom: 10px;">Kalendarz Zrzutek i Live'ów</h2>
+                <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6; font-size: 0.95rem;">
+                    Śledź harmonogram nadchodzących edycji zrzutek, planowane spotkania na żywo oraz terminy aktualizacji wtyczki Wingman.
+                </p>
+                <span style="background: #f1f5f9; color: var(--text-muted); padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lock" style="color: #3b82f6;"></i> Moduł w przygotowaniu
+                </span>
+            </div>
+        </div>
+
+        <div id="leaderboards-section" class="hidden" style="max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; animation: fadeIn 0.3s ease;">
+            <div style="background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; padding: 50px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <div style="width: 80px; height: 80px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px auto;">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 style="color: var(--text-main); font-weight: 800; font-size: 1.8rem; margin-bottom: 10px;">Ranking i Grywalizacja</h2>
+                <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6; font-size: 0.95rem;">
+                    Bądź aktywny na forum, pomagaj innym wydawcom i zdobywaj punkty doświadczenia. Awansuj w rankingu społeczności i odblokowuj unikalne nagrody!
+                </p>
+                <span style="background: #f1f5f9; color: var(--text-muted); padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lock" style="color: #f59e0b;"></i> Moduł w przygotowaniu
+                </span>
+            </div>
+        </div>
+
+    <div id="thread-modal" class="modal">
+        <div class="modal-box" style="position: relative;">
+            <button onclick="document.getElementById('thread-modal').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            
+            <div id="thread-content">Ładowanie...</div>
+            
+            <div style="margin-top: 25px; border-top: 1px solid var(--border-light); padding-top: 20px;">
+                <textarea id="comment-content" placeholder="Napisz odpowiedź..." style="height: 100px; margin-bottom: 10px;"></textarea>
+                <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="submitComment()">Opublikuj Odpowiedź</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-knowledge-modal" class="modal">
+        <div class="modal-box">
+            <h3 style="color: var(--text-main);"><i class="fas fa-edit"></i> Dodaj Artykuł / Poradnik</h3>
+            
+            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Temat wpisu</label>
+            <input type="text" id="knowledge-title" placeholder="np. Jak szukać nisz w Helium 10?">
+            
+            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Treść wpisu</label>
+            <div id="editor-container" style="height: 300px; background: var(--bg-white); margin-bottom: 15px; border-radius: 0 0 8px 8px;"></div>
+            
+            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Miniaturka (Opcjonalnie)</label>
+            <div class="drop-zone" id="knowledge-drop-zone" onclick="document.getElementById('knowledge-image-input').click()">
+                <i class="fas fa-image"></i>
+                <p>Kliknij, aby dodać zrzut ekranu lub grafikę</p>
+                <input type="file" id="knowledge-image-input" accept="image/*" style="display: none;">
+            </div>
+            <img id="knowledge-image-preview" style="display: none; width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;">
+            
+            <div style="display:flex; justify-content: flex-end; gap:10px;">
+                <button class="tab-btn" style="background: var(--bg-light); border: 1px solid var(--border-light);" onclick="closeAdminModal()">Anuluj</button>
+                <button class="btn-primary" id="admin-save-btn" onclick="submitKnowledgePost()">Opublikuj Wiedzę <i class="fas fa-rocket"></i></button>
+            </div>
+        </div>
+    </div>
+
+        
+            </div>
+
+    <div id="chat-modal" class="hidden" style="position: fixed; bottom: 80px; right: 20px; width: calc(100% - 40px); max-width: 380px; height: 450px; background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; display: flex; flex-direction: column; overflow: hidden;">
+    <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: var(--cherry); border-top-left-radius: 16px; border-top-right-radius: 16px;">
         <div style="display: flex; align-items: center; gap: 10px;">
             <div id="chat-avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background: #a0134a; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">?</div>
             <span id="chat-user-name" style="color: white; font-weight: 600; font-size: 0.95rem;">Rozmowa</span>
@@ -614,18 +869,10 @@
     </div>
 </div>
 
-<!-- Ukryta sekcja z nagrodą (Level 3) -->
-<div id="reward-level-3" style="display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 12px; margin-top: 25px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); border: 1px solid #34d399;">
-    <h3 style="margin-top: 0; font-size: 1.4rem;">🎉 Odblokowano Nagrodę: Level 3!</h3>
-    <p style="font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
-        Dziękujemy za Twoją niesamowitą aktywność na forum. Jako podziękowanie, odbierz swój darmowy <strong>Starter Pack dla Twórców (Wektory SVG + Szablony Activity Book)</strong>.
-    </p>
-    <!-- Na razie pusty link '#' -->
-    <a href="#" style="display: inline-block; background: white; color: #059669; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <i class="fas fa-download"></i> Pobierz Starter Pack
-    </a>
-    <p style="font-size: 0.75rem; margin-top: 15px; opacity: 0.8;">(Link wkrótce zostanie zaktualizowany o pliki robocze)</p>
-</div>
+
+
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     <script>
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
@@ -652,11 +899,12 @@
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ email, password: pass })
                 });
-                if(!res.ok) throw new Error("Błąd logowania");
-                
-                // ZAPISUJEMY SESJĘ!
-                localStorage.setItem('wingman_user', email);
+                if (res.ok) {
                 userEmail = email;
+                localStorage.setItem('wingman_user', email); // ZMIANA: używamy jednego, wspólnego klucza
+                initDashboard();
+                switchAppTab('panel', null); // Przekieruj od razu do "Mój Panel"
+            }
                 
                 initDashboard(); // Uruchom widok
             } catch(e) { document.getElementById('login-msg').innerText = "Błędne dane"; }
@@ -668,6 +916,14 @@
             document.getElementById('dash-view').classList.remove('hidden');
             loadDashboardData();
             loadHistory();
+            loadDetailedWalletHistory();
+            // --- LOGIKA STARTOWA (SKOOL STYLE) ---
+            // Sprawdzamy, czy w linku przekazano konkretną zakładkę (np. ?tab=community)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTab = urlParams.get('tab') || 'community'; // Jeśli brak, domyślnie to 'community'
+            
+            // Przełączamy od razu na wybraną zakładkę
+            switchAppTab(targetTab, null);
         }
 
         // --- 3. AUTOMATYCZNY START ---
@@ -711,7 +967,8 @@ if (data.lottery_winner) {
 // Dodawanie zielonej odznaki o darmowej zrzutce, jeśli wygrał loterię
 if (data.has_free_ticket) {
     const bonusList = document.getElementById('current-bonuses-list');
-    if (bonusList) {
+    // ZMIANA: Sprawdzamy czy już przypadkiem nie dopisaliśmy tego tekstu
+    if (bonusList && !bonusList.innerHTML.includes('Masz darmową zrzutkę')) {
         bonusList.innerHTML += `<li style="color: #22c55e; font-weight: bold; margin-top: 5px;">🎁 Masz darmową zrzutkę w tym miesiącu!</li>`;
     }
 }
@@ -795,43 +1052,42 @@ if (data.has_free_ticket) {
 
                 if (data.stats) {
                     accessInfo.innerHTML = `
-                        <div id="dash-countdown" style="font-size:1.5rem; font-weight:800; text-align:center; color:#db2777; margin-bottom:20px; text-shadow:0 0 20px rgba(219, 39, 119, 0.4);">Ładowanie...</div>
+                        <div id="dash-countdown" style="font-size:1.5rem; font-weight:800; text-align:center; color:var(--cherry); margin-bottom:20px;">Ładowanie...</div>
 
-                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                        <div style="background: #ffffff; border: 1px solid var(--glass-border); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--glass-border); padding-bottom:10px;">
                                 <div style="text-align:left;">
-                                    <span style="color:#94a3b8; font-size:0.8rem; text-transform:uppercase;">Twój Numer</span>
-                                    <div style="font-size:1.8rem; font-weight:bold; color:white;">#${data.stats.my_number}</div>
+                                    <span style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Twój Numer</span>
+                                    <div style="font-size:1.8rem; font-weight:bold; color:var(--text-main);">#${data.stats.my_number}</div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <span style="color:#94a3b8; font-size:0.8rem; text-transform:uppercase;">Dołączyło po Tobie</span>
-                                    <div style="font-size:1.8rem; font-weight:bold; color:#fbbf24;">+${data.stats.people_behind}</div>
+                                    <span style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Dołączyło po Tobie</span>
+                                    <div style="font-size:1.8rem; font-weight:bold; color:var(--cherry);">+${data.stats.people_behind}</div>
                                 </div>
                             </div>
 
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-                                    <div style="font-size:0.7rem; color:#94a3b8;">Twój Depozyt</div>
-                                    <div style="font-size:1.1rem; font-weight:bold;">${data.stats.deposit} zł</div>
+                                <div style="background:#f8fafc; border:1px solid var(--glass-border); padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:var(--text-muted);">Twój Depozyt</div>
+                                    <div style="font-size:1.1rem; font-weight:bold; color:var(--text-main);">${data.stats.deposit} zł</div>
                                 </div>
-                                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-                                    <div style="font-size:0.7rem; color:#94a3b8;">Cena na wejściu</div>
-                                    <div style="font-size:1.1rem; font-weight:bold; color:#cbd5e1;">${data.stats.price_when_joined} zł</div>
+                                <div style="background:#f8fafc; border:1px solid var(--glass-border); padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:var(--text-muted);">Cena na wejściu</div>
+                                    <div style="font-size:1.1rem; font-weight:bold; color:var(--text-main);">${data.stats.price_when_joined} zł</div>
                                 </div>
-                                <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #059669; padding:10px; border-radius:8px;">
+                                <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; padding:10px; border-radius:8px;">
                                     <div style="font-size:0.7rem; color:#10b981;">📉 Spójrz jak spada!</div>
                                     <div style="font-size:1.2rem; font-weight:bold; color:#10b981;">ok. ${data.stats.current_price} zł</div>
                                 </div>
-                                <div style="background:rgba(236, 72, 153, 0.1); border:1px solid #db2777; padding:10px; border-radius:8px;">
-                                    <div style="font-size:0.7rem; color:#ec4899;">Przewidywany Zwrot</div>
-                                    <div style="font-size:1.2rem; font-weight:bold; color:#ec4899;">ok. ${data.stats.projected_refund} zł</div>
+                                <div style="background:rgba(160, 19, 74, 0.1); border:1px solid var(--cherry); padding:10px; border-radius:8px;">
+                                    <div style="font-size:0.7rem; color:var(--cherry);">Przewidywany Zwrot</div>
+                                    <div style="font-size:1.2rem; font-weight:bold; color:var(--cherry);">ok. ${data.stats.projected_refund} zł</div>
                                 </div>
                             </div>
-                            <p style="margin-top:15px; font-size:0.75rem; color:#64748b; text-align:center;">
+                            <p style="margin-top:15px; font-size:0.75rem; color:var(--text-muted); text-align:center;">
                                 *Zwrot = Depozyt - (Cena + 10zł opłaty). Kwota wróci na portfel po zakończeniu zrzutki.
                             </p>
                         </div>
-
                         ${subHtml} 
                     `;
                     startDashCountdown();
@@ -971,7 +1227,6 @@ if (data.has_free_ticket) {
                     };
                 }
             }, 100);
-            loadForum();
 
             // --- WIZUALIZACJA PIECZĄTEK (SYSTEM KEBAB) ---
             const stamps = data.loyalty_stamps || 0;
@@ -1030,74 +1285,7 @@ if (data.has_free_ticket) {
         }
 
 
-async function loadForum() {
-    try {
-        const res = await fetch(`${API}/api/forum/posts`);
-        const posts = await res.json();
-        const feed = document.getElementById('forum-feed');
-        
-        if (posts.length === 0) {
-            feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">Brak pytań. Bądź pierwszy!</p>`;
-            return;
-        }
 
-        feed.innerHTML = posts.map(p => `
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="font-size: 0.7rem; background: var(--cherry); color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase;">
-                            ${p.topic}
-                        </span>
-                        <span style="font-size: 0.85rem; color: var(--text-muted);">
-                            ${p.email.split('@')[0]} 
-                            <span style="margin-left: 5px; opacity: 0.6;">• ${new Date(p.created_at).toLocaleDateString()}</span>
-                        </span>
-                    </div>
-                    <button onclick="likePost(${p.id})" class="help-pill" style="cursor: pointer; border: none; transition: 0.3s;">
-                        👍 ${p.likes}
-                    </button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 1rem; line-height: 1.6; white-space: pre-wrap;">${p.content}</div>
-            </div>
-        `).join('');
-    } catch (e) { console.error("Błąd ładowania forum:", e); }
-}
-
-async function submitPost() {
-    const topic = document.getElementById('forum-topic').value;
-    const content = document.getElementById('forum-content').value;
-    
-    if(!content || content.length < 5) return alert("Napisz coś więcej!");
-
-    const res = await fetch(`${API}/api/forum/post`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, topic, content })
-    });
-
-    if(res.ok) {
-        document.getElementById('post-modal').style.display = 'none';
-        document.getElementById('forum-content').value = '';
-        loadForum(); // Odśwież listę
-        loadDashboardData(); // Odśwież punkty reputacji w odznakach!
-    }
-}
-
-async function likePost(id) {
-    const res = await fetch(`${API}/api/forum/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, postId: id })
-    });
-    
-    if(res.ok) {
-        loadForum();
-        loadDashboardData(); // Odśwież punkty lajków w badge'u
-    } else {
-        const err = await res.json();
-        alert(err.error || "Nie można polubić");
-    }
-}
 
 
 
@@ -1304,17 +1492,20 @@ async function likePost(id) {
         }
 
         async function loadDetailedWalletHistory() {
-    const historyBody = document.getElementById('wallet-history-body');
-    
-    // Pobieramy e-mail zalogowanego użytkownika (masz go już w zmiennej na stronie)
-    const userEmail = localStorage.getItem('wingman_user'); 
+            const historyBody = document.getElementById('wallet-history-body');
+            
+            // ZMIANA: Korzystamy z globalnej zmiennej. Jeśli gość wszedł na stronę, zatrzymujemy funkcję.
+            if (!userEmail) {
+                historyBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Zaloguj się, aby zobaczyć swoją historię portfela.</td></tr>`;
+                return;
+            }
 
-    try {
-        const res = await fetch(`${API}/api/user/wallet-history`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userEmail })
-        });
+            try {
+                const res = await fetch(`${API}/api/user/wallet-history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail })
+                });
         
         const data = await res.json();
         
@@ -1336,15 +1527,15 @@ async function likePost(id) {
             const row = document.createElement('tr');
             row.style.borderBottom = "1px solid #334155";
             row.innerHTML = `
-                <td style="padding: 15px 10px; color: #94a3b8;">${date}</td>
+                <td style="padding: 15px 10px; color: var(--text-muted);">${date}</td>
                 <td style="padding: 15px 10px; font-weight: bold; color: ${amountColor};">
                     ${amountSign}${parseFloat(t.amount).toFixed(2)} zł
                 </td>
                 <td style="padding: 15px 10px;">
-                    <div style="font-weight: bold; color: #f1f5f9;">${t.transaction_type}</div>
-                    <div style="font-size: 0.75rem; color: #64748b;">${t.description}</div>
+                    <div style="font-weight: bold; color: var(--text-main);">${t.transaction_type}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">${t.description}</div>
                 </td>
-                <td style="padding: 15px 10px; font-weight: bold; color: #cbd5e1;">
+                <td style="padding: 15px 10px; font-weight: bold; color: var(--text-main);">
                     ${parseFloat(t.balance_after).toFixed(2)} zł
                 </td>
             `;
@@ -1357,10 +1548,7 @@ async function likePost(id) {
     }
 }
 
-// Wywołaj funkcję przy starcie strony (obok innych funkcji ładujących)
-document.addEventListener('DOMContentLoaded', () => {
-    loadDetailedWalletHistory();
-});
+
 
         function closeModalCleanUrl() {
             const modal = document.getElementById('success-modal');
@@ -1413,26 +1601,89 @@ async function saveRequiredNickname() {
     }
 }
 
-// --- ZAKŁADKA SPOŁECZNOŚĆ I PANEL (PRZEŁĄCZANIE) ---
-        function setActiveButton(clickedElement) {
-            if(!clickedElement) return;
-            // Usuwa podświetlenie ze wszystkich przycisków w menu
-            document.querySelectorAll('.btn-forum-clean').forEach(btn => btn.classList.remove('active'));
-            // Dodaje podświetlenie tylko do klikniętego
-            clickedElement.classList.add('active');
-        }
+// --- NOWY SYSTEM ZARZĄDZANIA WIDOKAMI (SINGLE PAGE APP) ---
+        function switchAppTab(tabName, clickedElement) {
+            // 1. Zmiana podświetlenia w górnych zakładkach
+            document.querySelectorAll('.skool-tab').forEach(btn => btn.classList.remove('active'));
+            if(clickedElement && clickedElement.classList.contains('skool-tab')) {
+                clickedElement.classList.add('active');
+            } else {
+                const tabs = Array.from(document.querySelectorAll('.skool-tab'));
+                const targetTab = tabs.find(t => 
+                    (tabName === 'community' && t.innerText.includes('Społeczność')) ||
+                    (tabName === 'classroom' && t.innerText.includes('Szkoła')) ||
+                    (tabName === 'calendar' && t.innerText.includes('Kalendarz')) ||
+                    (tabName === 'members' && t.innerText.includes('Członkowie')) ||
+                    (tabName === 'leaderboards' && t.innerText.includes('Ranking')) ||
+                    (tabName === 'panel' && t.innerText.includes('Mój Panel'))
+                );
+                if(targetTab) targetTab.classList.add('active');
+            }
 
-        function showCommunity(element) {
+            // 2. Zmiana podświetlenia w dolnym pasku
+            document.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+            if(clickedElement && clickedElement.classList.contains('bottom-nav-item')) {
+                clickedElement.classList.add('active');
+            } else {
+                // Synchronizacja dolnego paska jeśli kliknięto górną zakładkę
+                if(tabName === 'community' || tabName === 'panel') {
+                     const bottomIcons = Array.from(document.querySelectorAll('.bottom-nav-item'));
+                     const targetIcon = bottomIcons.find(t => t.innerText.toLowerCase().includes(tabName === 'community' ? 'home' : 'profile'));
+                     if(targetIcon) targetIcon.classList.add('active');
+                }
+            }
+
+            // 3. Ukrywanie wszystkich głównych sekcji
             document.getElementById('main-dashboard-content').classList.add('hidden');
-            document.getElementById('community-section').classList.remove('hidden');
-            setActiveButton(element); // Odpalamy podświetlenie
-            loadCommunityMembers(); 
-        }
-
-        function showDashboard(element) {
             document.getElementById('community-section').classList.add('hidden');
-            document.getElementById('main-dashboard-content').classList.remove('hidden');
-            setActiveButton(element); // Odpalamy podświetlenie
+            document.getElementById('forum-section').classList.add('hidden');
+            document.getElementById('classroom-section').classList.add('hidden');   // Dodane ukrywanie
+            document.getElementById('calendar-section').classList.add('hidden');    // Dodane ukrywanie
+            document.getElementById('leaderboards-section').classList.add('hidden'); // Dodane ukrywanie
+
+            // 4. Pokazywanie właściwej sekcji z uwzględnieniem blokad dla gości
+            if (tabName === 'panel') {
+                if (!userEmail) {
+                    alert("Mój Panel jest dostępny tylko dla zalogowanych Wingmanów!");
+                    showLoginPanel(); // Wzywamy nasz zgrabny panel logowania/rejestracji bez odświeżania strony!
+                    return;
+                }
+                document.getElementById('main-dashboard-content').classList.remove('hidden');
+                
+            } else if (tabName === 'members') {
+                document.getElementById('community-section').classList.remove('hidden');
+                if (typeof loadCommunityMembers === "function") loadCommunityMembers(); 
+                
+            } else if (tabName === 'community') {
+                document.getElementById('forum-section').classList.remove('hidden');
+                loadUnifiedFeed(); 
+                
+            } else if (tabName === 'classroom') {
+                if (!userEmail) {
+                    // Wyświetlamy ładny komunikat blokady zamiast pustej strony
+                    document.getElementById('classroom-section').innerHTML = `
+                        <div style="background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; padding: 50px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); text-align: center;">
+                            <div style="width: 80px; height: 80px; background: var(--cherry-light); color: var(--cherry); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px auto;">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h2 style="color: var(--text-main); font-weight: 800; font-size: 1.8rem; margin-bottom: 10px;">Szkoła jest tylko dla Wingmanów!</h2>
+                            <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6; font-size: 0.95rem;">
+                                Dostęp do kursów wideo, poradników i tajnych strategii KDP mają wyłącznie zalogowani członkowie społeczności.
+                            </p>
+                            <button onclick="showLoginPanel()" class="btn-primary" style="padding: 10px 25px; border-radius: 8px; margin: 0 auto;">
+    Zaloguj się i uzyskaj dostęp
+</button>
+                        </div>
+                    `;
+                }
+                document.getElementById('classroom-section').classList.remove('hidden');
+                
+            } else if (tabName === 'calendar') {
+                document.getElementById('calendar-section').classList.remove('hidden');  
+                
+            } else if (tabName === 'leaderboards') {
+                document.getElementById('leaderboards-section').classList.remove('hidden'); 
+            }
         }
 
         
@@ -1489,24 +1740,24 @@ async function saveRequiredNickname() {
                     const adminBadge = m.role === 'admin' ? '<span style="background: #a0134a; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">ADMIN</span>' : '';
 
                     return `
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; opacity: ${hasNickname ? '1' : '0.6'};">
+                    <div style="background: #ffffff; border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; opacity: ${hasNickname ? '1' : '0.6'}; box-shadow: 0 2px 5px rgba(0,0,0,0.02);" onmouseover="this.style.background='var(--cherry-light)'" onmouseout="this.style.background='#ffffff'">
                         <div style="display: flex; align-items: center; gap: 15px;">
-                            <div style="position: relative; width: 48px; height: 48px; border-radius: 50%; background: ${avatarColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                            <div style="position: relative; width: 48px; height: 48px; border-radius: 50%; background: ${avatarColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                                 ${letter}
                                 ${statusDot}
                             </div>
                             <div>
-                                <div style="color: white; font-weight: 600; font-size: 1rem; display: flex; align-items: center;">
+                                <div style="color: var(--text-main); font-weight: 600; font-size: 1rem; display: flex; align-items: center;">
                                     ${displayName} ${adminBadge}
                                 </div>
-                                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 2px;">
+                                <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;">
                                     <i class="fas fa-calendar-alt" style="opacity: 0.7;"></i> Dołączył(a): ${joinDate}
                                 </div>
                             </div>
                         </div>
-                        <button onclick="openPrivateChat(${m.id}, '${displayName}')" style="background: transparent; border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
-    Czat <i class="far fa-comment"></i>
-</button>
+                        <button onclick="openPrivateChat(${m.id}, '${displayName}')" style="background: var(--cherry-light); border: 1px solid var(--cherry); color: var(--cherry); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
+                            Czat <i class="far fa-comment"></i>
+                        </button>
                     </div>
                     `;
                 }).join('');
@@ -1730,7 +1981,694 @@ async function updateUnreadCount() {
         sendHeartbeat();
         setInterval(sendHeartbeat, 60000);
 
+        const adminSecret = localStorage.getItem('admin_secret');
+        const isAdmin = adminSecret === 'super_tajne_haslo_admina';
 
+        let currentTab = 'admin';
+        let currentThreadId = null;
+        let knowledgeImageBase64 = "";
+
+
+// --- INICJALIZACJA EDYTORA QUILL ---
+        let quill;      // Edytor admina
+        let userQuill;  // Edytor użytkownika
+        window.addEventListener('load', function() {
+            // 1. Edytor dla zwykłych użytkowników (Zawsze aktywny)
+            userQuill = new Quill('#user-editor-container', {
+                theme: 'snow',
+                placeholder: 'Co dzisiaj napiszesz?',
+                modules: {
+                    toolbar: {
+                        container: [
+                            ['bold', 'italic', 'underline'], 
+                            [{ 'color': [] }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link', 'image']
+                        ],
+                        handlers: {
+                            image: function() {
+                                const range = this.quill.getSelection();
+                                const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com):');
+                                if(value){
+                                    this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Edytor dla Admina (Tylko jeśli zalogowany jako admin)
+            if (isAdmin) {
+                quill = new Quill('#editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Podziel się wiedzą...',
+                    modules: {
+                        toolbar: {
+                            container: [
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'align': [] }],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['link', 'image']
+                            ],
+                            handlers: {
+                                image: function() {
+                                    const range = this.quill.getSelection();
+                                    const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com):');
+                                    if(value){
+                                        this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // --- INICJALIZACJA STRONY ---
+        if (isAdmin) {
+            setupDragAndDrop();
+        }
+
+        
+
+        // ==========================================
+        // ZUNIFIKOWANY FEED SPOŁECZNOŚCI (SKOOL STYLE)
+        // ==========================================
+        async function loadUnifiedFeed(activeFilter = 'Wszystkie') {
+            const container = document.getElementById('unified-posts-container');
+            // Dynamiczny pasek dodawania posta w zależności od zalogowania
+            const writeBoxHtml = userEmail ? `
+                <div class="write-post-box" onclick="currentEditingPostId = null; document.getElementById('post-modal').style.display='flex'; if(userQuill) userQuill.setContents([]); document.getElementById('forum-post-title').value='';">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--cherry-light); color: var(--cherry); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">
+                        <i class="fas fa-pen-alt" style="font-size: 0.9rem;"></i>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1rem; font-weight: 600; flex-grow: 1;">Napisz coś na forum...</div>
+                </div>
+            ` : `
+                <div class="write-post-box" style="cursor: default; background: #f8fafc;" onclick="alert('Zaloguj się, aby móc rozmawiać ze społecznością!')">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">
+                        <i class="fas fa-lock" style="font-size: 0.9rem;"></i>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1rem; font-weight: 600; flex-grow: 1;">Zaloguj się, aby dodać własny wpis...</div>
+                </div>
+            `;
+
+            // Wstrzykujemy strukturę (Pasek + Filtry)
+            container.innerHTML = `
+                ${writeBoxHtml}
+                <div class="forum-filters">
+                    <button class="filter-pill ${activeFilter === 'Wszystkie' ? 'active' : ''}" onclick="filterFeed('Wszystkie', this)">Wszystkie</button>
+                    <button class="filter-pill ${activeFilter === 'Ogłoszenia' ? 'active' : ''}" onclick="filterFeed('Ogłoszenia', this)"><span style="color:#ef4444">📢</span> Ogłoszenia</button>
+                    <button class="filter-pill ${activeFilter === 'Dyskusja' ? 'active' : ''}" onclick="filterFeed('Dyskusja', this)"><span style="color:#3b82f6">💬</span> Dyskusja</button>
+                    <button class="filter-pill ${activeFilter === 'Wtyczka Wingman' ? 'active' : ''}" onclick="filterFeed('Wtyczka Wingman', this)"><span style="color:#8b5cf6">🧩</span> Wtyczka Wingman</button>
+                    <button class="filter-pill ${activeFilter === 'Wiedza' ? 'active' : ''}" onclick="filterFeed('Wiedza', this)"><span style="color:#10b981">💡</span> Wiedza</button>
+                </div>
+                <div id="actual-posts-list"></div>
+            `;
+            
+            const postsListContainer = document.getElementById('actual-posts-list');
+            
+            try {
+                // 1. Pobieramy posty z bazy wiedzy i forum jednocześnie
+                const [knowRes, forumRes] = await Promise.all([
+                    fetch(`${API}/api/knowledge/posts`),
+                    fetch(`${API}/api/forum/posts`)
+                ]);
+                const knowPosts = await knowRes.json();
+                const forumPosts = await forumRes.json();
+
+                let allPosts = [];
+                
+                // 2. Formatowanie postów Admina
+                knowPosts.forEach(p => {
+                    allPosts.push({
+                        id: p.id, type: 'knowledge', title: p.title, content: p.content, image_url: p.image_url,
+                        created_at: p.created_at, likes: p.likes, authorName: 'Kamil Sznicer',
+                        isAdmin: true, tag: '💡 Wiedza Wingmana', tagColor: '#10b981', authorId: null
+                    });
+                });
+
+                // 3. Formatowanie postów Użytkowników
+                forumPosts.forEach(p => {
+                    const hasNickname = p.nickname && p.nickname.trim() !== "";
+                    const displayName = hasNickname ? p.nickname : p.email.split('@')[0];
+                    const isPostAdmin = p.email === 'kamil.sznicer@o2.pl'; // System rozpozna Twoje posty!
+
+                    allPosts.push({
+                        id: p.id, type: 'forum', title: p.topic, content: p.content, image_url: null,
+                        created_at: p.created_at, likes: p.likes, authorName: displayName,
+                        isAdmin: isPostAdmin, tag: p.topic, tagColor: 'var(--cherry)', authorId: p.user_id,
+                        authorEmail: p.email
+                    });
+                });
+
+                // 4. Sortowanie: Najnowsze na samej górze
+                allPosts.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+// --- NOWE: Filtrowanie po kategorii ---
+                if (activeFilter !== 'Wszystkie') {
+                    allPosts = allPosts.filter(p => {
+                        // Jeśli kliknięto 'Wiedza', łapiemy oficjalne artykuły admina ORAZ posty użytkowników z tym tagiem
+                        if (activeFilter === 'Wiedza') return p.type === 'knowledge' || p.tag.includes('Wiedza');
+                        // Dla reszty sprawdzamy zwykłe dopasowanie tagu
+                        return p.tag.includes(activeFilter);
+                    });
+                }
+
+                if (allPosts.length === 0) {
+                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted);">Brak postów. Bądź pierwszy!</p>`;
+                    return;
+                }
+
+                // 5. Renderowanie (Generowanie HTML z Hover-Kartą)
+                document.getElementById('actual-posts-list').innerHTML = allPosts.map(p => {
+                    const initial = p.authorName.charAt(0).toUpperCase();
+                    const adminBadge = p.isAdmin ? '<span style="background: var(--cherry); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; font-weight: 800; letter-spacing: 0.5px;">ZAŁOŻYCIEL</span>' : '';
+                    const avatarBg = p.isAdmin ? 'background:var(--cherry-light); color:var(--cherry);' : 'background:#e2e8f0; color:#64748b;';
+                    
+                    // Skracanie długiego tekstu
+                    const strippedText = p.content.replace(/<[^>]*>?/gm, '');
+                    const isLong = strippedText.length > 300;
+
+                    return `
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="author-info">
+                                
+                                <!-- AWATAR Z KARTĄ HOVER (CHACIE) -->
+                                <div class="avatar-wrapper">
+                                    <div class="avatar" style="${avatarBg}">${initial}</div>
+                                    
+                                    ${!p.isAdmin && p.authorId ? `
+                                    <div class="profile-popover">
+                                        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                            <div class="avatar" style="width:60px; height:60px; font-size:2rem; ${avatarBg}">${initial}</div>
+                                            <div>
+                                                <div style="font-weight:bold; font-size:1.1rem; color: var(--text-main);">${p.authorName}</div>
+                                                <div style="color:var(--text-muted); font-size:0.8rem; margin-top:2px;">Członek społeczności</div>
+                                            </div>
+                                        </div>
+                                        <button onclick="openPrivateChat(${p.authorId}, '${p.authorName}')" class="btn-primary" style="width:100%; justify-content:center; background:#fef08a; color:#b45309; border:none;">
+                                            <i class="far fa-comment-dots"></i> Wyślij Wiadomość
+                                        </button>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div>
+                                    <div class="author-name">${p.authorName}${adminBadge}</div>
+                                    <div class="post-meta">${new Date(p.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <span class="tag" style="color: ${p.tagColor}; background: ${p.tagColor}1A; font-size: 0.75rem;">${p.tag}</span>
+                        </div>
+                        
+                        ${p.title !== p.tag ? `<h4 class="post-title">${p.title}</h4>` : ''}
+                        
+                        <div class="post-content-wrapper">
+                            <div class="post-content" id="post-text-${p.type}-${p.id}" style="display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem;">
+                                ${p.content}
+                            </div>
+                            
+                            ${isLong ? `
+                            <div onclick="document.getElementById('post-text-${p.type}-${p.id}').style.webkitLineClamp = 'unset'; this.style.display='none';" style="color: var(--cherry); font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 8px; transition: 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                Czytaj więcej...
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-image" style="margin-top: 15px;">` : ''}
+
+                        <div class="post-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px;">
+                            <div style="display: flex; gap: 15px;">
+                                <button class="action-btn" onclick="${userEmail ? `event.stopPropagation(); likePostType('${p.type}', ${p.id}, this)` : `alert('Zaloguj się, aby polubić ten wpis!')`}">
+                                    <i class="fas fa-thumbs-up"></i> Lubię to (${p.likes || 0})
+                                </button>
+                                ${p.type === 'forum' ? `
+                                <span class="action-btn" onclick="${userEmail ? `openThread(${p.id})` : `alert('Zaloguj się, aby przeglądać i dodawać komentarze!')`}">
+                                    <i class="far fa-comment-alt"></i> Komentarze
+                                </span>
+                                ` : ''}
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px;">
+                                ${userEmail && p.type === 'forum' && (userEmail === p.authorEmail || isAdmin) ? `
+                                    <button class="action-btn" onclick="editForumPost(${p.id}, '${p.tag}')" style="font-size: 0.85rem;"><i class="fas fa-edit"></i> Edytuj</button>
+                                    <button class="action-btn" onclick="deleteForumPost(${p.id})" style="color: var(--danger); font-size: 0.85rem;"><i class="fas fa-trash"></i> Usuń</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+            } catch (e) { console.error(e); }
+        }
+
+        // Pomocnicza funkcja do lajkowania obu typów postów
+        async function likePostType(type, id, btnElement) {
+            if (type === 'knowledge') {
+                await likeKnowledgePost(id);
+                loadUnifiedFeed(); // Odśwież widok
+            } else {
+                await likeUserPost(id, btnElement);
+                loadUnifiedFeed(); // Odśwież widok
+            }
+        }
+
+        function toggleAdminText(id) {
+            const shortText = document.getElementById(`admin-short-text-${id}`);
+            const fullText = document.getElementById(`admin-full-text-${id}`);
+            const btn = document.getElementById(`admin-read-btn-${id}`);
+            const thumb = document.getElementById(`admin-thumb-${id}`);
+
+            if (fullText.classList.contains('hidden')) {
+                // Rozwijamy
+                shortText.classList.add('hidden');
+                if (thumb) thumb.classList.add('hidden'); // Opcjonalnie: ukryj miniaturkę, żeby nie dublować obrazków
+
+                // Znajdujemy post w globalnej liście i wstrzykujemy czysty HTML
+                const post = knowledgePostsList.find(p => p.id === id);
+                fullText.innerHTML = post.content;
+                fullText.classList.remove('hidden');
+                btn.innerHTML = 'Zwiń tekst <i class="fas fa-chevron-up"></i>';
+                btn.classList.remove('hidden'); // Przycisk wraca
+            } else {
+                // Zwijamy
+                fullText.classList.add('hidden');
+                fullText.innerHTML = ''; // Czyścimy dla oszczędności pamięci
+                shortText.classList.remove('hidden');
+                if (thumb) thumb.classList.remove('hidden'); // Przywracamy miniaturkę
+                btn.innerHTML = 'Czytaj dalej <i class="fas fa-chevron-down"></i>';
+            }
+        }
+
+        async function likeKnowledgePost(id) {
+            if (localStorage.getItem(`liked_knowledge_${id}`)) return alert("Już to polubiłeś!");
+            try {
+                // WYSYŁAMY LAJKA DO NOWEGO MIEJSCA
+                const res = await fetch(`${API}/api/knowledge/like`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ id }) });
+                if (res.ok) {
+                    localStorage.setItem(`liked_knowledge_${id}`, 'true');
+                    const countSpan = document.getElementById(`admin-like-count-${id}`);
+                    countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                    document.getElementById(`admin-like-btn-${id}`).classList.add('liked');
+                }
+            } catch (e) {}
+        }
+
+        async function deleteKnowledgePost(id) {
+            if(!confirm("Trwale usunąć ten artykuł?")) return;
+            try {
+                const res = await fetch(`${API}/api/knowledge/post/${id}`, {
+                    method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ secret: adminSecret })
+                });
+                if(res.ok) loadUnifiedFeed();
+            } catch(e) { console.error(e); }
+        }
+
+        // --- OBSŁUGA MODALA ADMINA ---
+        function openAdminModal() {
+            document.getElementById('admin-knowledge-modal').style.display = 'flex';
+            document.getElementById('knowledge-title').value = '';
+            if(quill) quill.setContents([]);
+            document.getElementById('knowledge-image-preview').style.display = 'none';
+            document.getElementById('knowledge-drop-zone').style.display = 'block';
+            knowledgeImageBase64 = "";
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-knowledge-modal').style.display = 'none';
+        }
+
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('knowledge-drop-zone');
+            const fileInput = document.getElementById('knowledge-image-input');
+            const imagePreview = document.getElementById('knowledge-image-preview');
+
+            if (!dropZone) return;
+
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+            dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault(); dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) processFile(e.dataTransfer.files[0]);
+            });
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) processFile(e.target.files[0]);
+            });
+
+            function processFile(file) {
+                if (!file.type.startsWith('image/')) return alert('Tylko pliki graficzne!');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    knowledgeImageBase64 = e.target.result;
+                    imagePreview.src = knowledgeImageBase64;
+                    imagePreview.style.display = 'block';
+                    dropZone.style.display = 'none'; 
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function submitKnowledgePost() {
+            const title = document.getElementById('knowledge-title').value;
+            const content = quill.root.innerHTML;
+            if (!title || !content) return alert("Wypełnij temat i treść!");
+
+            const btn = document.getElementById('admin-save-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publikowanie...';
+
+            try {
+                const res = await fetch(`${API}/api/knowledge/post`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ title, content, image_url: knowledgeImageBase64, secret: adminSecret })
+                });
+                
+                if (res.ok) {
+                    closeAdminModal();
+                    loadUnifiedFeed(); 
+                } else {
+                    alert("Błąd zapisu! Upewnij się, że zaktualizowałeś plik na serwerze.");
+                }
+            } catch (e) { console.error(e); }
+            btn.innerHTML = 'Opublikuj Wiedzę <i class="fas fa-rocket"></i>';
+        }
+
+
+        // Obsługa kliknięć w dolne ikony narzędzi (Skool Style)
+        function customQuillAction(type) {
+            const range = userQuill.getSelection(true) || { index: userQuill.getLength() };
+            
+            if (type === 'image') {
+                const url = prompt('Podaj bezpośredni link do obrazka (np. z Imgur):');
+                if (url) userQuill.insertEmbed(range.index, 'image', url, Quill.sources.USER);
+            } else if (type === 'link') {
+                const url = prompt('Podaj adres URL (np. https://google.pl):');
+                if (url) userQuill.formatText(range.index, range.length, 'link', url);
+            } else if (type === 'video') {
+                const url = prompt('Podaj link do YouTube (np. https://www.youtube.com/watch?v=...):');
+                if (url) userQuill.insertEmbed(range.index, 'video', url, Quill.sources.USER);
+            }
+        }
+
+        // --- EDYCJA I USUWANIE POSTÓW ---
+        let currentEditingPostId = null;
+
+        async function deleteForumPost(postId) {
+            if (!confirm("Czy na pewno chcesz usunąć ten wpis? Tej akcji nie cofniesz.")) return;
+            
+            try {
+                const res = await fetch(`${API}/api/forum/post/${postId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, secret: adminSecret })
+                });
+                if (res.ok) {
+                    loadUnifiedFeed(); // Odświeżamy widok po zniknięciu wpisu
+                } else {
+                    alert("Błąd: Nie masz uprawnień lub post nie istnieje.");
+                }
+            } catch (e) {
+                alert("Błąd połączenia z serwerem.");
+            }
+        }
+
+        function editForumPost(postId, currentTopic) {
+            const contentBox = document.getElementById(`post-text-forum-${postId}`);
+            if (!contentBox) return;
+
+            currentEditingPostId = postId; // Oznaczamy, że jesteśmy w trybie edycji
+            
+            // Otwieramy i wypełniamy modal
+            document.getElementById('post-modal').style.display = 'flex';
+            document.getElementById('forum-topic').value = currentTopic;
+            document.getElementById('forum-post-title').value = ''; 
+            
+            if(userQuill) {
+                userQuill.setContents([]);
+                // Pobieramy surowy HTML posta i wrzucamy do edytora
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = contentBox.innerHTML;
+                
+                // Ekstrakcja tytułu z <h3> (jeśli użytkownik wcześniej go wpisał)
+                const h3 = tempDiv.querySelector('h3');
+                if(h3) {
+                    document.getElementById('forum-post-title').value = h3.innerText;
+                    h3.remove(); // Usuwamy z treści, by nie zduplikować przy zapisie
+                }
+                
+                userQuill.clipboard.dangerouslyPasteHTML(tempDiv.innerHTML);
+            }
+        }
+
+        async function submitUserPost() {
+            if (!userEmail) { alert("Zaloguj się, aby dodać wpis!"); return; }
+            
+            const topic = document.getElementById('forum-topic').value;
+            const titleInput = document.getElementById('forum-post-title').value.trim();
+            let content = userQuill.root.innerHTML;
+            const textOnly = userQuill.getText().trim();
+
+            if (textOnly.length < 5 && !content.includes('<img') && !content.includes('<iframe')) {
+                return alert("Napisz coś więcej!");
+            }
+
+            if (titleInput) {
+                content = `<h3 style="margin-top:0; color: var(--text-main); font-weight: 800;">${titleInput}</h3>` + content;
+            }
+
+            // Automatyczny wybór czy Zapisujemy (Nowy post) czy Aktualizujemy (Edycja)
+            let method = 'POST';
+            let endpoint = `${API}/api/forum/post`;
+            
+            if (currentEditingPostId) {
+                method = 'PUT';
+                endpoint = `${API}/api/forum/post/${currentEditingPostId}`;
+            }
+
+            const res = await fetch(endpoint, {
+                method: method, 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, secret: adminSecret, topic, content })
+            });
+
+            if (res.ok) {
+                document.getElementById('post-modal').style.display = 'none';
+                document.getElementById('forum-post-title').value = '';
+                if(userQuill) userQuill.setContents([]);
+                currentEditingPostId = null; // Wychodzimy z trybu edycji
+                loadUnifiedFeed();
+            } else {
+                alert("Wystąpił błąd podczas zapisywania posta.");
+            }
+        }
+
+        async function likeUserPost(id, btnElement) {
+            if (!userEmail) return alert("Zaloguj się, aby lajkować!");
+            const res = await fetch(`${API}/api/forum/like`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, postId: id })
+            });
+            if (res.ok) {
+                
+            }
+        }
+
+        // CZYTANIE WĄTKU
+        async function openThread(postId) {
+            currentThreadId = postId;
+            document.getElementById('thread-modal').style.display = 'flex';
+            const threadContent = document.getElementById('thread-content');
+            threadContent.innerHTML = '<p style="text-align: center;">Ładowanie wątku...</p>';
+
+            try {
+                const res = await fetch(`${API}/api/forum/post/${postId}`);
+                const data = await res.json();
+                
+                // Logika profilowa twórcy posta
+                const authorAlias = (data.post.nickname && data.post.nickname.trim() !== "") ? data.post.nickname : data.post.email.split('@')[0];
+                const initial = authorAlias.charAt(0).toUpperCase();
+                const isPostAdmin = data.post.email === 'kamil.sznicer@o2.pl';
+                const adminBadge = isPostAdmin ? '<span style="background: var(--cherry); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; font-weight: 800; letter-spacing: 0.5px;">ZAŁOŻYCIEL</span>' : '';
+                const avatarBg = isPostAdmin ? 'background:var(--cherry-light); color:var(--cherry);' : 'background: #e2e8f0; color: #64748b;';
+
+                let html = `
+                    <div style="margin-bottom: 20px;">
+                        <div class="post-header">
+                            <div class="author-info">
+                                <div class="avatar" style="${avatarBg}">${initial}</div>
+                                <div>
+                                    <div class="author-name" style="display: flex; align-items: center;">${authorAlias} ${adminBadge}</div>
+                                    <div class="post-meta">${new Date(data.post.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <span class="tag" style="background: var(--cherry-light); color: var(--cherry);">${data.post.topic}</span>
+                        </div>
+                        <div class="post-content" style="font-size: 1.05rem;">${data.post.content}</div>
+                    </div>
+                    <h4 style="margin: 25px 0 15px 0; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">Odpowiedzi (${data.comments.length})</h4>
+                `;
+
+                if (data.comments.length === 0) {
+                    html += `<p style="color: var(--text-muted); font-size: 0.9rem;">Brak odpowiedzi. Bądź pierwszy!</p>`;
+                } else {
+                    html += data.comments.map(c => {
+                        const cAlias = (c.nickname && c.nickname.trim() !== "") ? c.nickname : c.email.split('@')[0];
+                        const cIsAdmin = c.email === 'kamil.sznicer@o2.pl';
+                        const cBadge = cIsAdmin ? '<span style="background: var(--cherry); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; font-weight: 800;">ZAŁOŻYCIEL</span>' : '';
+
+                        return `
+                        <div class="comment-box">
+                            <div class="comment-author" style="display: flex; align-items: center;">
+                                ${cAlias} ${cBadge} 
+                                <span style="font-weight:normal; font-size:0.75rem; color:var(--text-muted); margin-left: auto;">${new Date(c.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div class="comment-text">${c.content}</div>
+                        </div>
+                    `}).join('');
+                }
+                threadContent.innerHTML = html;
+            } catch (e) {
+                threadContent.innerHTML = '<p style="color: red;">Błąd ładowania wątku.</p>';
+            }
+        }
+
+        async function submitComment() {
+            if (!userEmail) return alert("Zaloguj się, aby odpowiadać!");
+            const content = document.getElementById('comment-content').value;
+            if (content.length < 3) return alert("Komentarz jest za krótki!");
+
+            const res = await fetch(`${API}/api/forum/comment`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, postId: currentThreadId, content })
+            });
+
+            if (res.ok) {
+                document.getElementById('comment-content').value = '';
+                openThread(currentThreadId); 
+            }
+        }
+
+function filterFeed(category, clickedButton) {
+            // Zdejmij klasę 'active' ze wszystkich przycisków
+            document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+            // Dodaj do klikniętego
+            clickedButton.classList.add('active');
+            // Załaduj tablicę od nowa z wybranym filtrem
+            loadUnifiedFeed(category);
+        }
+
+function showLoginPanel() {
+    document.getElementById('dash-view').classList.add('hidden');
+    document.getElementById('login-view').classList.remove('hidden');
+}
+
+        // --- INTELIGENTNY START SYSTEMU ---
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedEmail = localStorage.getItem('wingman_user'); // ZMIANA: sprawdzamy ten sam klucz
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasTabParam = urlParams.get('tab'); // Sprawdzamy czy użytkownik przyszedł z konkretnego linku
+
+        if (savedEmail) {
+            // 1. Stały użytkownik: Logujemy automatycznie i włączamy Społeczność
+            userEmail = savedEmail;
+            initDashboard();
+            switchAppTab(hasTabParam || 'community', null);
+        } else if (hasTabParam === 'community') {
+            // 2. Osoba z ulicy klika "Społeczność": Wpuszczamy jako Gościa bez pytania o hasło
+            userEmail = null;
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dash-view').classList.remove('hidden');
+            switchAppTab('community', null);
+            setupGuestNavbar();
+        } else {
+            // 3. Ktoś klika "Zaloguj się" na index.html lub wchodzi bezpośrednio: Pokazujemy ekran logowania
+            userEmail = null;
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('dash-view').classList.add('hidden');
+        }
+    });
+
+    // Funkcja dostosowująca pasek dla Gościa (naprawia przycisk w prawym górnym rogu)
+    function setupGuestNavbar() {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Zaloguj się';
+            logoutBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                showLoginPanel(); // <--- Korzystamy z nowej funkcji
+            };
+        }
+    }
+
+    function showRegisterPanel() {
+            document.getElementById('login-form-content').classList.add('hidden');
+            document.getElementById('register-form-content').classList.remove('hidden');
+        }
+
+        function showLoginFromRegister() {
+            document.getElementById('register-form-content').classList.add('hidden');
+            document.getElementById('login-form-content').classList.remove('hidden');
+        }
+
+        async function registerFromDashboard() {
+            const nickname = document.getElementById('reg-nickname').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-pass-confirm').value;
+            const msgEl = document.getElementById('reg-msg');
+            const btn = document.getElementById('reg-btn');
+
+            if (password !== confirm) {
+                msgEl.innerText = "Hasła nie są takie same!"; msgEl.style.color = "var(--danger)"; return;
+            }
+            if (nickname.length < 3) {
+                msgEl.innerText = "Imię musi mieć min. 3 znaki!"; msgEl.style.color = "var(--danger)"; return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = "Rejestracja...";
+
+            try {
+                const res = await fetch(`${API}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, nickname }),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Wystąpił nieznany błąd.');
+
+                msgEl.innerText = "✅ Konto utworzone! Logowanie...";
+                msgEl.style.color = "var(--success)";
+
+                // Zaloguj automatycznie nową osobę
+                setTimeout(async () => {
+                    const loginRes = await fetch(`${API}/api/login`, {
+                        method: 'POST', headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ email, password })
+                    });
+                    if (loginRes.ok) {
+                        userEmail = email;
+                        localStorage.setItem('wingman_user', email);
+                        showLoginFromRegister();
+                        initDashboard();
+                        switchAppTab('panel', null);
+                    }
+                }, 1500);
+
+            } catch (err) {
+                msgEl.innerText = `Błąd: ${err.message}`;
+                msgEl.style.color = "var(--danger)";
+            }
+            btn.disabled = false;
+            btn.innerHTML = "Zarejestruj się";
+        }
 
     </script>
 
@@ -1751,22 +2689,7 @@ async function updateUnreadCount() {
         }
     }
 </script>
-<div id="post-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; backdrop-filter: blur(8px);">
-    <div class="card" style="width: 90%; max-width: 500px; border: 1px solid var(--cherry); background: #0f172a;">
-        <h3 style="color:white; margin-bottom: 20px;">Nowy temat na forum</h3>
-        <select id="forum-topic" style="width:100%; padding:12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius:8px; color:white; margin-bottom: 15px;">
-            <option value="Research">🔍 Research & Nisze</option>
-            <option value="Design">🎨 Design & Ilustracje</option>
-            <option value="Reklamy">📈 Reklamy KDP (AMS)</option>
-            <option value="Techniczne">⚙️ Sprawy techniczne</option>
-        </select>
-        <textarea id="forum-content" placeholder="Opisz swój problem..." style="width:100%; height:150px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:10px; color:white; padding:15px; margin-bottom:20px; font-family: inherit; resize: none;"></textarea>
-        <div style="display:flex; gap:10px;">
-            <button class="btn btn-primary" onclick="submitPost()">Opublikuj 🚀</button>
-            <button class="btn" style="background:transparent; border: 1px solid var(--glass-border); color: var(--text-muted);" onclick="document.getElementById('post-modal').style.display='none'">Anuluj</button>
-        </div>
-    </div>
-</div>
+
 
 <script src="//code.tidio.co/q6vbfqclwkzfcgohcacijiwzgaqcvhrz.js" async></script>
 
@@ -1796,6 +2719,8 @@ async function updateUnreadCount() {
         if(res.ok) { alert("Gotowe! System zapisał zwycięzcę."); location.reload(); } 
         else { alert("Błąd!"); }
     }
+
+    
 </script>
 
 <div id="nickname-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center;">
