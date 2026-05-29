@@ -82,14 +82,18 @@
         .bottom-nav-item span { font-size: 0.65rem; margin-top: 4px; font-weight: 600; }
 
         @media (max-width: 768px) {
-            .mobile-bottom-nav { display: block; }
+            .mobile-bottom-nav { display: block; display: flex; } /* Dodano flex dla lepszego wyrównania */
             body { padding-bottom: 70px; } /* Miejsce na pasek */
             .desktop-actions { display: none !important; } /* Chowamy ikony z górnego paska na telefonie */
             .skool-tabs-bar { padding: 0 15px; gap: 15px; } 
             
-            /* Przesunięcie ikony Tidio Chat nad dolny pasek nawigacji */
-            #tidio-chat-iframe {
-                bottom: 80px !important;
+            /* NOWA, AGRESYWNA BLOKADA TIDIO DLA MOBILE */
+            /* Targetujemy główne potencjalne kontenery Tidio, iframe i widgety */
+            #tidio-chat,
+            #tidio-chat-iframe,
+            .tidio-chat-widget,
+            div[id^="tidio-chat"] {
+                bottom: 90px !important; /* Przesuwamy wyżej o 90px */
             }
         }
 
