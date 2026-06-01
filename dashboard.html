@@ -2860,9 +2860,11 @@ function showLoginPanel() {
             const monthNames = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
             document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
 
-            // Pokaż przycisk tylko dla Ciebie
-            if (userEmail === 'kamil.sznicer@o2.pl' || isAdmin) {
+            // Pokaż przycisk tylko dla Ciebie (Ścisła blokada po mailu)
+            if (userEmail === 'kamil.sznicer@o2.pl') {
                 document.getElementById('admin-calendar-actions').innerHTML = `<button onclick="document.getElementById('calendar-event-modal').style.display='flex'" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(160, 19, 74, 0.2);"><i class="fas fa-plus"></i> Dodaj Wydarzenie</button>`;
+            } else {
+                document.getElementById('admin-calendar-actions').innerHTML = ''; // Bezpiecznik dla gości i innych użytkowników
             }
 
             // Obliczenia siatki
@@ -2957,7 +2959,7 @@ function showLoginPanel() {
                 iconBg = 'rgba(59, 130, 246, 0.1)'; iconColor = '#3b82f6';
             } else if (type === 'start') {
                 content = `<strong>Zbieramy środki na kolejną edycję!</strong><br><br>
-                💡 <em>Czy wiesz, że...</em><br>W ubiegłych miesiącach (np. w wielkiej majowej zrzutce) dzięki sile naszej społeczności zebraliśmy prawie <strong>40 osób</strong>, co brutalnie ścięło cenę końcową do <strong>ok. 36 zł</strong> za osobę! Im szybciej dołączysz, tym więcej czasu mamy na pobicie tego rekordu.`;
+                Zapisy zostały otwarte. Pamiętaj: im szybciej dołączysz i im więcej osób zrzuci się z nami do końca miesiąca, tym niższa będzie finalna cena dostępu dla każdego z nas. Rezerwuj miejsce!`;
                 icon = '<i class="fas fa-rocket"></i>';
                 iconBg = 'var(--cherry-light)'; iconColor = 'var(--cherry)';
             } else if (type === 'end') {
