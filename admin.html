@@ -281,7 +281,7 @@ console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`
             if(USER_COUNT === 0) return document.getElementById('preview').innerHTML = "Brak uczestników.";
             const costPLN = 287.20 * CURRENT_RATE;
             const perPerson = costPLN / USER_COUNT;
-            const refund = 75 - (perPerson + 0);
+            const refund = 75 - (perPerson + 10);
             let html = `Faktura: $287.20 * ${CURRENT_RATE} = <strong>${costPLN.toFixed(2)} PLN</strong><br>Zwrot: <strong style="color:${refund<0?'red':'green'}">${refund.toFixed(2)} zł</strong>`;
             document.getElementById('preview').innerHTML = html;
         }

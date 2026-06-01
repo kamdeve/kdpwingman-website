@@ -455,13 +455,13 @@
             </a>
 
             <div class="desktop-actions" style="display: flex; align-items: center; gap: 20px;">
-                <div style="cursor: pointer; color: #64748b; font-size: 1.3rem; transition: 0.2s;" onclick="alert('Skrzynka odbiorcza wkrótce!')" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='#64748b'">
+                <div class="inbox-wrapper" style="position: relative; cursor: pointer; color: #64748b; font-size: 1.3rem; transition: 0.2s;" onclick="openInbox()" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='#64748b'">
                     <i class="far fa-comment-dots"></i>
+                    <span id="unread-badge" style="position: absolute; top: -5px; right: -8px; background: #a0134a; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; display: none; font-weight: bold;">0</span>
                 </div>
                 
                 <div class="notifications-wrapper" style="position: relative; cursor: pointer;" onclick="toggleNotifications()">
                     <i class="fas fa-bell" style="font-size: 1.3rem; color: #64748b; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='#64748b'"></i>
-                    <span id="unread-badge" style="position: absolute; top: -5px; right: -8px; background: #a0134a; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; display: none; font-weight: bold;">0</span>
                     
                     <div id="notifications-dropdown" style="display: none; position: absolute; top: 35px; right: -10px; width: 320px; background: #ffffff; border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10000; flex-direction: column; overflow: hidden;">
                         <div style="padding: 12px 15px; border-bottom: 1px solid var(--glass-border); font-weight: 600; color: var(--text-main); background: #f8fafc; font-size: 0.9rem;">
@@ -489,7 +489,11 @@
         <div class="mobile-bottom-nav">
             <div class="mobile-bottom-nav-inner">
                 <div class="bottom-nav-item active" onclick="switchAppTab('community', this)"><i class="fas fa-home"></i><span>Home</span></div>
-                <div class="bottom-nav-item" onclick="alert('Skrzynka odbiorcza wkrótce!')"><i class="far fa-comment-dots"></i><span>Czaty</span></div>
+                <div class="bottom-nav-item" style="position: relative;" onclick="openInbox()">
+    <i class="far fa-comment-dots"></i>
+    <span id="mobile-unread-badge" style="position: absolute; top: -5px; right: 15px; background: #a0134a; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; display: none;">0</span>
+    <span>Czaty</span>
+</div>
                 
                 <div class="bottom-nav-item" style="position: relative;" onclick="toggleNotifications()">
                     <i class="fas fa-bell"></i>
@@ -879,6 +883,20 @@
     </div>
 </div>
 
+<div id="inbox-modal" class="hidden" style="position: fixed; bottom: 80px; right: 20px; width: calc(100% - 40px); max-width: 380px; height: 500px; background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9998; display: flex; flex-direction: column; overflow: hidden;">
+    <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: var(--cherry); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+        <span style="color: white; font-weight: 600; font-size: 1rem;"><i class="far fa-comment-dots"></i> Skrzynka Odbiorcza</span>
+        <button onclick="document.getElementById('inbox-modal').style.display='none'" style="background: transparent; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 1.1rem; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div id="inbox-list" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; background: #f8fafc;">
+        <div style="padding: 20px; text-align: center; color: var(--text-muted);">Ładowanie...</div>
+    </div>
+    
+    <div style="padding: 12px; border-top: 1px solid var(--glass-border); text-align: center; background: #ffffff;">
+        <button onclick="document.getElementById('inbox-modal').style.display='none'; switchAppTab('members', this);" style="background: transparent; border: 1px solid var(--cherry); color: var(--cherry); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; width: 100%; transition: 0.2s;" onmouseover="this.style.background='var(--cherry-light)'" onmouseout="this.style.background='transparent'">+ Rozpocznij nową rozmowę</button>
+    </div>
+</div>
 
 
 
@@ -1882,23 +1900,74 @@ async function saveRequiredNickname() {
         }
 
 async function updateUnreadCount() {
-            try {
-                const res = await fetch(`${API}/api/messages/unread-count`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ myEmail: userEmail })
-                });
-                const data = await res.json();
-                const badge = document.getElementById('unread-badge');
-                
-                if (data.count > 0) {
-                    badge.innerText = data.count;
-                    badge.style.display = 'block';
-                } else {
-                    badge.style.display = 'none';
-                }
-            } catch(e) { console.error("Błąd sprawdzania powiadomień"); }
+    try {
+        const res = await fetch(`${API}/api/messages/unread-count`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ myEmail: userEmail })
+        });
+        const data = await res.json();
+        const badge = document.getElementById('unread-badge');
+        const mobileBadge = document.getElementById('mobile-unread-badge');
+        
+        if (data.count > 0) {
+            if(badge) { badge.innerText = data.count; badge.style.display = 'block'; }
+            if(mobileBadge) { mobileBadge.innerText = data.count; mobileBadge.style.display = 'block'; }
+        } else {
+            if(badge) badge.style.display = 'none';
+            if(mobileBadge) mobileBadge.style.display = 'none';
         }
+    } catch(e) { console.error("Błąd sprawdzania powiadomień"); }
+}
+
+async function openInbox() {
+    if (!userEmail) return alert("Zaloguj się, aby mieć dostęp do wiadomości.");
+    const modal = document.getElementById('inbox-modal');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    const list = document.getElementById('inbox-list');
+    list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Ładowanie...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/messages/inbox`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ myEmail: userEmail })
+        });
+        const data = await res.json();
+        
+        if (data.length === 0) {
+            list.innerHTML = '<div style="padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">Brak wiadomości.<br>Znajdź kogoś w zakładce "Członkowie" i napisz!</div>';
+            return;
+        }
+
+        list.innerHTML = data.map(conv => {
+            const alias = (conv.nickname && conv.nickname.trim() !== "") ? conv.nickname : conv.email.split('@')[0];
+            const initial = alias.charAt(0).toUpperCase();
+            const unreadBadge = parseInt(conv.unread_count) > 0 ? `<div style="background: var(--cherry); color: white; font-size: 0.7rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center;">${conv.unread_count}</div>` : '';
+            const boldText = parseInt(conv.unread_count) > 0 ? 'font-weight: 800; color: var(--text-main);' : 'font-weight: 500; color: var(--text-muted);';
+            const dateStr = new Date(conv.created_at).toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+
+            return `
+            <div onclick="document.getElementById('inbox-modal').style.display='none'; openPrivateChat(${conv.other_user_id}, '${alias}')" style="padding: 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: #ffffff;" onmouseover="this.style.background='var(--bg-light)'" onmouseout="this.style.background='#ffffff'">
+                <div style="width: 45px; height: 45px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; flex-shrink: 0;">
+                    ${initial}
+                </div>
+                <div style="flex-grow: 1; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">${alias}</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">${dateStr}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="${boldText} font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">${conv.last_message}</span>
+                        ${unreadBadge}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">Błąd serwera.</div>';
+    }
+}
 
         // Sprawdzaj co 10 sekund
         setInterval(updateUnreadCount, 10000);
@@ -2733,12 +2802,12 @@ function showLoginPanel() {
     
 </script>
 
-<div id="nickname-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center;">
-    <div style="background: #1e293b; padding: 30px; border-radius: 16px; border: 2px solid #a0134a; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-        <h2 style="color: white; margin-bottom: 10px; font-weight: 800;">Powiedz jak Cię nazywać :)</h2>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">Tak będą widzieć Cię inni użytkownicy na naszym forum i czacie. Wpisz swoje imię lub pseudonim.</p>
-        <input type="text" id="new-nickname-input" placeholder="np. Tomek, KasiaKDP" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #374151; background: #0f172a; color: white; margin-bottom: 20px; font-size: 1rem; text-align: center;">
-        <button onclick="saveRequiredNickname()" style="background: linear-gradient(135deg, #a0134a 0%, #db2777 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">Zatwierdź i wejdź</button>
+<div id="nickname-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #ffffff; padding: 40px 30px; border-radius: 16px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.08);">
+        <h2 style="color: var(--text-main); margin-bottom: 10px; font-weight: 800; font-size: 1.8rem;">Powiedz jak Cię nazywać :)</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5;">Tak będą widzieć Cię inni użytkownicy na naszym forum i czacie. Wpisz swoje imię lub pseudonim.</p>
+        <input type="text" id="new-nickname-input" placeholder="np. Tomek, KasiaKDP" style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: #f8fafc; color: var(--text-main); margin-bottom: 20px; font-size: 1rem; text-align: center; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--cherry)'; this.style.outline='none';">
+        <button onclick="saveRequiredNickname()" style="background: var(--cherry-gradient); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; font-size: 1.05rem; cursor: pointer; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(160, 19, 74, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Zatwierdź i wejdź</button>
     </div>
 </div>
 
