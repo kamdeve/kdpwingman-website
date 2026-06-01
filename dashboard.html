@@ -381,6 +381,25 @@
         }
         #forum-post-title:focus { box-shadow: none; border-color: transparent; }
 
+        /* --- KALENDARZ STYLE --- */
+        .cal-day-header { padding: 15px 5px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .cal-cell { background: #ffffff; min-height: 130px; padding: 10px; display: flex; flex-direction: column; gap: 5px; transition: background 0.2s; position: relative; }
+        .cal-cell:hover { background: #f8fafc; }
+        .cal-cell.other-month { background: #fafafa; }
+        .cal-date { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-bottom: 5px; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; }
+        .cal-date.today { background: var(--cherry); color: white; box-shadow: 0 4px 10px rgba(160, 19, 74, 0.3); }
+        .cal-cell.other-month .cal-date { color: #cbd5e1; }
+        
+        .cal-event { font-size: 0.75rem; padding: 6px 8px; border-radius: 6px; font-weight: 600; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; border-left: 3px solid transparent; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 2px;}
+        .cal-event:hover { filter: brightness(0.95); transform: translateX(2px); }
+        
+        /* Kolory etykiet automatycznych i ręcznych */
+        .event-auto { background: #f1f5f9; color: #475569; border-left-color: #94a3b8; }
+        .event-start { background: var(--cherry-light); color: var(--cherry); border-left-color: var(--cherry); }
+        .event-end { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-left-color: var(--danger); }
+        .event-history { background: rgba(16, 185, 129, 0.1); color: var(--success); border-left-color: var(--success); }
+        .event-manual { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-left-color: #3b82f6; }
+
     </style>
 
 <script>
@@ -794,18 +813,62 @@
             </div>
         </div>
 
-        <div id="calendar-section" class="hidden" style="max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; animation: fadeIn 0.3s ease;">
-            <div style="background: #ffffff; border: 1px solid var(--glass-border); border-radius: 16px; padding: 50px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                <div style="width: 80px; height: 80px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px auto;">
-                    <i class="fas fa-calendar-alt"></i>
+        <div id="calendar-section" class="hidden" style="max-width: 1000px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.3s ease;">
+            <div style="background: var(--bg-white); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                
+                <!-- Górny Pasek Kalendarza -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--glass-border);">
+                    <button class="btn" style="width: auto; background: var(--bg-light); border: 1px solid var(--glass-border); color: var(--text-main); font-weight: 600;" onclick="currentCalDate = new Date(); renderCalendar();">Dzisiaj</button>
+                    
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <button style="background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; transition: 0.2s;" onclick="changeMonth(-1)" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'"><i class="fas fa-chevron-left"></i></button>
+                        <h2 id="calendar-month-year" style="margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--text-main); min-width: 160px; text-align: center; text-transform: capitalize;">Czerwiec 2026</h2>
+                        <button style="background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; transition: 0.2s;" onclick="changeMonth(1)" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    
+                    <div id="admin-calendar-actions"></div>
                 </div>
-                <h2 style="color: var(--text-main); font-weight: 800; font-size: 1.8rem; margin-bottom: 10px;">Kalendarz Zrzutek i Live'ów</h2>
-                <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6; font-size: 0.95rem;">
-                    Śledź harmonogram nadchodzących edycji zrzutek, planowane spotkania na żywo oraz terminy aktualizacji wtyczki Wingman.
-                </p>
-                <span style="background: #f1f5f9; color: var(--text-muted); padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-lock" style="color: #3b82f6;"></i> Moduł w przygotowaniu
-                </span>
+
+                <!-- Dni tygodnia nagłówki -->
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; border-bottom: 1px solid var(--glass-border); background: #f8fafc;">
+                    <div class="cal-day-header">Pon</div>
+                    <div class="cal-day-header">Wto</div>
+                    <div class="cal-day-header">Śro</div>
+                    <div class="cal-day-header">Czw</div>
+                    <div class="cal-day-header">Pią</div>
+                    <div class="cal-day-header">Sob</div>
+                    <div class="cal-day-header">Nie</div>
+                </div>
+
+                <!-- Siatka Dni (Grid) -->
+                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); background: var(--glass-border); gap: 1px;">
+                    <!-- Generowane przez JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DLA ADMINA: Dodawanie własnego wydarzenia -->
+        <div id="calendar-event-modal" class="modal">
+            <div class="modal-box">
+                <h3 style="color: var(--text-main);"><i class="fas fa-calendar-plus"></i> Dodaj Wydarzenie</h3>
+                
+                <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Tytuł wydarzenia</label>
+                <input type="text" id="event-title" placeholder="np. Live na YT: Szukanie Nisz">
+                
+                <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Data</label>
+                <input type="date" id="event-date">
+                
+                <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Typ</label>
+                <select id="event-type" style="margin-bottom: 20px;">
+                    <option value="manual">🔵 Informacja / Live</option>
+                    <option value="start">🔴 Ważne / Zrzutka</option>
+                    <option value="history">🟢 Historia / Wyniki</option>
+                </select>
+
+                <div style="display:flex; justify-content: flex-end; gap:10px;">
+                    <button class="tab-btn" style="background: var(--bg-light); border: 1px solid var(--border-light);" onclick="document.getElementById('calendar-event-modal').style.display='none'">Anuluj</button>
+                    <button class="btn-primary" onclick="submitCalendarEvent()">Dodaj</button>
+                </div>
             </div>
         </div>
 
@@ -1708,7 +1771,7 @@ async function saveRequiredNickname() {
                 
             } else if (tabName === 'calendar') {
                 document.getElementById('calendar-section').classList.remove('hidden');  
-                
+                renderCalendar();
             } else if (tabName === 'leaderboards') {
                 document.getElementById('leaderboards-section').classList.remove('hidden'); 
             }
@@ -2747,6 +2810,128 @@ function showLoginPanel() {
             }
             btn.disabled = false;
             btn.innerHTML = "Zarejestruj się";
+        }
+
+        // ==========================================
+        // SYSTEM KALENDARZA (Z Automatyzacją)
+        // ==========================================
+        let currentCalDate = new Date();
+
+        async function renderCalendar() {
+            const year = currentCalDate.getFullYear();
+            const month = currentCalDate.getMonth();
+
+            const monthNames = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            // Pokaż przycisk tylko dla Ciebie
+            if (userEmail === 'kamil.sznicer@o2.pl' || isAdmin) {
+                document.getElementById('admin-calendar-actions').innerHTML = `<button onclick="document.getElementById('calendar-event-modal').style.display='flex'" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(160, 19, 74, 0.2);"><i class="fas fa-plus"></i> Dodaj Wydarzenie</button>`;
+            }
+
+            // Obliczenia siatki
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const firstDay = firstDayIndex === 0 ? 6 : firstDayIndex - 1; // Start w Poniedziałek
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevDaysInMonth = new Date(year, month, 0).getDate();
+
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            const today = new Date();
+
+            // Pobieranie własnych wydarzeń z bazy (jeśli backend jest gotowy)
+            let customEvents = [];
+            try {
+                const res = await fetch(`${API}/api/calendar/events`);
+                if (res.ok) customEvents = await res.json();
+            } catch(e) { console.log("Brak customowych wydarzeń"); }
+
+            let totalCells = 42; // Zawsze 6 wierszy x 7 kolumn dla równej siatki
+            for (let i = 0; i < totalCells; i++) {
+                let cellDate, isCurrentMonth = false, dayNum;
+
+                if (i < firstDay) {
+                    dayNum = prevDaysInMonth - firstDay + i + 1;
+                    cellDate = new Date(year, month - 1, dayNum);
+                } else if (i >= firstDay && i < firstDay + daysInMonth) {
+                    dayNum = i - firstDay + 1;
+                    cellDate = new Date(year, month, dayNum);
+                    isCurrentMonth = true;
+                } else {
+                    dayNum = i - firstDay - daysInMonth + 1;
+                    cellDate = new Date(year, month + 1, dayNum);
+                }
+
+                const isToday = today.getDate() === cellDate.getDate() && today.getMonth() === cellDate.getMonth() && today.getFullYear() === cellDate.getFullYear();
+                const dateStr = `${cellDate.getFullYear()}-${String(cellDate.getMonth() + 1).padStart(2, '0')}-${String(cellDate.getDate()).padStart(2, '0')}`;
+
+                let cellHtml = `<div class="cal-cell ${isCurrentMonth ? '' : 'other-month'}">
+                    <span class="cal-date ${isToday ? 'today' : ''}">${dayNum}</span>
+                    <div style="display:flex; flex-direction:column; gap:3px;">`;
+
+                // --- AUTOMATYZACJA ZRZUTEK (Tylko dla aktualnego miesiąca w widoku) ---
+                if (isCurrentMonth) {
+                    const nextMonthName = monthNames[(month + 1) % 12];
+                    
+                    if (dayNum >= 1 && dayNum <= 4) {
+                        cellHtml += `<div class="cal-event event-auto" title="System w trakcie procesowania depozytów i zwrotów z poprzedniej zrzutki.">⚙️ Przerwa Techniczna</div>`;
+                    }
+                    if (dayNum === 5) {
+                        cellHtml += `<div class="cal-event event-manual" title="Uczestnicy z poprzedniego miesiąca otrzymują dziś dostęp!">🔑 Wysyłka Loginów</div>`;
+                        cellHtml += `<div class="cal-event event-start" title="Rezerwuj miejsce! Zbieramy środki na dostęp w kolejnym miesiącu.">🚀 Start: Edycja ${nextMonthName}</div>`;
+                    }
+                    if (dayNum === daysInMonth) {
+                        cellHtml += `<div class="cal-event event-end" title="Po północy zapisy zostaną zamknięte.">🛑 Koniec Zapisów</div>`;
+                    }
+                }
+
+                // --- WYDARZENIA DODANE PRZEZ ADMINA ---
+                const todaysCustom = customEvents.filter(e => e.date === dateStr);
+                todaysCustom.forEach(e => {
+                    // Jeśli jesteś adminem, kliknięcie usunie event
+                    const adminClick = (userEmail === 'kamil.sznicer@o2.pl' || isAdmin) ? `onclick="deleteCalendarEvent(${e.id})"` : '';
+                    cellHtml += `<div class="cal-event event-${e.type}" ${adminClick} title="${e.title}">${e.title}</div>`;
+                });
+
+                cellHtml += `</div></div>`;
+                grid.innerHTML += cellHtml;
+            }
+        }
+
+        function changeMonth(dir) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+            renderCalendar();
+        }
+
+        // --- OBSŁUGA WYSYŁKI WYDARZEŃ ---
+        async function submitCalendarEvent() {
+            const title = document.getElementById('event-title').value;
+            const date = document.getElementById('event-date').value;
+            const type = document.getElementById('event-type').value;
+
+            if(!title || !date) return alert("Wypełnij dane!");
+
+            try {
+                const res = await fetch(`${API}/api/calendar/event`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ secret: adminSecret, title, date, type })
+                });
+                if(res.ok) {
+                    document.getElementById('calendar-event-modal').style.display='none';
+                    renderCalendar(); // Odśwież kalendarz
+                }
+            } catch(e) { alert("Błąd połączenia."); }
+        }
+
+        async function deleteCalendarEvent(id) {
+            if(!confirm("Usunąć to wydarzenie?")) return;
+            try {
+                const res = await fetch(`${API}/api/calendar/event/${id}`, {
+                    method: 'DELETE', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ secret: adminSecret })
+                });
+                if(res.ok) renderCalendar();
+            } catch(e) { alert("Błąd usuwania"); }
         }
 
     </script>
