@@ -95,6 +95,19 @@
             div[id^="tidio-chat"] {
                 bottom: 90px !important; /* Przesuwamy wyżej o 90px */
             }
+
+            /* Poprawki kalendarza dla telefonów */
+        .cal-day-header { padding: 8px 2px; font-size: 0.65rem; }
+        .cal-cell { min-height: 70px; padding: 2px; }
+        .cal-date { width: 22px; height: 22px; font-size: 0.75rem; margin-bottom: 2px; }
+        .cal-event { 
+            font-size: 0.55rem; padding: 2px 4px; border-radius: 4px; border-left-width: 2px; 
+            white-space: normal; line-height: 1.1; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            margin-bottom: 2px;
+        }
+        #calendar-section { padding: 0 5px; margin: 15px auto; }
+        #calendar-month-year { font-size: 1.1rem; min-width: 120px; }
         }
 
 
@@ -868,6 +881,29 @@
                 <div style="display:flex; justify-content: flex-end; gap:10px;">
                     <button class="tab-btn" style="background: var(--bg-light); border: 1px solid var(--border-light);" onclick="document.getElementById('calendar-event-modal').style.display='none'">Anuluj</button>
                     <button class="btn-primary" onclick="submitCalendarEvent()">Dodaj</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="event-details-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center; display: none;">
+            <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                <button onclick="document.getElementById('event-details-modal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='var(--cherry)'" onmouseout="this.style.color='var(--text-muted)'"><i class="fas fa-times"></i></button>
+                
+                <div id="event-details-icon" style="width: 55px; height: 55px; border-radius: 50%; background: var(--cherry-light); color: var(--cherry); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 15px;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                
+                <h3 id="event-details-title" style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px;">Tytuł</h3>
+                <p id="event-details-date" style="font-size: 0.85rem; font-weight: 600; color: var(--cherry); margin-bottom: 15px; text-transform: uppercase;">Data</p>
+                
+                <div id="event-details-content" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+                    Opis wydarzenia...
+                </div>
+
+                <div id="event-details-admin-actions" style="margin-top: 25px; border-top: 1px solid var(--glass-border); padding-top: 15px; display: none;">
+                    <button id="event-details-delete-btn" class="btn" style="width: 100%; color: var(--danger); border: 1px solid var(--danger); background: transparent; font-weight: 600;">
+                        <i class="fas fa-trash"></i> Usuń to wydarzenie
+                    </button>
                 </div>
             </div>
         </div>
@@ -2874,28 +2910,86 @@ function showLoginPanel() {
                     const nextMonthName = monthNames[(month + 1) % 12];
                     
                     if (dayNum >= 1 && dayNum <= 4) {
-                        cellHtml += `<div class="cal-event event-auto" title="System w trakcie procesowania depozytów i zwrotów z poprzedniej zrzutki.">⚙️ Przerwa Techniczna</div>`;
+                        cellHtml += `<div class="cal-event event-auto" onclick="showEventDetails('Przerwa Techniczna', '${dateStr}', 'auto')">⚙️ Przerwa Techniczna</div>`;
                     }
                     if (dayNum === 5) {
-                        cellHtml += `<div class="cal-event event-manual" title="Uczestnicy z poprzedniego miesiąca otrzymują dziś dostęp!">🔑 Wysyłka Loginów</div>`;
-                        cellHtml += `<div class="cal-event event-start" title="Rezerwuj miejsce! Zbieramy środki na dostęp w kolejnym miesiącu.">🚀 Start: Edycja ${nextMonthName}</div>`;
+                        cellHtml += `<div class="cal-event event-manual" onclick="showEventDetails('Wysyłka Loginów', '${dateStr}', 'manual')">🔑 Wysyłka Loginów</div>`;
+                        cellHtml += `<div class="cal-event event-start" onclick="showEventDetails('Start: Edycja ${nextMonthName}', '${dateStr}', 'start')">🚀 Start: Edycja ${nextMonthName}</div>`;
                     }
                     if (dayNum === daysInMonth) {
-                        cellHtml += `<div class="cal-event event-end" title="Po północy zapisy zostaną zamknięte.">🛑 Koniec Zapisów</div>`;
+                        cellHtml += `<div class="cal-event event-end" onclick="showEventDetails('Koniec Zapisów', '${dateStr}', 'end')">🛑 Koniec Zapisów</div>`;
                     }
                 }
 
                 // --- WYDARZENIA DODANE PRZEZ ADMINA ---
                 const todaysCustom = customEvents.filter(e => e.date === dateStr);
                 todaysCustom.forEach(e => {
-                    // Jeśli jesteś adminem, kliknięcie usunie event
-                    const adminClick = (userEmail === 'kamil.sznicer@o2.pl' || isAdmin) ? `onclick="deleteCalendarEvent(${e.id})"` : '';
-                    cellHtml += `<div class="cal-event event-${e.type}" ${adminClick} title="${e.title}">${e.title}</div>`;
+                    // Podpinamy nową funkcję wyskakującego okienka, podając ID wydarzenia
+                    cellHtml += `<div class="cal-event event-${e.type}" onclick="showEventDetails('${e.title}', '${e.date}', '${e.type}', ${e.id})">${e.title}</div>`;
                 });
 
                 cellHtml += `</div></div>`;
                 grid.innerHTML += cellHtml;
             }
+        }
+
+        function showEventDetails(title, date, type, id = null) {
+            const modal = document.getElementById('event-details-modal');
+            document.getElementById('event-details-title').innerText = title;
+
+            // Formatyzacja daty z systemowego (YYYY-MM-DD) na polski, np. "15 Czerwca 2026"
+            const dateObj = new Date(date);
+            document.getElementById('event-details-date').innerText = dateObj.toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            let content = "";
+            let icon = '<i class="fas fa-info-circle"></i>';
+            let iconBg = 'var(--cherry-light)';
+            let iconColor = 'var(--cherry)';
+
+            // Treści automatycznych wydarzeń ze zrzutki
+            if (type === 'auto') {
+                content = "System właśnie przelicza wpłaty i generuje zwroty z poprzedniej edycji. Twój wirtualny portfel zostanie wkrótce zaktualizowany.";
+                icon = '<i class="fas fa-cogs"></i>';
+                iconBg = '#f1f5f9'; iconColor = '#475569';
+            } else if (type === 'manual') {
+                content = "Wszyscy uczestnicy z poprzedniego miesiąca otrzymują dziś dostęp do Helium 10! Sprawdzaj swoją skrzynkę e-mail.";
+                icon = '<i class="fas fa-key"></i>';
+                iconBg = 'rgba(59, 130, 246, 0.1)'; iconColor = '#3b82f6';
+            } else if (type === 'start') {
+                content = `<strong>Zbieramy środki na kolejną edycję!</strong><br><br>
+                💡 <em>Czy wiesz, że...</em><br>W ubiegłych miesiącach (np. w wielkiej majowej zrzutce) dzięki sile naszej społeczności zebraliśmy prawie <strong>40 osób</strong>, co brutalnie ścięło cenę końcową do <strong>ok. 36 zł</strong> za osobę! Im szybciej dołączysz, tym więcej czasu mamy na pobicie tego rekordu.`;
+                icon = '<i class="fas fa-rocket"></i>';
+                iconBg = 'var(--cherry-light)'; iconColor = 'var(--cherry)';
+            } else if (type === 'end') {
+                content = "Ostatnia szansa na dołączenie do zrzutki. O północy zamykamy listę, księgujemy depozyty i automatycznie dzielimy koszty narzędzia przez liczbę zebranych Wingmanów.";
+                icon = '<i class="fas fa-stopwatch"></i>';
+                iconBg = 'rgba(239, 68, 68, 0.1)'; iconColor = 'var(--danger)';
+            } else {
+                content = "Wydarzenie społeczności lub informacja od administratora.";
+            }
+
+            // Modyfikacja wyglądu ikony w okienku
+            const iconDiv = document.getElementById('event-details-icon');
+            iconDiv.innerHTML = icon;
+            iconDiv.style.background = iconBg;
+            iconDiv.style.color = iconColor;
+            document.getElementById('event-details-content').innerHTML = content;
+
+            // Logika usuwania (Tylko dla Admina i tylko dla niestandardowych wydarzeń)
+            const adminActions = document.getElementById('event-details-admin-actions');
+            const deleteBtn = document.getElementById('event-details-delete-btn');
+            
+            if (id && (userEmail === 'kamil.sznicer@o2.pl' || isAdmin)) {
+                adminActions.style.display = 'block';
+                deleteBtn.onclick = function() {
+                    modal.style.display = 'none';
+                    deleteCalendarEvent(id);
+                };
+            } else {
+                adminActions.style.display = 'none';
+            }
+
+            modal.style.display = 'flex';
         }
 
         function changeMonth(dir) {
