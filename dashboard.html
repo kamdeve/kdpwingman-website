@@ -931,6 +931,21 @@
                 <p style="color: var(--text-muted); font-size: 1rem;">Zobacz, jak wspólnie obniżamy koszty drogich narzędzi do KDP. Pełna transparentność.</p>
             </div>
             
+            <!-- NOWA SEKCJA: HISTORIA EDYCJI -->
+        <div id="platform-history-section" class="hidden" style="max-width: 1000px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.3s ease;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Archiwum Zrzutek</h2>
+                <p style="color: var(--text-muted); font-size: 1rem;">Zobacz, jak wspólnie obniżamy koszty drogich narzędzi do KDP. Pełna transparentność.</p>
+            </div>
+            
+            <!-- MIEJSCE NA BANER OSZCZĘDNOŚCI -->
+            <div id="platform-history-stats-banner"></div>
+            
+            <div id="platform-history-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+                <!-- Kafelki wygenerują się tutaj automatycznie -->
+            </div>
+        </div>
+
             <div id="platform-history-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
                 <!-- Kafelki wygenerują się tutaj automatycznie -->
             </div>
@@ -3020,18 +3035,40 @@ function showLoginPanel() {
         // 3. Budujemy zakładkę "Historia Edycji"
         async function loadPlatformHistory() {
             const grid = document.getElementById('platform-history-grid');
+            const statsBanner = document.getElementById('platform-history-stats-banner');
+            
             grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Ładowanie archiwum...</div>';
             
             const stats = await getFullHistory();
             
-            grid.innerHTML = stats.map(s => {
+            let totalSavedPLN = 0;
+            let totalAccesses = 0;
+
+            const cardsHtml = stats.map(s => {
                 const dateObj = new Date(s.month + "-01");
                 const monthName = dateObj.toLocaleDateString('pl-PL', {month: 'long', year: 'numeric'});
                 
-                // Dostosowanie koloru ikonki dla Platinum i Diamond
+                // --- LOGIKA CEN RYNKOWYCH W ZALEŻNOŚCI OD MIESIĄCA ---
+                let retailUSD = 79.20; // Domyślnie Platinum (do Grudnia 2025 włącznie)
+                if (s.month >= "2026-01" && s.month <= "2026-04") {
+                    retailUSD = 90.30; // Podwyżka Platinum (Styczeń - Kwiecień 2026)
+                } else if (s.month >= "2026-05") {
+                    retailUSD = 287.20; // Przejście na Diamond (od Maja 2026 w górę)
+                }
+
                 const isDiamond = s.tool.includes("Diamond");
                 const iconColor = isDiamond ? 'var(--cherry)' : '#64748b';
                 const bgHeader = isDiamond ? 'var(--cherry)' : '#64748b';
+                
+                // Szacunkowe przeliczenie na PLN (przybliżony stały kurs 3.95 do wyliczeń oszczędności)
+                const retailPLN = retailUSD * 3.95;
+                const userPricePLN = parseFloat(s.price);
+                
+                // Obliczamy ile pieniędzy "zostało w kieszeni" w danym miesiącu dla całej grupy
+                const savedThisMonth = (retailPLN - userPricePLN) * s.users;
+                
+                totalSavedPLN += savedThisMonth;
+                totalAccesses += s.users;
                 
                 return `
                 <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.02)';">
@@ -3040,19 +3077,43 @@ function showLoginPanel() {
                         <i class="fas fa-gem" style="opacity: 0.8;"></i>
                     </div>
                     <div style="padding: 25px;">
-                        <h3 style="font-size: 1.15rem; color: var(--text-main); margin-top: 0; margin-bottom: 20px; text-transform: none;"><i class="fas fa-box-open" style="color: ${iconColor}; margin-right: 8px;"></i> ${s.tool}</h3>
+                        <h3 style="font-size: 1.15rem; color: var(--text-main); margin-top: 0; margin-bottom: 15px; text-transform: none;"><i class="fas fa-box-open" style="color: ${iconColor}; margin-right: 8px;"></i> ${s.tool}</h3>
                         
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.85rem; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--glass-border);">
+                            <span style="color: var(--text-muted);">Cena rynkowa (Solo):</span>
+                            <span style="font-weight: 700; color: var(--danger); text-decoration: line-through;">$${retailUSD.toFixed(2)}</span>
+                        </div>
+
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
                             <span style="color: var(--text-muted); font-size: 0.95rem;">Uczestników:</span>
                             <span style="font-weight: 800; color: var(--text-main); font-size: 1.1rem;"><i class="fas fa-users" style="color: #3b82f6; margin-right: 5px;"></i> ${s.users}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-muted); font-size: 0.95rem;">Cena końcowa:</span>
+                            <span style="color: var(--text-muted); font-size: 0.95rem;">Cena zrzutkowa:</span>
                             <span style="font-weight: 800; color: var(--success); font-size: 1.4rem;">ok. ${s.price} zł</span>
                         </div>
                     </div>
                 </div>`;
             }).join('');
+
+            // Wstrzyknięcie zielonego banera na górę
+            if (statsBanner) {
+                statsBanner.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px 30px; border-radius: 16px; color: white; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px;">Dostarczono dostępów</div>
+                            <div style="font-size: 2.8rem; font-weight: 800; line-height: 1;">${totalAccesses}</div>
+                        </div>
+                        <div style="width: 2px; background: rgba(255,255,255,0.3); height: 60px;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px;">Zaoszczędziliśmy wspólnie ponad</div>
+                            <div style="font-size: 2.8rem; font-weight: 800; line-height: 1;">~ ${totalSavedPLN.toLocaleString('pl-PL', {maximumFractionDigits: 0})} zł!</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = cardsHtml;
         }
 
         function showEventDetails(title, date, type, id = null, users = 0, price = 0) {
