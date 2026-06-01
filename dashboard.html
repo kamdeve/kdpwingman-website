@@ -1125,44 +1125,6 @@ if (data.has_free_ticket) {
     }
 }
 
-    // --- NOWOŚĆ: WSTRZYKIWANIE ODZNAK LOJALNOŚCIOWYCH ---
-    const loyaltyRow = document.getElementById('loyalty-status-row');
-    if (loyaltyRow && data.buyerTier) {
-        loyaltyRow.innerHTML = `
-            <div class="tier-card-new">
-                <div class="badge-icon">${data.buyerTier.icon}</div>
-                <div>
-                    <div class="tier-label">Ranga Wydawcy</div>
-                    <div class="tier-name">${data.buyerTier.name}</div>
-                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;">
-                        Udział w ${data.buyCount} edycjach
-                    </div>
-                </div>
-            </div>
-
-            <div class="reputation-card">
-                <div class="badge-icon">🤝</div>
-                <div>
-                    <div class="tier-label">Reputacja Forum</div>
-                    <div class="tier-name">${data.forumRank}</div>
-                    <div class="help-pill">
-                        <i class="fas fa-thumbs-up"></i> ${data.reputationPoints} pkt
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-// --- GAMIFIKACJA: ODBLOKOWANIE NAGRODY (LEVEL 3) ---
-    const repPoints = data.reputationPoints || 0;
-    const rewardBanner = document.getElementById('reward-level-3');
-    
-    if (rewardBanner) {
-        if (repPoints >= 15) {
-            rewardBanner.style.display = 'block';
-        } else {
-            rewardBanner.style.display = 'none';
-        }
-    }
     const container = document.getElementById('join-btn-container');
     const accessInfo = document.getElementById('access-info');
 
