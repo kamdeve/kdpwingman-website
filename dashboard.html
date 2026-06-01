@@ -515,6 +515,7 @@
             <div class="skool-tab" onclick="switchAppTab('calendar', this)">Kalendarz</div>
             <div class="skool-tab" onclick="switchAppTab('members', this)">Członkowie</div>
             <div class="skool-tab" onclick="switchAppTab('leaderboards', this)">Ranking</div>
+            <div class="skool-tab" onclick="switchAppTab('platform-history', this)">Historia Edycji</div>
             <div class="skool-tab" onclick="switchAppTab('panel', this)">Mój Panel</div>
         </div>
 
@@ -920,6 +921,18 @@
                 <span style="background: #f1f5f9; color: var(--text-muted); padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="fas fa-lock" style="color: #f59e0b;"></i> Moduł w przygotowaniu
                 </span>
+            </div>
+        </div>
+
+        <!-- NOWA SEKCJA: HISTORIA EDYCJI -->
+        <div id="platform-history-section" class="hidden" style="max-width: 1000px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.3s ease;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Archiwum Zrzutek</h2>
+                <p style="color: var(--text-muted); font-size: 1rem;">Zobacz, jak wspólnie obniżamy koszty drogich narzędzi do KDP. Pełna transparentność.</p>
+            </div>
+            
+            <div id="platform-history-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+                <!-- Kafelki wygenerują się tutaj automatycznie -->
             </div>
         </div>
 
@@ -1767,7 +1780,7 @@ async function saveRequiredNickname() {
             document.getElementById('classroom-section').classList.add('hidden');   // Dodane ukrywanie
             document.getElementById('calendar-section').classList.add('hidden');    // Dodane ukrywanie
             document.getElementById('leaderboards-section').classList.add('hidden'); // Dodane ukrywanie
-
+            
             // 4. Pokazywanie właściwej sekcji z uwzględnieniem blokad dla gości
             if (tabName === 'panel') {
                 if (!userEmail) {
@@ -1810,6 +1823,10 @@ async function saveRequiredNickname() {
                 renderCalendar();
             } else if (tabName === 'leaderboards') {
                 document.getElementById('leaderboards-section').classList.remove('hidden'); 
+            } else if (tabName === 'platform-history') {
+                // NOWY WARUNEK
+                document.getElementById('platform-history-section').classList.remove('hidden'); 
+                loadPlatformHistory(); // Wywołujemy budowę kafelków
             }
         }
 
@@ -2868,11 +2885,7 @@ function showLoginPanel() {
             }
 
             // Pobieranie automatycznych STATYSTYK z poprzednich zrzutek
-            let historyStats = [];
-            try {
-                const resStats = await fetch(`${API}/api/stats/history`);
-                if (resStats.ok) historyStats = await resStats.json();
-            } catch(e) { console.log("Brak danych historycznych do kalendarza"); }
+            let historyStats = await getFullHistory();
 
             // Pobieranie własnych wydarzeń z bazy (Dodanych przez Ciebie ręcznie)
             let customEvents = [];
@@ -2952,6 +2965,94 @@ function showLoginPanel() {
                 cellHtml += `</div></div>`;
                 grid.innerHTML += cellHtml;
             }
+        }
+
+        // ==========================================
+        // SYSTEM HISTORII ZRZUTEK (Kafelki i Dane)
+        // ==========================================
+        
+        // 1. Wpisz tutaj swoje dawne zrzutki sprzed wprowadzenia obecnej bazy danych
+        const pastManualStats = [
+            { month: "2026-01", users: 23, price: "16.04", tool: "Helium 10 Platinum" },
+            { month: "2025-12", users: 24, price: "15.44", tool: "Helium 10 Platinum" },
+            { month: "2025-11", users: 26, price: "11.21", tool: "Helium 10 Platinum" },
+            { month: "2025-10", users: 29, price: "10.80", tool: "Helium 10 Platinum" },
+            { month: "2025-09", users: 22, price: "12.66", tool: "Helium 10 Platinum" },
+            { month: "2025-08", users: 23, price: "13.17", tool: "Helium 10 Platinum" },
+            { month: "2025-07", users: 26, price: "11.59", tool: "Helium 10 Platinum" },
+            { month: "2025-06", users: 28, price: "11.98", tool: "Helium 10 Platinum" },
+            { month: "2025-05", users: 27, price: "11.58", tool: "Helium 10 Platinum" },
+            { month: "2025-04", users: 21, price: "14.72", tool: "Helium 10 Platinum" },
+            { month: "2025-03", users: 14, price: "22.48", tool: "Helium 10 Platinum" },
+            { month: "2025-02", users: 15, price: "21.51", tool: "Helium 10 Platinum" },
+            { month: "2025-02", users: 20, price: "17.23", tool: "Helium 10 Platinum" },
+        ];
+
+        // 2. Pobieramy dane z serwera i łączymy z listą powyżej
+        async function getFullHistory() {
+            let dynamicStats = [];
+            try {
+                const res = await fetch(`${API}/api/stats/history`);
+                if(res.ok) {
+                    const data = await res.json();
+                    // Z bazy lecą same liczby, więc dopisujemy im nazwę obecnego narzędzia
+                    dynamicStats = data.map(d => ({ ...d, tool: "Helium 10 Diamond" }));
+                }
+            } catch(e){ console.log("Nie można pobrać bazy historii."); }
+
+            // Łączymy obie listy i sortujemy od najnowszej do najstarszej
+            const allStats = [...dynamicStats, ...pastManualStats];
+            
+            // Unikamy duplikatów (jeśli np. styczeń zassało i z bazy, i z ręki)
+            const uniqueStats = [];
+            const seenMonths = new Set();
+            for (const stat of allStats) {
+                if (!seenMonths.has(stat.month)) {
+                    seenMonths.add(stat.month);
+                    uniqueStats.push(stat);
+                }
+            }
+
+            uniqueStats.sort((a,b) => new Date(b.month + "-01") - new Date(a.month + "-01"));
+            return uniqueStats;
+        }
+
+        // 3. Budujemy zakładkę "Historia Edycji"
+        async function loadPlatformHistory() {
+            const grid = document.getElementById('platform-history-grid');
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Ładowanie archiwum...</div>';
+            
+            const stats = await getFullHistory();
+            
+            grid.innerHTML = stats.map(s => {
+                const dateObj = new Date(s.month + "-01");
+                const monthName = dateObj.toLocaleDateString('pl-PL', {month: 'long', year: 'numeric'});
+                
+                // Dostosowanie koloru ikonki dla Platinum i Diamond
+                const isDiamond = s.tool.includes("Diamond");
+                const iconColor = isDiamond ? 'var(--cherry)' : '#64748b';
+                const bgHeader = isDiamond ? 'var(--cherry)' : '#64748b';
+                
+                return `
+                <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.02)';">
+                    <div style="background: ${bgHeader}; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white;">
+                        <span style="font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">${monthName}</span>
+                        <i class="fas fa-gem" style="opacity: 0.8;"></i>
+                    </div>
+                    <div style="padding: 25px;">
+                        <h3 style="font-size: 1.15rem; color: var(--text-main); margin-top: 0; margin-bottom: 20px; text-transform: none;"><i class="fas fa-box-open" style="color: ${iconColor}; margin-right: 8px;"></i> ${s.tool}</h3>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
+                            <span style="color: var(--text-muted); font-size: 0.95rem;">Uczestników:</span>
+                            <span style="font-weight: 800; color: var(--text-main); font-size: 1.1rem;"><i class="fas fa-users" style="color: #3b82f6; margin-right: 5px;"></i> ${s.users}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--text-muted); font-size: 0.95rem;">Cena końcowa:</span>
+                            <span style="font-weight: 800; color: var(--success); font-size: 1.4rem;">ok. ${s.price} zł</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function showEventDetails(title, date, type, id = null, users = 0, price = 0) {
