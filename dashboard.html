@@ -896,7 +896,7 @@
         <div id="leaderboards-section" class="hidden" style="max-width: 1000px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.3s ease;">
             
             <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Skool Points & Ranking</h2>
+                <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Punkty Wingmana i Ranking</h2>
                 <p style="color: var(--text-muted); font-size: 1rem;">1 otrzymany lajk = 1 punkt (EXP). Pisz wartościowe posty i pomagaj na forum, aby awansować i odblokowywać kursy w Szkole!</p>
             </div>
 
@@ -1917,17 +1917,17 @@ async function saveRequiredNickname() {
                 }
             }
 
-            // Generowanie 9 poziomów (Kłódki Skool)
+            // Generowanie 9 poziomów (Kłódki)
             if(lbLevelsGrid) {
                 const levels = [
-                    { level: 1, name: "Nowicjusz KDP", req: 0, reward: "Forum" },
-                    { level: 2, name: "Poszukiwacz Nisz", req: 5, reward: "Podstawy Nisz" },
-                    { level: 3, name: "Aktywny Twórca", req: 20, reward: "Starter SVG" },
-                    { level: 4, name: "Niezależny Wydawca", req: 65, reward: "Zaawansowane PPC" },
-                    { level: 5, name: "Łowca Bestsellerów", req: 155, reward: "Czaty prywatne" },
-                    { level: 6, name: "Złoty Wingman", req: 385, reward: "Baza Nisz (PDF)" },
-                    { level: 7, name: "Weteran Amazona", req: 955, reward: "Grupa Mastermind" },
-                    { level: 8, name: "Magnat Wydawniczy", req: 2385, reward: "Spotkania 1on1" },
+                    { level: 1, name: "Nowicjusz KDP", req: 0, reward: "" },
+                    { level: 2, name: "Poszukiwacz Nisz", req: 5, reward: "Zajęcia poziomu 2 w Szkole" },
+                    { level: 3, name: "Aktywny Twórca", req: 20, reward: "Zajęcia poziomu 3 w Szkole" },
+                    { level: 4, name: "Niezależny Wydawca", req: 65, reward: "" },
+                    { level: 5, name: "Łowca Bestsellerów", req: 155, reward: "" },
+                    { level: 6, name: "Złoty Wingman", req: 385, reward: "" },
+                    { level: 7, name: "Weteran Amazona", req: 955, reward: "" },
+                    { level: 8, name: "Magnat Wydawniczy", req: 2385, reward: "" },
                     { level: 9, name: "Legenda KDP", req: 5000, reward: "Status Legendy" }
                 ];
 
@@ -1938,7 +1938,16 @@ async function saveRequiredNickname() {
                     const iconContent = isUnlocked ? lvl.level : '<i class="fas fa-lock" style="font-size:0.8rem;"></i>';
                     const textOpacity = isUnlocked ? '1' : '0.5';
 
-                    // Opcjonalnie: pokazywanie wymogu procentowego pod nazwą, tak jak w Skool (tu damy ile EXP trzeba)
+                    // Inteligentne formatowanie tekstu nagrody
+                    let rewardHtml = '';
+                    if (!isUnlocked) {
+                        if (lvl.reward !== "") {
+                            rewardHtml = `• Odblokuj: <span style="color:var(--cherry);">${lvl.reward}</span>`;
+                        } else {
+                            rewardHtml = `• Odblokuj`;
+                        }
+                    }
+
                     return `
                     <div style="display: flex; align-items: center; gap: 12px; opacity: ${textOpacity};">
                         <div style="width: 32px; height: 32px; border-radius: 50%; background: ${iconBg}; color: ${iconColor}; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0; border: 1px solid ${isUnlocked ? 'rgba(251, 191, 36, 0.4)' : '#e2e8f0'};">
@@ -1946,7 +1955,7 @@ async function saveRequiredNickname() {
                         </div>
                         <div>
                             <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">Level ${lvl.level} - ${lvl.name}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${lvl.req} EXP ${isUnlocked ? '' : `• Odblokuj: <span style="color:var(--cherry);">${lvl.reward}</span>`}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${lvl.req} EXP ${rewardHtml}</div>
                         </div>
                     </div>
                     `;
