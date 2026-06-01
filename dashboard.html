@@ -892,14 +892,42 @@
             </div>
         </div>
 
-        <div id="leaderboards-section" class="hidden" style="max-width: 800px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.3s ease;">
+        <!-- SEKCJA: RANKING I GRYWALIZACJA (Wizualizacja Skool) -->
+        <div id="leaderboards-section" class="hidden" style="max-width: 1000px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.3s ease;">
+            
             <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Ranking Twórców</h2>
-                <p style="color: var(--text-muted); font-size: 1rem;">Zdobywaj punkty (EXP) pomagając innym na forum. Im bardziej wartościowy post, tym więcej polubień otrzymasz. Odblokuj nagrody w Szkole!</p>
+                <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Skool Points & Ranking</h2>
+                <p style="color: var(--text-muted); font-size: 1rem;">1 otrzymany lajk = 1 punkt (EXP). Pisz wartościowe posty i pomagaj na forum, aby awansować i odblokowywać kursy w Szkole!</p>
             </div>
 
-            <div style="background: white; border-radius: 16px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <!-- KARTA PROFILU I POZIOMÓW (Top Card) -->
+            <div style="background: white; border-radius: 16px; border: 1px solid var(--glass-border); padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-wrap: wrap; gap: 40px; align-items: center;">
                 
+                <!-- Lewa strona: Awatar i info -->
+                <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; text-align: center; border-right: 1px solid var(--glass-border); padding-right: 20px;">
+                    <div style="position: relative; margin-bottom: 15px;">
+                        <div id="lb-avatar" style="width: 130px; height: 130px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 800; border: 4px solid var(--cherry-light); box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                            ?
+                        </div>
+                        <div id="lb-badge" style="position: absolute; bottom: 0; right: 5px; background: #3b82f6; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                            1
+                        </div>
+                    </div>
+                    <h3 id="lb-nickname" style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0 0 5px 0;">Ładowanie...</h3>
+                    <div id="lb-level-name" style="color: #3b82f6; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">Level 1 - Nowicjusz KDP</div>
+                    <div id="lb-points-info" style="color: var(--text-muted); font-size: 0.85rem;">Trwa wczytywanie danych...</div>
+                </div>
+
+                <!-- Prawa strona: Lista poziomów (Generowana z JS) -->
+                <div style="flex: 2; min-width: 300px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;" id="lb-levels-grid">
+                        <!-- Tu wskoczą poziomy 1-9 z kłódkami -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela wyników -->
+            <div style="background: white; border-radius: 16px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
                 <div style="display: flex; padding: 15px 25px; background: #f8fafc; border-bottom: 1px solid var(--glass-border); font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
                     <div style="width: 50px;">Rank</div>
                     <div style="flex-grow: 1;">Wingman</div>
@@ -1101,6 +1129,7 @@
                 document.getElementById('panel-exp-bar').style.width = data.gamification.progress + '%';
             }, 300);
         }
+        renderLeaderboardProfile(data.gamification, data.nickname);
     }
     // 2. Aktualizacja podstawowych informacji (Saldo i Edycja)
     const balanceEl = document.getElementById('balance');
@@ -1851,6 +1880,77 @@ async function saveRequiredNickname() {
                 }).join('');
             } catch(e) {
                 list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">Błąd pobierania rankingu.</div>';
+            }
+        }
+
+        function renderLeaderboardProfile(gami, nickname) {
+            const lbAvatar = document.getElementById('lb-avatar');
+            const lbBadge = document.getElementById('lb-badge');
+            const lbNickname = document.getElementById('lb-nickname');
+            const lbLevelName = document.getElementById('lb-level-name');
+            const lbPointsInfo = document.getElementById('lb-points-info');
+            const lbLevelsGrid = document.getElementById('lb-levels-grid');
+
+            // Jeśli na ranking wejdzie niezalogowany GOŚĆ:
+            if (!userEmail || !gami) {
+                if(lbNickname) lbNickname.innerText = "Anonim";
+                if(lbAvatar) lbAvatar.innerHTML = '<i class="fas fa-user-secret" style="font-size: 2rem;"></i>';
+                if(lbBadge) lbBadge.style.display = 'none';
+                if(lbLevelName) lbLevelName.innerText = "Zaloguj się, aby zbierać EXP";
+                if(lbPointsInfo) lbPointsInfo.innerHTML = '<a href="#" onclick="showLoginPanel()" style="color:var(--cherry); font-weight:bold; text-decoration:none;">Kliknij tutaj, aby dołączyć!</a>';
+                gami = { level: 0, exp: 0 }; // Ustawiamy poziom 0, aby wszystkie kłódki były zamknięte
+            } else {
+                // Dla ZALOGOWANEGO:
+                const alias = (nickname && nickname.trim() !== "") ? nickname : userEmail.split('@')[0];
+                if(lbNickname) lbNickname.innerText = alias;
+                if(lbAvatar) lbAvatar.innerText = alias.charAt(0).toUpperCase();
+                if(lbBadge) { lbBadge.style.display = 'flex'; lbBadge.innerText = gami.level; }
+                if(lbLevelName) lbLevelName.innerText = `Level ${gami.level} - ${gami.name}`;
+                
+                if(lbPointsInfo) {
+                    if(gami.level === 9) {
+                        lbPointsInfo.innerHTML = `Osiągnąłeś maksymalny poziom! 🎉`;
+                    } else {
+                        const pointsLeft = gami.nextExp - gami.exp;
+                        lbPointsInfo.innerHTML = `<strong>${pointsLeft}</strong> punktów do awansu <i class="far fa-question-circle" title="Zdobywaj polubienia od innych na forum!"></i>`;
+                    }
+                }
+            }
+
+            // Generowanie 9 poziomów (Kłódki Skool)
+            if(lbLevelsGrid) {
+                const levels = [
+                    { level: 1, name: "Nowicjusz KDP", req: 0, reward: "Forum" },
+                    { level: 2, name: "Poszukiwacz Nisz", req: 5, reward: "Podstawy Nisz" },
+                    { level: 3, name: "Aktywny Twórca", req: 20, reward: "Starter SVG" },
+                    { level: 4, name: "Niezależny Wydawca", req: 65, reward: "Zaawansowane PPC" },
+                    { level: 5, name: "Łowca Bestsellerów", req: 155, reward: "Czaty prywatne" },
+                    { level: 6, name: "Złoty Wingman", req: 385, reward: "Baza Nisz (PDF)" },
+                    { level: 7, name: "Weteran Amazona", req: 955, reward: "Grupa Mastermind" },
+                    { level: 8, name: "Magnat Wydawniczy", req: 2385, reward: "Spotkania 1on1" },
+                    { level: 9, name: "Legenda KDP", req: 5000, reward: "Status Legendy" }
+                ];
+
+                lbLevelsGrid.innerHTML = levels.map(lvl => {
+                    const isUnlocked = gami.level >= lvl.level;
+                    const iconBg = isUnlocked ? 'rgba(251, 191, 36, 0.15)' : '#f1f5f9';
+                    const iconColor = isUnlocked ? '#b45309' : '#94a3b8';
+                    const iconContent = isUnlocked ? lvl.level : '<i class="fas fa-lock" style="font-size:0.8rem;"></i>';
+                    const textOpacity = isUnlocked ? '1' : '0.5';
+
+                    // Opcjonalnie: pokazywanie wymogu procentowego pod nazwą, tak jak w Skool (tu damy ile EXP trzeba)
+                    return `
+                    <div style="display: flex; align-items: center; gap: 12px; opacity: ${textOpacity};">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: ${iconBg}; color: ${iconColor}; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0; border: 1px solid ${isUnlocked ? 'rgba(251, 191, 36, 0.4)' : '#e2e8f0'};">
+                            ${iconContent}
+                        </div>
+                        <div>
+                            <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">Level ${lvl.level} - ${lvl.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${lvl.req} EXP ${isUnlocked ? '' : `• Odblokuj: <span style="color:var(--cherry);">${lvl.reward}</span>`}</div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
             }
         }
 
