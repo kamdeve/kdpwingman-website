@@ -2976,7 +2976,13 @@ function showLoginPanel() {
         
         // 1. Wpisz tutaj swoje dawne zrzutki sprzed wprowadzenia obecnej bazy danych
         const pastManualStats = [
-            { month: "2026-01", users: 23, price: "16.04", tool: "Helium 10 Platinum" },
+        // NADPISANE BŁĘDNE DANE Z BAZY DANYCH:
+            { month: "2026-04", users: 16, price: "20.49", tool: "Helium 10 Platinum" },
+            { month: "2026-03", users: 19, price: "17.26", tool: "Helium 10 Platinum" },
+
+
+        // STARE DANE:
+            { month: "2026-01", users: 26, price: "16.04", tool: "Helium 10 Platinum" },
             { month: "2025-12", users: 24, price: "15.44", tool: "Helium 10 Platinum" },
             { month: "2025-11", users: 26, price: "11.21", tool: "Helium 10 Platinum" },
             { month: "2025-10", users: 29, price: "10.80", tool: "Helium 10 Platinum" },
@@ -2988,7 +2994,7 @@ function showLoginPanel() {
             { month: "2025-04", users: 21, price: "14.72", tool: "Helium 10 Platinum" },
             { month: "2025-03", users: 14, price: "22.48", tool: "Helium 10 Platinum" },
             { month: "2025-02", users: 15, price: "21.51", tool: "Helium 10 Platinum" },
-            { month: "2025-02", users: 20, price: "17.23", tool: "Helium 10 Platinum" },
+            { month: "2025-01", users: 20, price: "17.23", tool: "Helium 10 Platinum" },
         ];
 
         // 2. Pobieramy dane z serwera i łączymy z listą powyżej
@@ -2998,7 +3004,7 @@ function showLoginPanel() {
                 const res = await fetch(`${API}/api/stats/history`);
                 if(res.ok) {
                     const data = await res.json();
-                    // Z bazy lecą same liczby, dopisujemy nazwę na podstawie miesiąca (Diamond od Maja 2026)
+                    // Z bazy lecą same liczby, dopisujemy nazwę na podstawie miesiąca
                     dynamicStats = data.map(d => {
                         const toolName = d.month >= "2026-05" ? "Helium 10 Diamond" : "Helium 10 Platinum";
                         return { ...d, tool: toolName };
@@ -3006,10 +3012,10 @@ function showLoginPanel() {
                 }
             } catch(e){ console.log("Nie można pobrać bazy historii."); }
 
-            // Łączymy obie listy i sortujemy od najnowszej do najstarszej
-            const allStats = [...dynamicStats, ...pastManualStats];
+            // ZMIANA PRIORYTETU: Ręczne statystyki są pierwsze, więc "wygrywają" z bazą!
+            const allStats = [...pastManualStats, ...dynamicStats];
             
-            // Unikamy duplikatów (jeśli np. styczeń zassało i z bazy, i z ręki)
+            // Unikamy duplikatów (jeśli np. Marzec jest i tu, i tu, bierzemy tylko ten ręczny)
             const uniqueStats = [];
             const seenMonths = new Set();
             for (const stat of allStats) {
