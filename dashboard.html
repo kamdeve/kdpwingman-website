@@ -2867,7 +2867,21 @@ function showLoginPanel() {
                 document.getElementById('admin-calendar-actions').innerHTML = ''; // Bezpiecznik dla gości i innych użytkowników
             }
 
-            // Obliczenia siatki
+            // Pobieranie automatycznych STATYSTYK z poprzednich zrzutek
+            let historyStats = [];
+            try {
+                const resStats = await fetch(`${API}/api/stats/history`);
+                if (resStats.ok) historyStats = await resStats.json();
+            } catch(e) { console.log("Brak danych historycznych do kalendarza"); }
+
+            // Pobieranie własnych wydarzeń z bazy (Dodanych przez Ciebie ręcznie)
+            let customEvents = [];
+            try {
+                const res = await fetch(`${API}/api/calendar/events`);
+                if (res.ok) customEvents = await res.json();
+            } catch(e) { console.log("Brak customowych wydarzeń"); }
+
+            // Obliczenia siatki kalendarza
             const firstDayIndex = new Date(year, month, 1).getDay();
             const firstDay = firstDayIndex === 0 ? 6 : firstDayIndex - 1; // Start w Poniedziałek
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -2877,14 +2891,7 @@ function showLoginPanel() {
             grid.innerHTML = '';
             const today = new Date();
 
-            // Pobieranie własnych wydarzeń z bazy (jeśli backend jest gotowy)
-            let customEvents = [];
-            try {
-                const res = await fetch(`${API}/api/calendar/events`);
-                if (res.ok) customEvents = await res.json();
-            } catch(e) { console.log("Brak customowych wydarzeń"); }
-
-            let totalCells = 42; // Zawsze 6 wierszy x 7 kolumn dla równej siatki
+            let totalCells = 42; 
             for (let i = 0; i < totalCells; i++) {
                 let cellDate, isCurrentMonth = false, dayNum;
 
@@ -2911,6 +2918,19 @@ function showLoginPanel() {
                 if (isCurrentMonth) {
                     const nextMonthName = monthNames[(month + 1) % 12];
                     
+                    // 1-wszy dzień miesiąca: SPRAWDZAMY CZY SĄ WYNIKI POPRZEDNIEJ ZRZUTKI
+                    if (dayNum === 1) {
+                        const prevMonthDate = new Date(year, month - 1, 1);
+                        const prevMonthStr = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
+                        const prevMonthName = monthNames[prevMonthDate.getMonth()];
+                        
+                        const stat = historyStats.find(s => s.month === prevMonthStr);
+                        // Jeśli backend znalazł użytkowników dla poprzedniego miesiąca - generujemy event!
+                        if (stat) {
+                            cellHtml += `<div class="cal-event event-history" onclick="showEventDetails('Wyniki: Edycja ${prevMonthName}', '${dateStr}', 'history', null, ${stat.users}, ${stat.price})">📊 Wyniki Zrzutki</div>`;
+                        }
+                    }
+
                     if (dayNum >= 1 && dayNum <= 4) {
                         cellHtml += `<div class="cal-event event-auto" onclick="showEventDetails('Przerwa Techniczna', '${dateStr}', 'auto')">⚙️ Przerwa Techniczna</div>`;
                     }
@@ -2923,10 +2943,9 @@ function showLoginPanel() {
                     }
                 }
 
-                // --- WYDARZENIA DODANE PRZEZ ADMINA ---
+                // --- WYDARZENIA DODANE RĘCZNIE PRZEZ ADMINA ---
                 const todaysCustom = customEvents.filter(e => e.date === dateStr);
                 todaysCustom.forEach(e => {
-                    // Podpinamy nową funkcję wyskakującego okienka, podając ID wydarzenia
                     cellHtml += `<div class="cal-event event-${e.type}" onclick="showEventDetails('${e.title}', '${e.date}', '${e.type}', ${e.id})">${e.title}</div>`;
                 });
 
@@ -2935,11 +2954,10 @@ function showLoginPanel() {
             }
         }
 
-        function showEventDetails(title, date, type, id = null) {
+        function showEventDetails(title, date, type, id = null, users = 0, price = 0) {
             const modal = document.getElementById('event-details-modal');
             document.getElementById('event-details-title').innerText = title;
 
-            // Formatyzacja daty z systemowego (YYYY-MM-DD) na polski, np. "15 Czerwca 2026"
             const dateObj = new Date(date);
             document.getElementById('event-details-date').innerText = dateObj.toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -2948,7 +2966,6 @@ function showLoginPanel() {
             let iconBg = 'var(--cherry-light)';
             let iconColor = 'var(--cherry)';
 
-            // Treści automatycznych wydarzeń ze zrzutki
             if (type === 'auto') {
                 content = "System właśnie przelicza wpłaty i generuje zwroty z poprzedniej edycji. Twój wirtualny portfel zostanie wkrótce zaktualizowany.";
                 icon = '<i class="fas fa-cogs"></i>';
@@ -2959,29 +2976,35 @@ function showLoginPanel() {
                 iconBg = 'rgba(59, 130, 246, 0.1)'; iconColor = '#3b82f6';
             } else if (type === 'start') {
                 content = `<strong>Zbieramy środki na kolejną edycję!</strong><br><br>
-                Zapisy zostały otwarte. Pamiętaj: im szybciej dołączysz i im więcej osób zrzuci się z nami do końca miesiąca, tym niższa będzie finalna cena dostępu dla każdego z nas. Rezerwuj miejsce!`;
+                Zapisy zostały oficjalnie otwarte. Pamiętaj: im szybciej dołączysz i im więcej osób zrzuci się z nami do końca miesiąca, tym niższa będzie finalna cena dostępu dla każdego z nas. Rezerwuj swoje miejsce!`;
                 icon = '<i class="fas fa-rocket"></i>';
                 iconBg = 'var(--cherry-light)'; iconColor = 'var(--cherry)';
             } else if (type === 'end') {
                 content = "Ostatnia szansa na dołączenie do zrzutki. O północy zamykamy listę, księgujemy depozyty i automatycznie dzielimy koszty narzędzia przez liczbę zebranych Wingmanów.";
                 icon = '<i class="fas fa-stopwatch"></i>';
                 iconBg = 'rgba(239, 68, 68, 0.1)'; iconColor = 'var(--danger)';
+            } else if (type === 'history') {
+                // TUTAJ ZNAJDUJĄ SIĘ PRAWDZIWE DANE POBRANE Z BAZY DANYCH!
+                content = `<strong>Edycja oficjalnie rozliczona!</strong><br><br>
+                👥 Udało nam się zebrać: <strong style="color: var(--text-main); font-size: 1.1rem;">${users} Wingmanów</strong><br>
+                💰 Cena końcowa dostępu wyniosła: <strong style="color: var(--success); font-size: 1.1rem;">ok. ${price} zł</strong><br><br>
+                Zgodnie z obietnicą, wszystkie nadpłaty wróciły już na wirtualne portfele uczestników. Wielkie dzięki za wspólną edycję!`;
+                icon = '<i class="fas fa-chart-line"></i>';
+                iconBg = 'rgba(16, 185, 129, 0.1)'; iconColor = 'var(--success)';
             } else {
                 content = "Wydarzenie społeczności lub informacja od administratora.";
             }
 
-            // Modyfikacja wyglądu ikony w okienku
             const iconDiv = document.getElementById('event-details-icon');
             iconDiv.innerHTML = icon;
             iconDiv.style.background = iconBg;
             iconDiv.style.color = iconColor;
             document.getElementById('event-details-content').innerHTML = content;
 
-            // Logika usuwania (Tylko dla Admina i tylko dla niestandardowych wydarzeń)
             const adminActions = document.getElementById('event-details-admin-actions');
             const deleteBtn = document.getElementById('event-details-delete-btn');
             
-            if (id && (userEmail === 'kamil.sznicer@o2.pl' || isAdmin)) {
+            if (id && userEmail === 'kamil.sznicer@o2.pl') {
                 adminActions.style.display = 'block';
                 deleteBtn.onclick = function() {
                     modal.style.display = 'none';
