@@ -1078,28 +1078,30 @@
         return; 
     }
 
+    // NAJPIERW pobieramy 'data'
     const data = await res.json();
     checkUserNickname(data);
-    // (Wstaw to tam, gdzie odbierasz dane `data.gamification`)
-                if (data.gamification) {
-                    const elNumber = document.getElementById('panel-level-number');
-                    if (elNumber) {
-                        elNumber.innerText = data.gamification.level;
-                        document.getElementById('panel-level-name').innerText = data.gamification.name;
-                        document.getElementById('panel-exp-current').innerText = data.gamification.exp + ' EXP';
-                        
-                        if(data.gamification.level === 9) {
-                            document.getElementById('panel-exp-next').innerText = "Osiągnięto legendarny poziom!";
-                        } else {
-                            document.getElementById('panel-exp-next').innerText = "Do poziomu " + (data.gamification.level + 1) + ": " + data.gamification.nextExp + " EXP";
-                        }
-                        
-                        // Opóźnienie dla ładnego efektu napełniania się paska
-                        setTimeout(() => {
-                            document.getElementById('panel-exp-bar').style.width = data.gamification.progress + '%';
-                        }, 300);
-                    }
-                }
+
+    // DOPIERO POTEM odczytujemy pasek postępu z 'data'
+    if (data.gamification) {
+        const elNumber = document.getElementById('panel-level-number');
+        if (elNumber) {
+            elNumber.innerText = data.gamification.level;
+            document.getElementById('panel-level-name').innerText = data.gamification.name;
+            document.getElementById('panel-exp-current').innerText = data.gamification.exp + ' EXP';
+            
+            if(data.gamification.level === 9) {
+                document.getElementById('panel-exp-next').innerText = "Osiągnięto legendarny poziom!";
+            } else {
+                document.getElementById('panel-exp-next').innerText = "Do poziomu " + (data.gamification.level + 1) + ": " + data.gamification.nextExp + " EXP";
+            }
+            
+            // Opóźnienie dla ładnego efektu napełniania się paska
+            setTimeout(() => {
+                document.getElementById('panel-exp-bar').style.width = data.gamification.progress + '%';
+            }, 300);
+        }
+    }
     // 2. Aktualizacja podstawowych informacji (Saldo i Edycja)
     const balanceEl = document.getElementById('balance');
     if (balanceEl && data.wallet_balance !== undefined) {
