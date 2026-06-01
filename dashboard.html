@@ -2998,8 +2998,11 @@ function showLoginPanel() {
                 const res = await fetch(`${API}/api/stats/history`);
                 if(res.ok) {
                     const data = await res.json();
-                    // Z bazy lecą same liczby, więc dopisujemy im nazwę obecnego narzędzia
-                    dynamicStats = data.map(d => ({ ...d, tool: "Helium 10 Diamond" }));
+                    // Z bazy lecą same liczby, dopisujemy nazwę na podstawie miesiąca (Diamond od Maja 2026)
+                    dynamicStats = data.map(d => {
+                        const toolName = d.month >= "2026-05" ? "Helium 10 Diamond" : "Helium 10 Platinum";
+                        return { ...d, tool: toolName };
+                    });
                 }
             } catch(e){ console.log("Nie można pobrać bazy historii."); }
 
@@ -3086,16 +3089,58 @@ function showLoginPanel() {
 
             // Wstrzyknięcie zielonego banera na górę
             if (statsBanner) {
+                
+                // Obliczamy ile 1 osoba zaoszczędziła w OSTATNIEJ edycji
+                const latestStat = stats[0];
+                let currentSingleSaving = 0;
+                if(latestStat) {
+                    let latestRetailUSD = latestStat.month >= "2026-05" ? 287.20 : 90.30;
+                    currentSingleSaving = Math.round((latestRetailUSD * 3.95) - parseFloat(latestStat.price));
+                }
+
                 statsBanner.innerHTML = `
-                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px 30px; border-radius: 16px; color: white; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px;">Dostarczono dostępów</div>
-                            <div style="font-size: 2.8rem; font-weight: 800; line-height: 1;">${totalAccesses}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px;">
+                        
+                        <!-- Główny Box - Oszczędności Globalne -->
+                        <div style="flex: 1 1 300px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; border-radius: 16px; color: white; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px;">Zaoszczędziliśmy wspólnie ponad</div>
+                            <div style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 10px;">~ ${totalSavedPLN.toLocaleString('pl-PL', {maximumFractionDigits: 0})} zł!</div>
+                            <div style="font-size: 0.9rem; opacity: 0.85;">Dostarczono łącznie <strong>${totalAccesses}</strong> dostępów do narzędzi.</div>
                         </div>
-                        <div style="width: 2px; background: rgba(255,255,255,0.3); height: 60px;"></div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px;">Zaoszczędziliśmy wspólnie ponad</div>
-                            <div style="font-size: 2.8rem; font-weight: 800; line-height: 1;">~ ${totalSavedPLN.toLocaleString('pl-PL', {maximumFractionDigits: 0})} zł!</div>
+
+                        <!-- Single Box - Oszczędności 1 Osoby -->
+                        <div style="flex: 1 1 300px; background: white; padding: 30px; border-radius: 16px; border: 2px solid var(--cherry); box-shadow: 0 10px 25px rgba(160, 19, 74, 0.1); text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 5px;">Twoja oszczędność w tym miesiącu to</div>
+                            <div style="font-size: 3rem; font-weight: 800; line-height: 1.1; color: var(--cherry); margin-bottom: 10px;">~ ${currentSingleSaving} zł</div>
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">Tyle zostaje w Twojej kieszeni dzięki jednej zrzutce na Diamond.</div>
+                        </div>
+                    </div>
+
+                    <!-- Alternatywy Inwestycyjne -->
+                    <div style="background: #ffffff; border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                        <h4 style="text-align: center; color: var(--text-main); font-size: 1.1rem; font-weight: 800; margin-top: 0; margin-bottom: 20px; text-transform: uppercase;">Zaoszczędzone pieniądze możesz reinwestować w:</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; text-align: center;">
+                            
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); transition: 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 2.2rem; color: #3b82f6; margin-bottom: 12px;"><i class="fas fa-bullhorn"></i></div>
+                                <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Reklamy<br>Amazon PPC</div>
+                            </div>
+
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); transition: 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 2.2rem; color: #f59e0b; margin-bottom: 12px;"><i class="fas fa-paint-brush"></i></div>
+                                <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Wektory i Grafiki<br>(Creative Fabrica)</div>
+                            </div>
+
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); transition: 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 2.2rem; color: var(--cherry); margin-bottom: 12px;"><i class="fas fa-book-open"></i></div>
+                                <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Profesjonalne<br>Okładki i Edycję</div>
+                            </div>
+
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); transition: 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 2.2rem; color: #10b981; margin-bottom: 12px;"><i class="fas fa-language"></i></div>
+                                <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Tłumaczenia na<br>zagraniczne rynki</div>
+                            </div>
+
                         </div>
                     </div>
                 `;
