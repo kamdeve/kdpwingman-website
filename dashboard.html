@@ -2207,6 +2207,7 @@ async function saveRequiredNickname() {
         }
 
 async function updateUnreadCount() {
+    if (!userEmail) return;
     try {
         const res = await fetch(`${API}/api/messages/unread-count`, {
             method: 'POST',
@@ -2281,6 +2282,7 @@ async function openInbox() {
         updateUnreadCount();
 
         async function toggleNotifications() {
+            if (!userEmail) return alert("Zaloguj się, aby zobaczyć powiadomienia.");
             const dropdown = document.getElementById('notifications-dropdown');
             
             // Jeśli jest otwarte - zamknij
