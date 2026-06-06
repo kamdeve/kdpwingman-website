@@ -2164,11 +2164,17 @@ async function saveRequiredNickname() {
                 // Generowanie dymków wiadomości (Twoje na prawo, rozmówcy na lewo)
                 body.innerHTML = messages.map(msg => {
                     const isMine = msg.receiver_id === currentChatReceiverId;
-                    const bg = isMine ? 'var(--cherry)' : 'rgba(255,255,255,0.08)';
+                    
+                    // Zmiana tła dla rozmówcy na jasnoszare
+                    const bg = isMine ? 'var(--cherry)' : '#f1f5f9';
+                    
+                    // Zmiana koloru tekstu: biały dla Ciebie, ciemny dla rozmówcy
+                    const textColor = isMine ? 'white' : 'var(--text-main)';
+                    
                     const align = isMine ? 'align-self: flex-end; border-bottom-right-radius: 2px;' : 'align-self: flex-start; border-bottom-left-radius: 2px;';
                     
                     return `
-                        <div style="max-width: 75%; padding: 8px 12px; border-radius: 12px; color: white; font-size: 0.85rem; line-height: 1.4; ${align} background: ${bg}; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <div style="max-width: 75%; padding: 8px 12px; border-radius: 12px; color: ${textColor}; font-size: 0.85rem; line-height: 1.4; ${align} background: ${bg}; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                             ${msg.content}
                         </div>
                     `;
