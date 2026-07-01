@@ -258,7 +258,7 @@ CURRENT_EMAILS = [...new Set([...current, ...past])];
 console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`);
                 
                 renderTables(data);
-                updatePreview();
+                updatePreview(data.participants);
                 
                 // --- FIX: Obsługa przycisku rozliczania ---
                 const settleBtn = document.getElementById('settle-btn');
@@ -289,12 +289,32 @@ console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`
             } catch(e) { console.error(e); alert("Błąd połączenia"); }
         }
 
-        function updatePreview() {
-            if(USER_COUNT === 0) return document.getElementById('preview').innerHTML = "Brak uczestników.";
-            const costPLN = 287.20 * CURRENT_RATE;
+        function updatePreview(participants) {
+            if(USER_COUNT === 0 || !participants) return document.getElementById('preview').innerHTML = "Brak uczestników.";
+            
+            // 1. Liczymy głosy na bieżąco w przeglądarce
+            const votesOneAccount = participants.filter(p => p.wants_one_account).length;
+            const requiredVotes = Math.ceil(USER_COUNT * 0.8);
+            
+            // 2. Sprawdzamy, czy wygrywa podział na 2 konta, czy ankieta ściąga nas do 1 konta
+            let isSplitActive = USER_COUNT >= 45;
+            if (isSplitActive && votesOneAccount >= requiredVotes) {
+                isSplitActive = false;
+            }
+
+            // 3. Ustawiamy właściwą cenę
+            const costUSD = isSplitActive ? 574.40 : 287.20;
+            const costPLN = costUSD * CURRENT_RATE;
             const perPerson = costPLN / USER_COUNT;
             const refund = 75 - (perPerson + 10);
-            let html = `Faktura: $287.20 * ${CURRENT_RATE} = <strong>${costPLN.toFixed(2)} PLN</strong><br>Zwrot: <strong style="color:${refund<0?'red':'green'}">${refund.toFixed(2)} zł</strong>`;
+            
+            // 4. Wyświetlamy piękny raport w oknie
+            let html = `Faktura: $${costUSD.toFixed(2)} * ${CURRENT_RATE} = <strong>${costPLN.toFixed(2)} PLN</strong><br>
+                        Zwrot: <strong style="color:${refund<0?'red':'green'}">${refund.toFixed(2)} zł/os.</strong>
+                        <div style="font-size: 0.75rem; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ccc;">
+                            <strong>Status Systemu:</strong> ${isSplitActive ? '🔴 2 Konta (Podział)' : '🟢 1 Konto (Brak podziału)'} <br>
+                            <strong>Ankieta społeczności:</strong> ${votesOneAccount} / ${requiredVotes} wymaganych głosów za ryzykownym obniżeniem ceny.
+                        </div>`;
             document.getElementById('preview').innerHTML = html;
         }
 
