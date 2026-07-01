@@ -308,7 +308,11 @@ console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`
                 tUser.innerHTML = data.participants.map(p => `
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-3 font-bold text-blue-600">${p.month_target}</td>
-                        <td class="p-3">${p.email}</td>
+                        <td class="p-3">
+                            ${p.email} <br>
+                            ${p.group ? `<span class="tag" style="background: ${p.group === 1 ? '#10b981' : '#a0134a'}; color: white; font-size: 0.7rem;">Konto #${p.group}</span>` : ''}
+                            ${p.wants_one_account ? '<span class="tag" style="background: #eab308; color: #b45309; font-size: 0.7rem; margin-left: 5px;">Głos: 1 Konto</span>' : ''}
+                        </td>
                         <td class="p-3 text-green-600 font-bold">${p.amount_paid} zł</td>
                         <td class="p-3 text-gray-500 text-xs">${new Date(p.joined_at).toLocaleString()}</td>
                         <td class="p-3 text-center flex items-center justify-center gap-2">
