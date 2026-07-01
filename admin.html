@@ -96,21 +96,33 @@ async function setStatus(status) {
             </div>
 
 <div class="card" style="margin-top: 30px; margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #a0134a;">
-    <h3 style="margin-top: 0; color: #a0134a;">🚀 Wyślij loginy do Helium 10</h3>
+    <h3 style="margin-top: 0; color: #a0134a;">🚀 Wyślij loginy do Helium 10 (Z obsługą 2 kont)</h3>
     <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 20px;">
-        Wpisz dane do Helium 10. Po kliknięciu, system wyśle maile do <strong>wszystkich osób na liście poniżej</strong> (Obecni Uczestnicy).
+        Wpisz dane do kont. Jeśli ankieta nakazała podział grupy (powyżej 45 osób), system sam rozdzieli uczestników na dwa konta i wyśle im odpowiednie maile.
     </p>
 
-    <input type="text" id="helium-login" placeholder="Login (e-mail) do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-<input type="text" id="helium-password" placeholder="Hasło do Helium 10" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+            <h4 style="margin-top: 0; color: #10b981;">KONTO #1 (Główne)</h4>
+            <input type="text" id="tool-login-1" placeholder="Login (e-mail) do Konta 1" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+            <input type="text" id="tool-pass-1" placeholder="Hasło do Konta 1" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+            <h4 style="margin-top: 0; color: #a0134a;">KONTO #2 (Zapasowe)</h4>
+            <p style="font-size: 0.75rem; color: #666; margin-top: -5px; margin-bottom: 10px;">Zostaw puste, jeśli jest 1 konto.</p>
+            <input type="text" id="tool-login-2" placeholder="Login (e-mail) do Konta 2" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+            <input type="text" id="tool-pass-2" placeholder="Hasło do Konta 2" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+        </div>
+    </div>
 
-
-
-<button onclick="sendHeliumCredentials()" id="send-cred-btn" class="btn btn-blue" style="width: 100%; padding: 12px; background: #a0134a; font-weight: bold; font-size: 1rem;">
-    Wyślij loginy do grupy z tego miesiąca
-</button>
+    <button onclick="sendHeliumCredentials()" id="send-cred-btn" class="btn" style="width: 100%; padding: 12px; background: #a0134a; color: white; font-weight: bold; font-size: 1rem; border-radius: 6px; border: none;">
+        Rozdziel i wyślij loginy do grupy
+    </button>
     <p id="send-cred-msg" style="margin-top: 15px; font-size: 0.9rem; text-align: center; font-weight: bold;"></p>
 </div>
+
+
 
 <div class="card" style="margin-top: 20px; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3b82f6;">
     <h3 style="margin-top: 0; color: #1e40af;">📢 Przypomnienie o nowej składce</h3>
@@ -433,47 +445,44 @@ console.log(`Wybrano ${CURRENT_EMAILS.length} osób z edycji ${currentMonthStr}`
 
 
 async function sendHeliumCredentials() {
-    const login = document.getElementById('helium-login').value;
-    const pass = document.getElementById('helium-password').value;
+    const login1 = document.getElementById('tool-login-1').value;
+    const pass1 = document.getElementById('tool-pass-1').value;
+    const login2 = document.getElementById('tool-login-2').value;
+    const pass2 = document.getElementById('tool-pass-2').value;
+    
     const msgEl = document.getElementById('send-cred-msg');
     const btn = document.getElementById('send-cred-btn');
 
-    if (!login || !pass) {
-        msgEl.innerText = "Uzupełnij wszystkie dane logowania!";
+    if (!login1 || !pass1) {
+        msgEl.innerText = "Musisz uzupełnić przynajmniej dane dla Konta #1!";
         msgEl.style.color = "#dc3545";
         return;
     }
 
-    if (CURRENT_EMAILS.length === 0) {
-        msgEl.innerText = "Brak uczestników do wysyłki w tym miesiącu!";
-        msgEl.style.color = "#dc3545";
-        return;
-    }
-
-    if (!confirm(`Czy na pewno wysłać loginy do ${CURRENT_EMAILS.length} uczestników na ten miesiąc?`)) return;
+    if (!confirm("Czy na pewno chcesz ROZESŁAĆ loginy? System automatycznie sprawdzi ankietę i w razie potrzeby podzieli użytkowników na grupy.")) return;
 
     btn.disabled = true;
-    msgEl.innerText = "Wysyłanie maili (to może potrwać kilka sekund)...";
-    msgEl.style.color = "#6c757d";
+    msgEl.innerText = "Trwa masowa wysyłka...";
+    msgEl.style.color = "#64748b";
 
     try {
         const res = await fetch(`${API}/api/admin/send-credentials`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                heliumLogin: login, 
-                heliumPassword: pass,
-                secret: KEY,
-                emails: CURRENT_EMAILS 
+                secret: KEY, 
+                login1: login1, 
+                pass1: pass1, 
+                login2: login2, 
+                pass2: pass2 
             })
         });
 
         const data = await res.json();
-
+        
         if (res.ok) {
             msgEl.innerText = "✅ " + data.message;
-            msgEl.style.color = "#28a745"; 
-            document.getElementById('helium-password').value = ""; 
+            msgEl.style.color = "#28a745";
         } else {
             msgEl.innerText = "Błąd: " + data.error;
             msgEl.style.color = "#dc3545";
