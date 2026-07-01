@@ -208,7 +208,12 @@
                 <div id="countdown" class="text-2xl md:text-3xl font-bold text-[#a0134a] font-mono">Ładowanie...</div>
             </div>
 
-            <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div id="split-warning" class="hidden max-w-2xl mx-auto mb-8 text-sm text-slate-700 bg-blue-50 border border-blue-200 p-4 rounded-xl shadow-sm text-left">
+                <i class="fas fa-info-circle text-blue-500 mr-2 text-lg align-middle"></i> 
+                <strong>Ważne:</strong> Po przekroczeniu 45 osób automatycznie otworzyliśmy drugą grupę dla zachowania bezpieczeństwa konta i zapewnienia Wam najwyższego komfortu pracy w Helium 10 z minimum wylogowywania z sesji.
+            </div>
+
+            <div id="main-stats-container" class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 
                 <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 relative">
                     <p class="text-sm text-slate-500 uppercase tracking-widest mb-2">Uczestnicy edycji</p>
@@ -238,6 +243,8 @@
                     </div>
                 </div>
             </div>
+
+            <div id="voting-banner-container"></div>
 
             <div class="max-w-4xl mx-auto mb-12 p-8 bg-white shadow-lg border border-slate-200 rounded-3xl">
                 <h3 class="text-xl font-bold mb-6 text-center text-slate-900">🎯 Cele cenowe edycji (Helium 10 Diamond)</h3>
@@ -640,26 +647,109 @@
     fetch(`${API_URL}/api/group-buy/status`)
         .then(res => res.json())
         .then(data => {
-            const countEl = document.getElementById('participant-count'); 
-            const priceUsdEl = document.getElementById('current-price-usd');
-            const pricePlnEl = document.getElementById('current-price-pln');
+            const container = document.getElementById('main-stats-container');
+            const splitWarning = document.getElementById('split-warning');
+            const votingContainer = document.getElementById('voting-banner-container');
 
-            if(countEl) countEl.innerText = data.users;
-            if(priceUsdEl) priceUsdEl.innerText = `$${data.priceUSD}`;
-            if(pricePlnEl) pricePlnEl.innerText = `ok. ${data.pricePLN} PLN`;
+            // ==========================================
+            // LOGIKA 1: RENDEROWANIE KONT (1 lub 2)
+            // ==========================================
+            if (data.isSplitActive && container) {
+                // Pokazujemy 2 konta i ostrzeżenie
+                splitWarning.classList.remove('hidden');
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl shadow-xl border-2 relative overflow-hidden" style="border-color: #10b981;">
+                        <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #10b981;">KONTO #1</div>
+                        <p class="text-sm text-slate-500 uppercase tracking-widest mb-2">Uczestnicy</p>
+                        <div class="text-5xl font-bold text-slate-900 mb-6">${data.group1} <span class="text-xl text-slate-400 font-normal">/ 30</span></div>
+                        <p class="text-xs text-slate-500 uppercase tracking-widest mb-1">Cena za osobę:</p>
+                        <div class="text-4xl font-bold text-slate-900 mb-1">$${data.priceUSD}</div>
+                        <div class="text-lg font-medium" style="color: #10b981;">ok. ${data.pricePLN} PLN</div>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-xl border-2 relative overflow-hidden" style="border-color: #a0134a;">
+                        <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">KONTO #2</div>
+                        <p class="text-sm text-slate-500 uppercase tracking-widest mb-2">Uczestnicy</p>
+                        <div class="text-5xl font-bold text-slate-900 mb-6">${data.group2} <span class="text-xl text-slate-400 font-normal">/ 30</span></div>
+                        <p class="text-xs text-slate-500 uppercase tracking-widest mb-1">Cena za osobę:</p>
+                        <div class="text-4xl font-bold text-slate-900 mb-1">$${data.priceUSD}</div>
+                        <div class="text-lg font-medium" style="color: #10b981;">ok. ${data.pricePLN} PLN</div>
+                    </div>
+                `;
+            } else if (container) {
+                // Standardowy widok - 1 konto
+                splitWarning.classList.add('hidden');
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 relative">
+                        <p class="text-sm text-slate-500 uppercase tracking-widest mb-2">Uczestnicy edycji</p>
+                        <div id="participant-count" class="text-6xl font-bold text-slate-900">${data.users}</div>
+                        
+                        <div class="w-full bg-slate-200 rounded-full h-4 mt-6 mb-4 overflow-hidden">
+                            <div id="progress-bar-visual" class="bg-[#a0134a] h-full transition-all duration-1000" style="width: ${Math.min(100, Math.max(5, (data.users / 25) * 100))}%"></div>
+                        </div>
+                        
+                        <p class="text-xs text-slate-600 mb-2">
+                            <i class="fas fa-users text-blue-500"></i> Minimum do startu: <strong>15 osób</strong><br>
+                            <span class="text-slate-400">(Gwarancja 100% zwrotu, jeśli nie ruszymy)</span>
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-2xl shadow-xl border-2 relative overflow-hidden" style="border-color: #a0134a;">
+                        <div class="absolute top-0 right-0 text-white text-xs font-bold px-3 py-1 rounded-bl-lg" style="background-color: #a0134a;">TERAZ</div>
+                        <p class="text-sm text-slate-500 uppercase tracking-widest mb-2">Szacowana cena / os.</p>
+                        <div id="current-price-usd" class="text-5xl font-bold text-slate-900 mb-1">$${data.priceUSD}</div>
+                        <div id="current-price-pln" class="text-xl font-medium" style="color: #10b981;">ok. ${data.pricePLN} PLN</div>
+                        
+                        <div class="mt-4 p-3 bg-slate-50 rounded border border-slate-200 text-left">
+                            <p class="text-xs text-slate-600">
+                                <i class="fas fa-history text-yellow-500"></i> <strong>Historycznie:</strong><br>
+                                Cena końcowa zazwyczaj spada poniżej <strong class="text-slate-900">75 PLN</strong>.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
 
+            // ==========================================
+            // LOGIKA 2: BANER ANKIETY
+            // ==========================================
+            if (data.isVotingOpen && data.users >= 45 && votingContainer) {
+                const votePercent = Math.min(100, (data.votes / data.requiredVotes) * 100);
+                votingContainer.innerHTML = `
+                    <div class="max-w-4xl mx-auto mb-8 p-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-3xl shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">ANKIETA</div>
+                        <h3 class="text-xl font-bold text-amber-900 mb-2">⚠️ Trwa głosowanie społeczności (Wymagane 80% głosów)</h3>
+                        <p class="text-sm text-amber-800 mb-5">
+                            Automatycznie otworzyliśmy drugie konto dla Waszego bezpieczeństwa. Jeśli jednak 80% grupy zagłosuje za zaryzykowaniem i powrotem na 1 mocno obciążone konto w zamian za niższą cenę, połączymy koszyki. Szacowana cena w przypadku 1 konta to <strong>ok. ${data.priceIfOnePLN} PLN</strong>.
+                        </p>
+                        <div class="flex justify-between text-sm font-bold text-amber-900 mb-2">
+                            <span>Oddane głosy: ${data.votes}</span>
+                            <span>Cel: ${data.requiredVotes}</span>
+                        </div>
+                        <div class="w-full bg-amber-200 rounded-full h-5 overflow-hidden mb-3 shadow-inner">
+                            <div class="bg-amber-500 h-full transition-all duration-1000 flex items-center justify-end pr-2 text-[10px] text-white font-bold" style="width: ${votePercent}%">${votePercent.toFixed(0)}%</div>
+                        </div>
+                        <p class="text-xs text-amber-700 font-semibold mt-4 text-center"><i class="fas fa-vote-yea mr-1"></i> Swój głos możesz oddać w Panelu Klienta (zakładka Status).</p>
+                    </div>
+                `;
+            } else if (votingContainer) {
+                votingContainer.innerHTML = "";
+            }
+
+            // ==========================================
+            // LOGIKA 3: CELE CENOWE (Zachowane bez zmian)
+            // ==========================================
             const goals = [15, 20, 25, 30];
             const prices = { 15: 71, 20: 53, 25: 42, 30: 35 };
-            const container = document.getElementById('goals-container');
+            const goalsContainer = document.getElementById('goals-container');
             
-            if(container) {
-                container.innerHTML = ""; 
+            if(goalsContainer) {
+                goalsContainer.innerHTML = ""; 
                 goals.forEach(goal => {
                     const progress = Math.min(100, (data.users / goal) * 100);
                     const isReached = data.users >= goal;
                     const needed = goal - data.users;
                     
-                    container.innerHTML += `
+                    goalsContainer.innerHTML += `
                         <div class="bg-slate-50 p-5 rounded-xl border ${isReached ? 'border-green-400 shadow-sm' : 'border-slate-200'}">
                             <div class="flex justify-between mb-3 text-sm">
                                 <span class="${isReached ? 'text-green-600 font-bold' : 'text-slate-600'}">Cel: ${goal} osób</span>
@@ -674,13 +764,6 @@
                         </div>
                     `;
                 });
-            }
-
-            const visualBar = document.getElementById('progress-bar-visual');
-            if(visualBar) {
-                let percent = Math.max(5, (data.users / 25) * 100); 
-                if(percent > 100) percent = 100;
-                visualBar.style.width = percent + "%";
             }
         })
         .catch(err => console.error("Błąd licznika:", err));
