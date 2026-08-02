@@ -606,7 +606,7 @@
                         <div>
                             <h3 style="color: var(--text-main); margin: 0;"><i class="fas fa-ticket-alt" style="color: #fbbf24;"></i> Twój Karnet Lojalnościowy</h3>
                             <p style="color: var(--text-muted); font-size: 0.85rem; margin: 5px 0 0 0;">
-                                Zbierz 6 pieczątek, a <strong>7. zrzutka będzie gratis!</strong> 🎁
+                                Zbierz pieczątki i odbierz <strong>bonusy edukacyjne i narzędzia KDP!</strong> 🎁
                             </p>
                         </div>
                         <div id="stamps-counter" style="background: var(--cherry-light); color: var(--cherry); padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.9rem;">
@@ -2647,8 +2647,8 @@ async function openInbox() {
                             </div>
                             
                             ${isLong ? `
-                            <div onclick="document.getElementById('post-text-${p.type}-${p.id}').style.webkitLineClamp = 'unset'; this.style.display='none';" style="color: var(--cherry); font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 8px; transition: 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
-                                Czytaj więcej...
+                            <div id="read-more-btn-${p.type}-${p.id}" onclick="togglePostText('${p.type}', ${p.id})" style="color: var(--cherry); font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 8px; transition: 0.2s; display: inline-block;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                Czytaj więcej... <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 3px;"></i>
                             </div>
                             ` : ''}
                         </div>
@@ -2689,6 +2689,20 @@ async function openInbox() {
             } else {
                 await likeUserPost(id, btnElement);
                 loadUnifiedFeed(); // Odśwież widok
+            }
+        }
+
+function togglePostText(type, id) {
+            const textBox = document.getElementById(`post-text-${type}-${id}`);
+            const btn = document.getElementById(`read-more-btn-${type}-${id}`);
+            
+            // Sprawdzamy, czy tekst jest zwinięty (limit 5 linii)
+            if (textBox.style.webkitLineClamp === '5' || textBox.style.webkitLineClamp === 5) {
+                textBox.style.webkitLineClamp = 'unset'; // Rozwijamy
+                btn.innerHTML = 'Zwiń tekst <i class="fas fa-chevron-up" style="font-size: 0.8em; margin-left: 3px;"></i>';
+            } else {
+                textBox.style.webkitLineClamp = '5'; // Zwijamy z powrotem
+                btn.innerHTML = 'Czytaj więcej... <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 3px;"></i>';
             }
         }
 
@@ -2867,11 +2881,16 @@ async function openInbox() {
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = contentBox.innerHTML;
                 
-                // Ekstrakcja tytułu z <h3> (jeśli użytkownik wcześniej go wpisał)
+                // Ekstrakcja tytułu z <h3> (stare posty) lub z nowego DIVa (nowe posty)
                 const h3 = tempDiv.querySelector('h3');
+                const newTitleDiv = tempDiv.querySelector('.forum-post-title-rendered');
+                
                 if(h3) {
                     document.getElementById('forum-post-title').value = h3.innerText;
                     h3.remove(); // Usuwamy z treści, by nie zduplikować przy zapisie
+                } else if (newTitleDiv) {
+                    document.getElementById('forum-post-title').value = newTitleDiv.innerText;
+                    newTitleDiv.remove(); 
                 }
                 
                 userQuill.clipboard.dangerouslyPasteHTML(tempDiv.innerHTML);
@@ -2891,7 +2910,8 @@ async function openInbox() {
             }
 
             if (titleInput) {
-                content = `<h3 style="margin-top:0; color: var(--text-main); font-weight: 800;">${titleInput}</h3>` + content;
+                // Zmieniamy tag na div z dedykowaną klasą, aby omijał restrykcje nagłówków h3 i zachował piękny wygląd
+                content = `<div class="forum-post-title-rendered" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: var(--text-main);">${titleInput}</div>` + content;
             }
 
             // Automatyczny wybór czy Zapisujemy (Nowy post) czy Aktualizujemy (Edycja)
