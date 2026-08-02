@@ -2986,29 +2986,47 @@ function togglePostText(type, id) {
             }
         }
 
-        // Pomocnicza funkcja do lajkowania obu typów postów
+        // Główny silnik lajków (Teraz działa w locie, bez odświeżania ekranu!)
         async function likePostType(type, id, btnElement) {
-            // Tymczasowo blokujemy przycisk (zabezpieczenie przed podwójnym kliknięciem)
-            btnElement.disabled = true;
-            btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            // 1. Zczytujemy obecną liczbę z tekstu przycisku (np. z "Lubię to (4)" wyciągnie 4)
+            const currentText = btnElement.innerText;
+            const match = currentText.match(/\((\d+)\)/);
+            let currentLikes = match ? parseInt(match[1]) : 0;
 
+            // 2. Blokujemy przycisk na ułamek sekundy i włączamy kółko ładowania (aby ktoś nie kliknął 5 razy)
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<i class="fas fa-thumbs-up"></i> <i class="fas fa-spinner fa-spin"></i>';
+
+            let success = false;
+
+            // 3. Wysyłamy zapytanie do serwera w zależności od typu wpisu
             if (type === 'knowledge') {
-                await likeKnowledgePost(id);
-                loadUnifiedFeed(); // Odśwież widok
+                success = await likeKnowledgePostDynamic(id);
             } else {
-                const success = await likeUserPost(id, btnElement);
-                // Odświeżamy feed po akcji, by usunąć spinner i wczytać nowy stan
-                loadUnifiedFeed(); 
+                success = await likeUserPost(id);
             }
+
+            // 4. Jeśli serwer dał zielone światło – dodajemy +1 i kolorujemy przycisk w locie
+            if (success) {
+                currentLikes++;
+                btnElement.innerHTML = `<i class="fas fa-thumbs-up"></i> Lubię to (${currentLikes})`;
+                btnElement.style.color = "var(--cherry)"; // Wizualne potwierdzenie dla użytkownika
+                btnElement.classList.add('liked');
+            } else {
+                // Jeśli był błąd (np. lajkowanie swojego posta), po prostu wracamy do starego stanu
+                btnElement.innerHTML = `<i class="fas fa-thumbs-up"></i> Lubię to (${currentLikes})`;
+            }
+            
+            // 5. Odblokowujemy przycisk
+            btnElement.disabled = false;
         }
 
-        // Aktualizacja lajków dla postów użytkowników z obsługą błędów
-        async function likeUserPost(id, btnElement) {
+        // Zmodyfikowana funkcja dla postów użytkowników
+        async function likeUserPost(id) {
             if (!userEmail) {
                 alert("Zaloguj się, aby lajkować!");
                 return false;
             }
-            
             try {
                 const res = await fetch(`${API}/api/forum/like`, {
                     method: 'POST', 
@@ -3019,9 +3037,8 @@ function togglePostText(type, id) {
                 const data = await res.json();
                 
                 if (res.ok) {
-                    return true; // Sukces
+                    return true;
                 } else {
-                    // Wyświetla konkretny błąd prosto z Twojego backendu (np. "Nie możesz lajkować swojego posta")
                     alert("Odznaka Wingmana: " + (data.error || "Nie udało się polubić tego wpisu."));
                     return false;
                 }
@@ -3029,6 +3046,28 @@ function togglePostText(type, id) {
                 console.error("Błąd sieci podczas lajkowania:", err);
                 return false;
             }
+        }
+
+        // Zmodyfikowana funkcja dla bazy wiedzy (Admina)
+        async function likeKnowledgePostDynamic(id) {
+            if (localStorage.getItem(`liked_knowledge_${id}`)) {
+                alert("Odznaka Wingmana: Już wcześniej doceniłeś ten poradnik!");
+                return false;
+            }
+            try {
+                const res = await fetch(`${API}/api/knowledge/like`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ id }) 
+                });
+                if (res.ok) {
+                    localStorage.setItem(`liked_knowledge_${id}`, 'true');
+                    return true;
+                }
+            } catch (e) {
+                console.error("Błąd przy lajkowaniu artykułu.", e);
+            }
+            return false;
         }
 
         // CZYTANIE WĄTKU
