@@ -325,7 +325,26 @@
         .tag { font-size: 0.7rem; background: #e2e8f0; color: var(--text-muted); padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase; }
         .post-title { font-size: 1.3rem; font-weight: 800; margin: 15px 0 10px 0; color: var(--text-main); }
         .post-content { color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem; }
-        .post-image { width: 100%; border-radius: 10px; margin-top: 15px; object-fit: cover; max-height: 400px; border: 1px solid var(--border-light); }
+        /* Naprawa proporcji obrazków (Miniaturki i wewnątrz postów) */
+        .post-image { 
+            width: 100%; 
+            height: auto !important; 
+            border-radius: 10px; 
+            margin-top: 15px; 
+            object-fit: contain !important; /* Contain zapobiega ucinaniu grafiki i zachowuje proporcje */
+            max-height: 500px; 
+            border: 1px solid var(--border-light); 
+            background: #f8fafc; 
+        }
+        
+        .post-content img, #thread-content img, .ql-editor img {
+            max-width: 100%;
+            height: auto !important;
+            border-radius: 8px;
+            object-fit: contain !important;
+            display: block;
+            margin: 10px 0;
+        }
         .post-actions { display: flex; gap: 15px; margin-top: 20px; border-top: 1px solid var(--border-light); padding-top: 15px; }
         .action-btn { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
         .action-btn:hover, .action-btn.liked { color: var(--cherry); }
@@ -2572,8 +2591,25 @@ async function openInbox() {
                     const displayName = hasNickname ? p.nickname : p.email.split('@')[0];
                     const isPostAdmin = p.email === 'kamil.sznicer@o2.pl'; // System rozpozna Twoje posty!
 
+                    // --- AUTOMATYCZNA MINIATURKA ---
+                    // Szukamy pierwszego zdjęcia w tekście i wyciągamy je przed przycisk "Czytaj więcej"
+                    let coverImage = null;
+                    let cleanContent = p.content;
+                    
+                    try {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = p.content;
+                        const firstImg = tempDiv.querySelector('img'); 
+                        
+                        if (firstImg) {
+                            coverImage = firstImg.src; // Kopiujemy zdjęcie
+                            firstImg.remove(); // Usuwamy z tekstu, żeby się nie dublowało
+                            cleanContent = tempDiv.innerHTML; // Zapisujemy tekst bez pierwszego obrazka
+                        }
+                    } catch(err) { console.error("Błąd generowania miniaturki:", err); }
+
                     allPosts.push({
-                        id: p.id, type: 'forum', title: p.topic, content: p.content, image_url: null,
+                        id: p.id, type: 'forum', title: p.topic, content: cleanContent, image_url: coverImage, // <<< Używamy wyciągniętego zdjęcia
                         created_at: p.created_at, likes: p.likes, authorName: displayName,
                         isAdmin: isPostAdmin, tag: p.topic, tagColor: 'var(--cherry)', authorId: p.user_id,
                         authorEmail: p.email
