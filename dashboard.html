@@ -2986,39 +2986,43 @@ function togglePostText(type, id) {
             }
         }
 
-        // Główny silnik lajków (Teraz działa w locie, bez odświeżania ekranu!)
+        // Główny silnik lajków (Teraz z twardą blokadą przed ponownym kliknięciem)
         async function likePostType(type, id, btnElement) {
-            // 1. Zczytujemy obecną liczbę z tekstu przycisku (np. z "Lubię to (4)" wyciągnie 4)
+            // 1. ZABEZPIECZENIE: Jeśli przycisk ma już klasę 'liked', całkowicie ignorujemy kliknięcie
+            if (btnElement.classList.contains('liked')) {
+                return; 
+            }
+
             const currentText = btnElement.innerText;
             const match = currentText.match(/\((\d+)\)/);
             let currentLikes = match ? parseInt(match[1]) : 0;
 
-            // 2. Blokujemy przycisk na ułamek sekundy i włączamy kółko ładowania (aby ktoś nie kliknął 5 razy)
+            // Blokujemy przycisk na ułamek sekundy na czas komunikacji z serwerem
             btnElement.disabled = true;
             btnElement.innerHTML = '<i class="fas fa-thumbs-up"></i> <i class="fas fa-spinner fa-spin"></i>';
 
             let success = false;
 
-            // 3. Wysyłamy zapytanie do serwera w zależności od typu wpisu
             if (type === 'knowledge') {
                 success = await likeKnowledgePostDynamic(id);
             } else {
                 success = await likeUserPost(id);
             }
 
-            // 4. Jeśli serwer dał zielone światło – dodajemy +1 i kolorujemy przycisk w locie
             if (success) {
                 currentLikes++;
                 btnElement.innerHTML = `<i class="fas fa-thumbs-up"></i> Lubię to (${currentLikes})`;
-                btnElement.style.color = "var(--cherry)"; // Wizualne potwierdzenie dla użytkownika
+                btnElement.style.color = "var(--cherry)"; 
                 btnElement.classList.add('liked');
+                
+                // 2. KLUCZOWA ZMIANA: Zostawiamy przycisk permanentnie zablokowany (disabled)
+                // Użytkownik nie będzie mógł w niego kliknąć po raz drugi.
+                btnElement.style.cursor = "default";
             } else {
-                // Jeśli był błąd (np. lajkowanie swojego posta), po prostu wracamy do starego stanu
+                // Jeśli był błąd (np. serwer odmówił), wracamy do normy i odblokowujemy
                 btnElement.innerHTML = `<i class="fas fa-thumbs-up"></i> Lubię to (${currentLikes})`;
+                btnElement.disabled = false;
             }
-            
-            // 5. Odblokowujemy przycisk
-            btnElement.disabled = false;
         }
 
         // Zmodyfikowana funkcja dla postów użytkowników
