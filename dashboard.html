@@ -325,25 +325,27 @@
         .tag { font-size: 0.7rem; background: #e2e8f0; color: var(--text-muted); padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase; }
         .post-title { font-size: 1.3rem; font-weight: 800; margin: 15px 0 10px 0; color: var(--text-main); }
         .post-content { color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem; }
-        /* Naprawa proporcji obrazków (Miniaturki i wewnątrz postów) */
+        /* Inteligentne formatowanie obrazków (Pionowe i Poziome) */
         .post-image { 
-            width: 100%; 
+            max-width: 100%; 
+            max-height: 450px; /* Zabezpieczenie przed gigantycznymi pionowymi zdjęciami */
+            width: auto !important; /* Pozwala na naturalne proporcje */
             height: auto !important; 
             border-radius: 10px; 
-            margin-top: 15px; 
-            object-fit: contain !important; /* Contain zapobiega ucinaniu grafiki i zachowuje proporcje */
-            max-height: 500px; 
-            border: 1px solid var(--border-light); 
-            background: #f8fafc; 
+            margin: 15px auto 0 auto; /* Idealne wyśrodkowanie w poście */
+            display: block;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
         
         .post-content img, #thread-content img, .ql-editor img {
-            max-width: 100%;
+            max-width: 100% !important;
+            max-height: 450px !important;
+            width: auto !important;
             height: auto !important;
             border-radius: 8px;
-            object-fit: contain !important;
             display: block;
-            margin: 10px 0;
+            margin: 15px auto !important; /* Środkuje wszystkie zdjęcia w tekście i trybie czytania */
         }
         .post-actions { display: flex; gap: 15px; margin-top: 20px; border-top: 1px solid var(--border-light); padding-top: 15px; }
         .action-btn { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
