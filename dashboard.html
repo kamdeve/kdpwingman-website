@@ -378,8 +378,14 @@
 
 
 /* --- SKOOL POST MODAL --- */
-        /* Ukrywamy domyślny górny pasek edytora */
-        #post-modal .ql-toolbar { display: none; }
+        /* Odkrywamy górny pasek edytora i nadajemy mu ładny wygląd */
+        #post-modal .ql-toolbar { 
+            display: block; 
+            border: none; 
+            border-bottom: 1px solid var(--glass-border); 
+            padding: 10px 0; 
+            margin-bottom: 10px; 
+        }
         
         /* Czysty wygląd pola tekstowego */
         #post-modal .ql-container { border: none !important; font-size: 1.1rem; font-family: 'Inter', sans-serif; }
@@ -2446,27 +2452,23 @@ async function openInbox() {
         let quill;      // Edytor admina
         let userQuill;  // Edytor użytkownika
         window.addEventListener('load', function() {
-            // 1. Edytor dla zwykłych użytkowników (Zawsze aktywny)
+            // 1. Edytor dla zwykłych użytkowników (Zaawansowany format)
             userQuill = new Quill('#user-editor-container', {
                 theme: 'snow',
                 placeholder: 'Co dzisiaj napiszesz?',
                 modules: {
                     toolbar: {
                         container: [
-                            ['bold', 'italic', 'underline'], 
-                            [{ 'color': [] }],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            ['link', 'image']
-                        ],
-                        handlers: {
-                            image: function() {
-                                const range = this.quill.getSelection();
-                                const value = prompt('Wklej link bezpośredni do zdjęcia (np. z imgur.com):');
-                                if(value){
-                                    this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
-                                }
-                            }
-                        }
+                            [{ 'header': [1, 2, 3, false] }], // Wielkość nagłówków
+                            [{ 'size': ['small', false, 'large', 'huge'] }], // Wielkość czcionki
+                            ['bold', 'italic', 'underline', 'strike'], // Formatowanie tekstu
+                            [{ 'color': [] }, { 'background': [] }], // Kolor tekstu i tła
+                            [{ 'align': [] }], // Wyrównanie (lewo, środek, prawo)
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }], // Listy punktowane
+                            ['link', 'image', 'video'] // Opcja dodawania obrazów z dysku
+                        ]
+                        // USUNĘLIŚMY stary "handler" obrazków. 
+                        // Teraz Quill natywnie otworzy systemowe okno wyboru pliku z komputera!
                     }
                 }
             });
@@ -2831,8 +2833,23 @@ function togglePostText(type, id) {
             const range = userQuill.getSelection(true) || { index: userQuill.getLength() };
             
             if (type === 'image') {
-                const url = prompt('Podaj bezpośredni link do obrazka (np. z Imgur):');
-                if (url) userQuill.insertEmbed(range.index, 'image', url, Quill.sources.USER);
+                // Wywołanie systemowego okna wyboru pliku z komputera
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.click();
+
+                input.onchange = () => {
+                    const file = input.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            // Wstawia obrazek bezpośrednio w tekst posta (Base64)
+                            userQuill.insertEmbed(range.index, 'image', e.target.result, Quill.sources.USER);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
             } else if (type === 'link') {
                 const url = prompt('Podaj adres URL (np. https://google.pl):');
                 if (url) userQuill.formatText(range.index, range.length, 'link', url);
