@@ -2721,16 +2721,7 @@ async function openInbox() {
             } catch (e) { console.error(e); }
         }
 
-        // Pomocnicza funkcja do lajkowania obu typów postów
-        async function likePostType(type, id, btnElement) {
-            if (type === 'knowledge') {
-                await likeKnowledgePost(id);
-                loadUnifiedFeed(); // Odśwież widok
-            } else {
-                await likeUserPost(id, btnElement);
-                loadUnifiedFeed(); // Odśwież widok
-            }
-        }
+     
 
 function togglePostText(type, id) {
             const textBox = document.getElementById(`post-text-${type}-${id}`);
@@ -2995,14 +2986,48 @@ function togglePostText(type, id) {
             }
         }
 
+        // Pomocnicza funkcja do lajkowania obu typów postów
+        async function likePostType(type, id, btnElement) {
+            // Tymczasowo blokujemy przycisk (zabezpieczenie przed podwójnym kliknięciem)
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            if (type === 'knowledge') {
+                await likeKnowledgePost(id);
+                loadUnifiedFeed(); // Odśwież widok
+            } else {
+                const success = await likeUserPost(id, btnElement);
+                // Odświeżamy feed po akcji, by usunąć spinner i wczytać nowy stan
+                loadUnifiedFeed(); 
+            }
+        }
+
+        // Aktualizacja lajków dla postów użytkowników z obsługą błędów
         async function likeUserPost(id, btnElement) {
-            if (!userEmail) return alert("Zaloguj się, aby lajkować!");
-            const res = await fetch(`${API}/api/forum/like`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, postId: id })
-            });
-            if (res.ok) {
+            if (!userEmail) {
+                alert("Zaloguj się, aby lajkować!");
+                return false;
+            }
+            
+            try {
+                const res = await fetch(`${API}/api/forum/like`, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, postId: id })
+                });
                 
+                const data = await res.json();
+                
+                if (res.ok) {
+                    return true; // Sukces
+                } else {
+                    // Wyświetla konkretny błąd prosto z Twojego backendu (np. "Nie możesz lajkować swojego posta")
+                    alert("Odznaka Wingmana: " + (data.error || "Nie udało się polubić tego wpisu."));
+                    return false;
+                }
+            } catch (err) {
+                console.error("Błąd sieci podczas lajkowania:", err);
+                return false;
             }
         }
 
