@@ -17,6 +17,9 @@ async function respond(request, assets) {
     const origin = 'https://cdn.jsdelivr.net/gh/kamdeve/kdpwingman-website@3924b7719fd9cf87f2f3fa5dc82296d016dd109e';
     return Response.redirect(origin+encodeURI(pathname),302);
   }
+  if (/^\/images\/niche\/(black-box|amazon-search|xray|cerebro|book-ranks)\.webp$/.test(pathname)) {
+    return Response.redirect('https://cdn.jsdelivr.net/gh/kamdeve/kdpwingman-website@eb0a4209af38810cc1ad55ea98746598264ce392'+pathname,302);
+  }
   const page = assets[pathname === '/index.html' ? '/' : pathname];
   if (typeof page !== 'string') return new Response('Brak strony',{status:404});
   const ext=pathname.split('.').pop();

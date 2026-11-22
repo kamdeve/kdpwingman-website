@@ -119,21 +119,30 @@
   const dialog = study.querySelector('dialog');
   if (typeof dialog.showModal !== 'function') return;
   const close = dialog.querySelector('[data-close]');
+  const zoom = dialog.querySelector('[data-zoom]');
   const viewport = dialog.querySelector('.research-scroll');
+  const photo = viewport.querySelector('img');
+  function setZoom(enabled) {
+    viewport.classList.toggle('is-actual', enabled);
+    zoom.setAttribute('aria-pressed', String(enabled));
+    zoom.textContent = enabled ? 'Dopasuj' : 'Widok 1:1';
+  }
   panels.forEach(panel => {
     const frame = panel.querySelector('.research-frame');
-    const expand = frame.querySelector('.research-expand');
-    expand.hidden = false;
-    expand.addEventListener('click', () => {
+    const source = frame.querySelector('img');
+    frame.querySelectorAll('.research-expand, .research-crop').forEach(link => link.addEventListener('click', event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
       dialog.querySelector('strong').textContent = frame.querySelector('.research-caption').textContent;
-      const detail = frame.cloneNode(true);
-      detail.querySelector('.research-expand').remove();
-      detail.querySelector('.research-caption').remove();
-      viewport.replaceChildren(detail);
+      photo.src = source.currentSrc || source.src;
+      photo.alt = source.alt;
+      setZoom(false);
       dialog.showModal();
+      viewport.scrollTo(0, 0);
       close.focus();
-    });
+    }));
   });
+  zoom.addEventListener('click', () => setZoom(zoom.getAttribute('aria-pressed') === 'false'));
   close.addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 })();

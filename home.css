@@ -960,3 +960,27 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
 .research-dialog .research-table { font-size:clamp(.95rem,2.5vw,1.6rem); }
 .research-dialog .research-volumes { font-size:clamp(1.1rem,2.5vw,1.8rem); }
 .research-dialog .research-query img { width:30%; max-width:260px; margin:0; }
+
+.research-crop { display:block; overflow:hidden; border:1px solid #37233219; border-radius:10px; background:#fff; box-shadow:0 3px 12px #33213612; cursor:zoom-in; }
+.research-crop img { display:block; width:100%; height:auto; }
+.research-frame .research-expand { display:inline-flex; align-items:center; min-height:40px; text-decoration:none; }
+.research-why { margin-top:14px; }
+.research-why summary { cursor:pointer; color:#85143f; font-weight:650; padding:.4rem 0; }
+.research-why dl { margin:8px 0 0; }
+.research-why dl div { border-top:1px solid #e2d6d3; padding:9px 0; }
+.research-why dt { font-weight:700; }
+.research-why dd { margin:3px 0 0; font-size:.94rem; }
+.research-dialog { width:min(96vw,1080px); }
+.research-dialog .research-scroll { padding:clamp(7px,2vw,20px); }
+.research-scroll img { width:100%; height:auto; }
+.research-scroll.is-actual img { width:auto; max-width:none; }
+@media (prefers-reduced-motion:no-preference) {
+  .research-dialog[open] .research-scroll img { animation:research-focus .22s ease-out both; }
+}
+
+.research-rank-comparison { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.8fr); align-items:stretch; border-radius:10px; overflow:hidden; background:white; }
+.research-rank-comparison ol { display:grid; grid-template-rows:repeat(3,1fr); list-style:none; margin:0; padding:0; }
+.research-rank-comparison li { display:flex; align-items:center; min-height:0; line-height:1.2; padding:3px 8px; font-size:clamp(.73rem,1.15vw,.95rem); }
+.research-rank-comparison li + li { border-top:1px solid #eee; }
+.research-rank-comparison .research-crop { border:0; border-radius:0; box-shadow:none; display:flex; align-items:center; }
+.research-rank-comparison .research-crop img { height:100%; object-fit:fill; }
