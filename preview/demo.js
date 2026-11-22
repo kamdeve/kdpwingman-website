@@ -29,7 +29,7 @@
     const due=data.free||data.joined ? 0 : Math.max(0,7500-data.balance);
     switch(path) {
       case 'group-buy/status': return {users:24+(data.joined?1:0),targetMonth:ym(1),isLocked:data.scenario==='closed'};
-      case 'stats/history': return [0,-1,-2].map((n,i)=>({month:ym(n),users:[29,32,27][i]}));
+      case 'stats/history': return [{month:'2026-11',users:40},{month:'2026-10',users:49},{month:'2026-09',users:43}];
       case 'register':
         if (data.registered || body.email==='test@example.com') fail('To konto już istnieje. Wybierz „Mam konto”.');
         data.registered = true; data.email=body.email; data.hash=await fingerprint(body.password); save(data); return {};
