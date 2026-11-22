@@ -71,3 +71,69 @@
   byId('more-news').onclick = () => {shown+=3;renderNews();};
   window.loadPulsPosts();
 })();
+
+(() => {
+  const study = document.querySelector('.research');
+  if (!study) return;
+  const tablist = study.querySelector('.research-tabs');
+  const tabs = [...tablist.querySelectorAll('[role=tab]')];
+  const panels = [...study.querySelectorAll('.research-step')];
+  const pager = study.querySelector('.research-pager');
+  const back = pager.querySelector('[data-back]');
+  const forward = pager.querySelector('[data-forward]');
+  let active = 0;
+
+  function selectStep(index, focusTab = false) {
+    active = index;
+    tabs.forEach((tab, n) => {
+      const current = n === index;
+      tab.tabIndex = current ? 0 : -1;
+      tab.setAttribute('aria-selected', String(current));
+      panels[n].hidden = !current;
+    });
+    back.disabled = index === 0;
+    forward.textContent = index === tabs.length - 1 ? 'Od początku ↺' : 'Dalej →';
+    if (focusTab) tabs[index].focus();
+  }
+
+  tabs.forEach((tab, n) => {
+    panels[n].setAttribute('role', 'tabpanel');
+    panels[n].setAttribute('aria-labelledby', tab.id);
+    panels[n].tabIndex = 0;
+    tab.addEventListener('click', () => selectStep(n));
+    tab.addEventListener('keydown', event => {
+      const count = tabs.length;
+      const target = {ArrowLeft:(n + count - 1) % count, ArrowRight:(n + 1) % count, Home:0, End:count - 1}[event.key];
+      if (target === undefined) return;
+      event.preventDefault();
+      selectStep(target, true);
+    });
+  });
+  back.addEventListener('click', () => selectStep(Math.max(0, active - 1), true));
+  forward.addEventListener('click', () => selectStep((active + 1) % tabs.length, true));
+  selectStep(0);
+  tablist.hidden = false;
+  pager.hidden = false;
+  study.classList.add('research-ready');
+
+  const dialog = study.querySelector('dialog');
+  if (typeof dialog.showModal !== 'function') return;
+  const close = dialog.querySelector('[data-close]');
+  const viewport = dialog.querySelector('.research-scroll');
+  panels.forEach(panel => {
+    const frame = panel.querySelector('.research-frame');
+    const expand = frame.querySelector('.research-expand');
+    expand.hidden = false;
+    expand.addEventListener('click', () => {
+      dialog.querySelector('strong').textContent = frame.querySelector('.research-caption').textContent;
+      const detail = frame.cloneNode(true);
+      detail.querySelector('.research-expand').remove();
+      detail.querySelector('.research-caption').remove();
+      viewport.replaceChildren(detail);
+      dialog.showModal();
+      close.focus();
+    });
+  });
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+})();
