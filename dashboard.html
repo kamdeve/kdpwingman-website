@@ -1108,6 +1108,7 @@
                 });
                 if (res.ok) {
                 userEmail = email;
+                localStorage.setItem('wingman_join_token', (await res.json()).token);
                 localStorage.setItem('wingman_user', email); // ZMIANA: używamy jednego, wspólnego klucza
                 initDashboard();
                 switchAppTab('panel', null); // Przekieruj od razu do "Mój Panel"
@@ -1618,6 +1619,7 @@ if (data.has_free_ticket) {
         // Obsługa wylogowania
         document.getElementById('logout-btn').addEventListener('click', function() {
             localStorage.removeItem('wingman_user');
+            localStorage.removeItem('wingman_join_token');
             window.location.href = "index.html";
         });
 
@@ -3251,6 +3253,7 @@ function showLoginPanel() {
                     });
                     if (loginRes.ok) {
                         userEmail = email;
+                        localStorage.setItem('wingman_join_token', (await loginRes.json()).token);
                         localStorage.setItem('wingman_user', email);
                         showLoginFromRegister();
                         initDashboard();

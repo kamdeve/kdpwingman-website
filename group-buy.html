@@ -272,16 +272,7 @@
 
             <div class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-2xl mb-12">
                 <h3 class="text-xl font-bold mb-6 text-center text-slate-900">Dołącz do aktualnej edycji</h3>
-                <form id="signupForm" class="flex flex-col gap-4">
-                    <label class="text-left text-slate-600 text-sm ml-1">Twój adres e-mail</label>
-                    <input type="email" id="emailInput" required placeholder="np. jan@kowalski.com" 
-                        class="w-full p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#a0134a] focus:outline-none transition">
-                    <button type="submit" 
-                        class="w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg transform transition hover:-translate-y-1"
-                        style="background: #a0134a;">
-                        Sprawdź status / Dołącz
-                    </button>
-                </form>
+                <a href="index.html#dolacz" class="block p-4 rounded-xl text-white font-bold" style="background:#881443">Dołącz do zrzutki</a>
                 <p id="message" class="mt-4 text-sm hidden"></p>
             </div>
 
@@ -432,173 +423,9 @@
     <script>
     const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
     
-    // Elementy DOM
-    const form = document.getElementById('signupForm'); 
-    const emailInput = document.getElementById('emailInput');
-    const btn = form.querySelector('button');
-    
-    const messageBox = document.createElement('div');
-    messageBox.style.marginTop = "15px";
-    messageBox.style.fontWeight = "bold";
-    messageBox.style.display = 'none';
-    form.appendChild(messageBox);
-
-    const passwordContainer = document.createElement('div');
-    passwordContainer.style.display = 'none';
-    passwordContainer.style.marginTop = '10px';
-    passwordContainer.innerHTML = `
-        <input type="text" id="quick-nickname" placeholder="Jak Cię nazywać? (np. Tomek)" 
-        class="w-full p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#a0134a] focus:outline-none transition mb-2">
-        
-        <input type="password" id="quick-password" placeholder="Ustaw hasło (min. 6 znaków)" 
-        class="w-full p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#a0134a] focus:outline-none transition mb-2">
-        
-        <input type="password" id="quick-password-confirm" placeholder="Powtórz hasło" 
-        class="w-full p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#a0134a] focus:outline-none transition mb-2">
-        
-        <p class="text-xs text-slate-500 mb-2">Konto zostanie utworzone automatycznie. Nie musisz potwierdzać maila.</p>
-    `;
-    form.insertBefore(passwordContainer, btn);
-
-    function showMessage(text, color = '#0f172a') {
-        messageBox.innerText = text;
-        messageBox.style.display = 'block';
-        messageBox.style.color = color;
-    }
-
-    // --- GŁÓWNA LOGIKA ---
-    btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        const passwordInput = document.getElementById('quick-password');
-        const confirmInput = document.getElementById('quick-password-confirm');
-        
-        const password = passwordInput.value.trim();
-        const confirmPass = confirmInput.value.trim();
-
-        if (!email) return showMessage("Wpisz adres e-mail!", "#e11d48");
-
-        messageBox.style.display = 'none';
-        
-        if (passwordContainer.style.display === 'block') {
-            // Pobieramy imię
-            const nicknameInput = document.getElementById('quick-nickname');
-            const nickname = nicknameInput ? nicknameInput.value.trim() : "";
-
-            if (nickname.length < 3) return showMessage("Imię musi mieć min. 3 znaki!", "#e11d48");
-            if (password.length < 6) return showMessage("Hasło musi mieć min. 6 znaków!", "#e11d48");
-            if (password !== confirmPass) return showMessage("Hasła nie są takie same!", "#e11d48");
-            
-            btn.disabled = true;
-            btn.innerText = "Tworzenie konta...";
-
-            try {
-                const regRes = await fetch(`${API_URL}/api/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    // DODAJEMY NICKNAME DO PACZKI:
-                    body: JSON.stringify({ email, password, nickname })
-                });
-
-                if (!regRes.ok) {
-                    const errData = await regRes.json();
-                    throw new Error(errData.message || "Błąd rejestracji");
-                }
-
-                showMessage("✅ Konto utworzone! Przechodzę do płatności...", "#10b981");
-                passwordContainer.style.display = 'none';
-                
-                setTimeout(() => checkUserStatus(email), 1000);
-
-            } catch (err) {
-                btn.disabled = false;
-                btn.innerText = "Załóż konto i dołącz";
-                showMessage("Błąd: " + err.message, "#e11d48");
-            }
-            return;
-        }
-
-        await checkUserStatus(email);
-    });
-
-    async function checkUserStatus(email) {
-        btn.disabled = true;
-        btn.innerText = "Sprawdzanie...";
-        
-        try {
-            const statusRes = await fetch(`${API_URL}/api/user/status`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
-            });
-
-            if (statusRes.status === 404) {
-                showMessage("⚠️ Nie masz konta. Ustaw hasło, aby dołączyć:", "#f59e0b");
-                passwordContainer.style.display = 'block';
-                btn.innerText = "Załóż konto i dołącz";
-                btn.disabled = false;
-                return;
-            }
-
-            const statusData = await statusRes.json();
-
-            if (statusData.has_joined) {
-                showMessage(`✅ Już jesteś na liście w tej edycji!`, "#10b981");
-                btn.innerText = "Przejdź do Panelu";
-                btn.onclick = () => window.location.href = "dashboard.html";
-                btn.disabled = false;
-                return;
-            }
-
-            if (statusData.wallet_balance < 75) {
-                const missingAmount = (75 - statusData.wallet_balance).toFixed(2);
-                let payAmount = parseFloat(missingAmount);
-                if(payAmount < 5) payAmount = 5.00;
-
-                showMessage(`⚠️ Brakuje środków. Dopłać różnicę.`, "#f59e0b");
-                btn.innerText = `Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
-                btn.disabled = false;
-
-                btn.onclick = async (ev) => {
-                    ev.preventDefault();
-                    btn.innerText = "Łączenie z bankiem...";
-                    btn.disabled = true;
-                    try {
-                        const payRes = await fetch(`${API_URL}/api/create-checkout-session`, {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email, amount: payAmount }) 
-                        });
-                        const payData = await payRes.json();
-                        if(payData.url) window.location.href = payData.url;
-                        else { alert("Błąd płatności"); btn.disabled = false; }
-                    } catch(e) { alert("Błąd: " + e.message); btn.disabled = false; }
-                };
-                return;
-            } 
-            else {
-                if(confirm("Masz środki w portfelu. Dołączyć do zrzutki?")) {
-                    const joinRes = await fetch(`${API_URL}/api/group-buy/join`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
-                    });
-                    if(joinRes.ok) { 
-                        alert("Dołączono!"); 
-                        window.location.href = "dashboard.html"; 
-                    } else { throw new Error("Błąd dołączania"); }
-                } else {
-                    btn.disabled = false;
-                    btn.innerText = "Sprawdź status / Dołącz";
-                }
-            }
-
-        } catch (err) {
-            showMessage("Błąd: " + err.message, "#e11d48");
-            btn.disabled = false;
-            btn.innerText = "Spróbuj ponownie";
-        }
-    }
-
     async function updateCountdown() {
         const statusRes = await fetch(`${API_URL}/api/group-buy/status`);
         const statusData = await statusRes.json();
-        const joinBtn = document.querySelector('#signupForm button');
         const countdownBox = document.getElementById('countdown').parentElement;
 
         if (statusData.isLocked) {
@@ -606,20 +433,9 @@
             countdownBox.style.background = "#fef3c7"; 
             countdownBox.style.borderColor = "#f59e0b";
             document.getElementById('countdown').style.color = "#d97706";
-            if(joinBtn) {
-                joinBtn.disabled = true;
-                joinBtn.innerText = "Startujemy 5-go!";
-                joinBtn.classList.remove('btn-pink-active');
-                joinBtn.style.background = "#94a3b8"; 
-            }
             return;
         }
 
-        if(joinBtn) {
-            joinBtn.disabled = false;
-            joinBtn.classList.add('btn-pink-active');
-            joinBtn.style.background = ""; 
-        }
 
         countdownBox.style.background = ""; 
         countdownBox.style.borderColor = "";
@@ -629,11 +445,6 @@
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
         const diff = lastDay - now;
 
-        if(joinBtn && joinBtn.disabled) {
-            joinBtn.disabled = false;
-            joinBtn.innerText = "Sprawdź status / Dołącz";
-            joinBtn.style.background = "";
-        }
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

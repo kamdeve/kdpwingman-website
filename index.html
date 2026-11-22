@@ -279,6 +279,8 @@
     })
 </script>
 
+<link rel="stylesheet" href="enrollment.css">
+<script src="enrollment.js" defer></script>
 </head>
 <body>
 
@@ -299,7 +301,7 @@
                 <a href="#how-it-works" class="nav-item">Jak to działa</a>
                 <a href="#features" class="nav-item">Funkcje</a>
                 <a href="https://chromewebstore.google.com/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" target="_blank" class="nav-item">Rozszerzenie</a>
-                <a href="group-buy.html" class="nav-item highlight">Wspólny Dostęp</a>
+                <a href="#dolacz" class="nav-item highlight">Wspólny Dostęp</a>
                 <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item youtube-icon">
                     <i class="fab fa-youtube"></i>
                 </a>
@@ -311,33 +313,34 @@
         </nav>
     </header>
 
-    <section class="hero-section">
-        <h1 class="hero-title">Zdominuj Amazon KDP za <span>ułamek ceny</span></h1>
-        <p class="hero-subtitle">
-            Profesjonalne narzędzia do analizy bez przepłacania. Przestań zgadywać, zacznij publikować zyskownie dzięki współdzielonym kosztom.
-        </p>
-        
-<div style="margin-top: 30px; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-            <div style="display: flex; transform: scale(1.1);">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: #38bdf8; border: 3px solid var(--bg-light); margin-right: -12px; z-index: 4;"></div>
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; border: 3px solid var(--bg-light); margin-right: -12px; z-index: 3;"></div>
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: #10b981; border: 3px solid var(--bg-light); margin-right: -12px; z-index: 2;"></div>
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: #ec4899; border: 3px solid var(--bg-light); z-index: 1;"></div>
-            </div>
-            <div style="font-size: 1.5rem; color: var(--text-main); font-weight: 700; letter-spacing: -0.5px;">
-                Zaufało nam już <span id="public-user-count" style="color: var(--cherry); font-size: 2.2rem; font-weight: 800; line-height: 1;">...</span> twórców KDP!
-            </div>
-        </div>
+    <section class="enroll" id="dolacz" aria-labelledby="enroll-title">
+  <div class="enroll-intro">
+    <p class="eyeline">KDP Wingman · Wspólny dostęp</p>
+    <h1 id="enroll-title">Helium 10 Diamond <em>we wspólnej zrzutce.</em></h1>
+    <p class="lead">Szukasz słów kluczowych lub sprawdzasz konkurencję dla swojej książki na Amazonie? Co miesiąc twórcy KDP składają się tutaj na dostęp do Helium 10 Diamond.</p>
+    <p>Rezerwujesz miejsce depozytem <strong>75 zł</strong>. Po rozliczeniu edycji nadwyżka wraca do Twojego portfela KDP Wingman.</p>
+    <div id="edition-history" hidden><h2>Uczestnicy poprzednich edycji</h2><ul id="history-items"></ul></div>
+  </div>
+  <article class="enroll-card" aria-labelledby="edition-title">
+    <p class="eyeline">Zapisy na edycję</p>
+    <h2 id="edition-title">Wczytuję edycję…</h2>
+    <dl><div><dt>Zapisane osoby</dt><dd id="edition-count">—</dd></div>
+    <div><dt>Dostęp e-mailem</dt><dd id="access-date">—</dd></div>
+    <div><dt>Depozyt za miejsce</dt><dd>75 zł</dd></div></dl>
+    <button id="join-start" class="enroll-primary" disabled>Dołącz do zrzutki</button>
+    <form id="join-form" hidden>
+      <div class="mode-picker"><button type="button" data-mode="register" aria-pressed="true">Nowe konto</button><button type="button" data-mode="login" aria-pressed="false">Mam konto</button></div>
+      <label id="nick-label">Imię lub pseudonim<input name="nickname" autocomplete="nickname" minlength="3" required></label>
+      <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
+      <label>Hasło<input type="password" name="password" autocomplete="new-password" minlength="6" required></label>
+      <button id="join-submit" class="enroll-primary">Załóż konto i przejdź do płatności</button>
+    </form>
+    <p id="join-message" role="status" aria-live="polite"></p>
+    <a href="dashboard.html" id="join-panel" hidden>Przejdź do panelu</a>
+    <small id="join-note">Wpłata jednorazowa. Płatność kartą przez Stripe.</small>
+  </article>
+</section>
 
-        <div class="video-wrapper">
-    <video width="100%" height="auto" controls style="border-radius: 20px; display: block;">
-        <source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4">
-        Twoja przeglądarka nie obsługuje odtwarzacza wideo.
-    </video>
-</div>
-
-        <a href="group-buy.html" class="cta-button">Zarezerwuj swoje miejsce 🚀</a>
-    </section>
 
     <section class="social-proof-section">
     <div class="social-proof-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -376,6 +379,12 @@
 </style>
 
     <div id="how-it-works" class="steps-container">
+<div class="video-wrapper">
+    <video width="100%" height="auto" controls style="border-radius: 20px; display: block;">
+        <source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4">
+        Twoja przeglądarka nie obsługuje odtwarzacza wideo.
+    </video>
+</div>
 
         <div class="step-row">
             <div class="step-content">
@@ -398,7 +407,7 @@
                 <span class="step-number">Krok 02</span>
                 <h2 class="step-title">Dokonaj wpłaty depozytu</h2>
                 <p class="step-desc">
-                    Bezpieczna płatność przez Stripe (Karta/BLIK). Wpłacasz stały depozyt. 
+                    Bezpieczna płatność przez Stripe (karta). Wpłacasz stały depozyt.
                     Twoje środki są bezpieczne i czekają na zamknięcie listy uczestników pierwszego dnia miesiąca.
                 </p>
             </div>
@@ -821,17 +830,7 @@ checkAdminStatus();
 
     <script src="//code.tidio.co/q6vbfqclwkzfcgohcacijiwzgaqcvhrz.js" async></script>
 
-<script>
-        // Pobieranie globalnego licznika społeczności
-        fetch('https://kdpwingmanv2backend-production.up.railway.app/api/stats/total-users')
-            .then(res => res.json())
-            .then(data => {
-                if(data.total) {
-                    document.getElementById('public-user-count').innerText = data.total;
-                }
-            })
-            .catch(err => console.log('Błąd licznika', err));
-    </script>
+
 
 </body>
 </html>
