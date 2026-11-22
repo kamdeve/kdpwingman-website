@@ -50,6 +50,18 @@
       default: fail('Nieznany ekran podglądu.');
     }
   };
+  const freeForm = document.querySelector('.register-form');
+  if (freeForm) freeForm.onsubmit = async event => {
+    event.preventDefault();
+    const nickname = document.getElementById('register-nickname').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-pass').value;
+    if(password !== document.getElementById('register-pass-confirm').value || password.length < 6 || nickname.length < 3) {
+      alert('Podaj imię (min. 3 znaki) i dwukrotnie to samo hasło (min. 6 znaków).'); return;
+    }
+    try { await window.enrollmentDemo('register',{nickname,email,password}); freeForm.reset(); alert('Utworzono konto testowe. Możesz wybrać „Mam konto” przy zapisie.'); }
+    catch(err){alert(err.message);}
+  };
   const pay = document.getElementById('demo-pay');
   if (pay) {
     const data=get();

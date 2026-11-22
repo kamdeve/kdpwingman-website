@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Centrum Społeczności - KDP Wingman</title>
+    <title>Centrum Społeczności - Wingman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -91,7 +91,7 @@
     <header class="navbar-container">
         <nav class="navbar-content">
             <a href="index.html" class="logo-link">
-                <i class="fas fa-chart-line" style="color: var(--cherry);"></i> KDP <span style="color: var(--cherry);">Wingman</span>
+                <img src="images/wingman-cherry.png" width="28" height="28" alt=""> <span style="color: var(--cherry);">Wingman</span>
             </a>
             <div class="nav-links">
                 <a href="group-buy.html" class="nav-item">Zrzutka</a>
@@ -195,7 +195,7 @@
         const API = "https://kdpwingmanv2backend-production.up.railway.app";
         const userEmail = localStorage.getItem('wingman_user');
         const adminSecret = localStorage.getItem('admin_secret');
-        const isAdmin = adminSecret === 'super_tajne_haslo_admina';
+        const isAdmin = Boolean(adminSecret);
 
         let currentTab = 'admin';
         let currentThreadId = null;
@@ -326,7 +326,7 @@
                         
                         <div class="post-header">
                             <div class="author-info">
-                                <div class="avatar"><img src="images/logo.svg" style="width: 25px;"></div>
+                                <div class="avatar"><img src="images/wingman-cherry.png" style="width: 25px;"></div>
                                 <div>
                                     <div class="author-name">Kamil Sznicer <i class="fas fa-check-circle" style="color: #38bdf8; font-size: 0.8rem;"></i></div>
                                     <div class="post-meta">${new Date(p.created_at).toLocaleDateString('pl-PL', {day: 'numeric', month: 'long', year: 'numeric'})}</div>

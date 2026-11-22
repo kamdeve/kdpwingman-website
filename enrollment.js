@@ -77,7 +77,10 @@
       const history = await api('stats/history');
       const rows = history.filter(row => row.month < edition.targetMonth && row.users > 0).slice(0,3);
       $('history-items').replaceChildren(...rows.map(row => {
-        const li = document.createElement('li'); li.textContent = month(row.month) + ' · ' + row.users + ' os.'; return li;
+        const li = document.createElement('li');
+        const largest = Math.max(...rows.map(item => item.users), 1);
+        li.style.setProperty('--bar', Math.min(100,row.users/largest*100) + '%');
+        li.textContent = month(row.month) + ' · ' + row.users + ' os.'; return li;
       }));
       $('edition-history').hidden = !rows.length;
     } catch { $('edition-history').hidden = true; }

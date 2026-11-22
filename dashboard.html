@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Klienta - KDP Wingman</title>
+    <title>Panel Klienta - Wingman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -458,7 +458,7 @@
 
     <div id="login-view">
         <div class="card login-box">
-            <h2 style="color: rgb(0, 0, 0); font-size: 2rem; margin-bottom: 10px;">KDP <span>Wingman</span></h2>
+            <h2 style="color: rgb(0, 0, 0); font-size: 2rem; margin-bottom: 10px;"><span>Wingman</span></h2>
             
             <div id="login-form-content">
                 <p style="color: var(--text-muted); margin-bottom: 30px;">Zaloguj się do panelu</p>
@@ -510,7 +510,7 @@
         
         <div class="skool-top-bar">
             <a href="index.html" class="logo">
-                <i class="fas fa-chart-line" style="color: #a0134a;"></i> KDP <span>Wingman</span>
+                <img src="images/wingman-cherry.png" width="28" height="28" alt=""> <span>Wingman</span>
             </a>
 
             <div class="desktop-actions" style="display: flex; align-items: center; gap: 20px;">
@@ -806,7 +806,7 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">
-                    Twój post na <span style="font-weight: 800;">KDP Wingman</span>
+                    Twój post na <span style="font-weight: 800;">Wingman</span>
                 </div>
             </div>
 
@@ -2464,7 +2464,7 @@ async function openInbox() {
         setInterval(sendHeartbeat, 60000);
 
         const adminSecret = localStorage.getItem('admin_secret');
-        const isAdmin = adminSecret === 'super_tajne_haslo_admina';
+        const isAdmin = Boolean(adminSecret);
 
         let currentTab = 'admin';
         let currentThreadId = null;

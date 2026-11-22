@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KDP Wingman - Przenieś swoje KDP na wyższy poziom</title>
+    <title>Wingman — wspólny dostęp do Helium 10 Diamond</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -281,47 +281,36 @@
 
 <link rel="stylesheet" href="enrollment.css">
 <script src="enrollment.js" defer></script>
-</head>
+<link rel="icon" href="images/wingman-cherry.png"><link rel="stylesheet" href="home.css"><script src="home.js" defer></script></head>
 <body>
 
-    <header class="navbar-container">
-        <nav class="navbar-content">
-            <a href="index.html" class="logo-link">
-                <img src="images/logo.svg" alt="KDP Wingman Icon" class="logo-img">
-                <span>KDP <span style="color: var(--cherry);">Wingman</span></span>
-            </a>
-
-            <button class="hamburger-btn" onclick="toggleMobileMenu()">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </button>
-
-            <div class="nav-links" id="nav-menu">
-                <a href="#how-it-works" class="nav-item">Jak to działa</a>
-                <a href="#features" class="nav-item">Funkcje</a>
-                <a href="https://chromewebstore.google.com/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm" target="_blank" class="nav-item">Rozszerzenie</a>
-                <a href="#dolacz" class="nav-item highlight">Wspólny Dostęp</a>
-                <a href="https://www.youtube.com/@KDPWingman/videos" target="_blank" class="nav-item youtube-icon">
-                    <i class="fab fa-youtube"></i>
-                </a>
-                <a href="dashboard.html?tab=community" class="btn-forum">
-                    <i class="fas fa-comments"></i> Społeczność
-                </a>
-                <a href="dashboard.html" class="btn-login">Zaloguj się</a>
-            </div>
-        </nav>
-    </header>
-
-    <section class="enroll" id="dolacz" aria-labelledby="enroll-title">
-  <div class="enroll-intro">
-    <p class="eyeline">KDP Wingman · Wspólny dostęp</p>
-    <h1 id="enroll-title">Helium 10 Diamond <em>we wspólnej zrzutce.</em></h1>
-    <p class="lead">Szukasz słów kluczowych lub sprawdzasz konkurencję dla swojej książki na Amazonie? Co miesiąc twórcy KDP składają się tutaj na dostęp do Helium 10 Diamond.</p>
-    <p>Rezerwujesz miejsce depozytem <strong>75 zł</strong>. Po rozliczeniu edycji nadwyżka wraca do Twojego portfela KDP Wingman.</p>
-    <div id="edition-history" hidden><h2>Uczestnicy poprzednich edycji</h2><ul id="history-items"></ul></div>
-  </div>
-  <article class="enroll-card" aria-labelledby="edition-title">
+    <header class="mast"><div class="shell mast-inner">
+<a class="wordmark" href="index.html" aria-label="Wingman — strona główna"><img src="images/wingman-cherry.png" alt="">Wingman</a>
+<nav aria-label="Główne menu"><a href="#how-it-works">Jak to działa</a><a href="#koszty">Kalkulator</a><a href="#puls">Puls zrzutki</a></nav>
+<a class="login-link" href="dashboard.html">Zaloguj się</a></div></header>
+<main>
+<section class="cover shell" aria-labelledby="cover-title"><div class="cover-copy">
+<p class="kicker">Wspólny dostęp do Helium 10 Diamond</p>
+<h1 id="cover-title">Badaj nisze.<br><em>Podziel koszt.</em></h1>
+<p class="intro">Sprawdź, czego czytelnicy szukają na Amazonie, zanim zaczniesz tworzyć książkę. W Wingman wydawcy KDP wspólnie pokrywają koszt narzędzia do analizy słów kluczowych i konkurencji.</p>
+<div class="actions"><a href="#dolacz" class="primary join-link">Dołącz do zrzutki</a><a class="text-link" href="#koszty">Policz swój koszt</a></div>
+<p class="fine">Depozyt 75 zł · Nadwyżka wraca do portfela po rozliczeniu.</p></div>
+<figure class="film"><div class="film-frame"><video id="intro-film" controls playsinline preload="metadata" poster="images/wingman-film.webp" aria-label="Jak działa zrzutka Wingman"><source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4"></video><button type="button" id="film-play" aria-label="Odtwórz film o zrzutce" hidden><span aria-hidden="true">▶</span></button></div><figcaption><strong>Jak działa zrzutka?</strong><span>Film · 1 min 33 s</span></figcaption></figure>
+</section>
+<section class="proof shell" aria-label="Społeczność Wingman"><div class="members"><strong id="registered-total">…</strong><span>zarejestrowanych użytkowników</span></div><div id="edition-history" hidden><h2>Uczestnicy poprzednich edycji</h2><ul id="history-items"></ul></div></section>
+<section id="how-it-works" class="instructions shell"><div class="section-top"><p class="kicker">Od zapisu do rozliczenia</p><h2>Jak działa Wingman?</h2></div><div class="steps"><article><a href="images/step1.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Wybierz edycję"><img loading="lazy" src="images/step1.png" alt="Wybierz edycję — ilustracja z instrukcji Wingman"></a><small>Krok 1</small><h3>Wybierz edycję</h3><p>Sprawdź miesiąc dostępu i liczbę zapisanych osób. Załóż konto przy zapisie lub zaloguj się.</p></article><article><a href="images/step2.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Wpłać depozyt"><img loading="lazy" src="images/step2.png" alt="Wpłać depozyt — ilustracja z instrukcji Wingman"></a><small>Krok 2</small><h3>Wpłać depozyt</h3><p>Rezerwujesz miejsce kwotą 75 zł. Jeśli masz środki w portfelu, zobaczysz potrzebną dopłatę.</p></article><article><a href="images/step3.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Śledź koszt udziału"><img loading="lazy" src="images/step3.png" alt="Śledź koszt udziału — ilustracja z instrukcji Wingman"></a><small>Krok 3</small><h3>Śledź koszt udziału</h3><p>W panelu sprawdzisz liczebność grupy i przewidywany koszt na osobę.</p></article><article><a href="images/step4.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Odbierz nadwyżkę"><img loading="lazy" src="images/step4.png" alt="Odbierz nadwyżkę — ilustracja z instrukcji Wingman"></a><small>Krok 4</small><h3>Odbierz nadwyżkę</h3><p>Po rozliczeniu kosztu narzędzia i opłaty serwisowej nadwyżka trafia do portfela na kolejną edycję.</p></article></div></section>
+<section id="koszty" class="cost-band"><div class="shell"><div class="section-top"><p class="kicker">Kalkulator zrzutki</p><h2>Ile kosztuje Twój udział?</h2><p>Przesuń suwak i sprawdź, jak liczba płacących osób zmienia cenę dostępu.</p></div>
+<div class="calc"><div class="calc-controls"><label for="people">Płacący uczestnicy</label><output id="people-out" for="people">40 osób</output><input type="range" id="people" min="15" max="60" value="40"><div class="range-limits"><span>15 osób</span><span>60 osób</span></div><label id="vote-option" hidden><input type="checkbox" id="one-account"> Grupa przegłosowała jedno konto</label><p id="calc-mode"></p><p class="fine">Symulacja przy kursie 4,00 zł/USD. Zakładamy, że wszyscy uczestnicy płacą. Ostateczne rozliczenie zależy od kursu i składu grupy.</p></div>
+<div class="calc-results" aria-live="polite"><div class="bar-label"><span>Samodzielny plan Diamond</span><strong id="solo-price"></strong></div><div class="bar"><i></i></div><div class="bar-label"><span>Udział w Wingman</span><strong id="share-price"></strong></div><div class="bar"><i id="share-bar"></i></div><div class="saving"><span>Różnica miesięcznie</span><strong id="saving"></strong></div><p id="refund"></p></div></div>
+<details class="math"><summary>Skąd te kwoty?</summary><p>Samodzielny plan Diamond w rozliczeniu miesięcznym kosztuje 359 USD przed ewentualnymi podatkami. Wingman dzieli koszt 287,20 USD za konto przez liczbę płacących osób i dolicza 10 zł opłaty serwisowej na osobę. Od 45 uczestników domyślnie liczymy dwa konta. Grupa może wybrać jedno większością 80% głosów.</p><a href="https://www.helium10.com/pricing/" target="_blank" rel="noopener">Sprawdź cennik Helium 10</a></details>
+<div class="budget">
+  <h3>Co możesz zrobić z różnicą?</h3>
+  <p>Przykładowy budżet na premierę książki: po 20 zł dziennie na test słów kluczowych w Amazon Ads przez 30 dni. To 600 zł.</p>
+  <p id="publishing-budget" aria-live="polite"></p>
+  <a class="text-link join-link" href="#dolacz">Dołącz do najbliższej edycji</a>
+</div></div></section>
+<section id="puls" class="news shell"><div class="section-top"><p class="kicker">Aktualności od organizatora</p><h2>Puls Zrzutki</h2></div><button id="admin-add-post-btn" class="text-link" style="display:none" onclick="openPostModal()">Dodaj wpis</button><div id="news-feed" aria-live="polite"><p>Wczytywanie aktualności…</p></div><button class="secondary" id="more-news" hidden>Pokaż starsze wpisy</button></section>
+<section id="dolacz" class="join-band"><div class="shell join-grid"><div><p class="kicker">Najbliższa edycja</p><h2>Zarezerwuj miejsce<br>w zrzutce.</h2><p>Jedna wpłata obejmuje jedną edycję. Dane dostępu otrzymasz e-mailem piątego dnia miesiąca edycji.</p><details><summary>Mam już środki w portfelu. Ile dopłacę?</summary><p>Po zalogowaniu zobaczysz kwotę do wpłaty z uwzględnieniem salda. Jeśli środki pokrywają depozyt, potwierdzisz udział z portfela.</p></details></div><article class="enroll-card" aria-labelledby="edition-title">
     <p class="eyeline">Zapisy na edycję</p>
     <h2 id="edition-title">Wczytuję edycję…</h2>
     <dl><div><dt>Zapisane osoby</dt><dd id="edition-count">—</dd></div>
@@ -338,160 +327,14 @@
     <p id="join-message" role="status" aria-live="polite"></p>
     <a href="dashboard.html" id="join-panel" hidden>Przejdź do panelu</a>
     <small id="join-note">Wpłata jednorazowa. Płatność kartą przez Stripe.</small>
-  </article>
-</section>
+  </article></div></section>
+<section id="features" class="shell tools"><h2>Przy pracy nad książką</h2><div class="usecases"><p><b>Wybór tematu</b>Porównaj frazy i sprawdź, jakie książki pojawiają się w wynikach wyszukiwania.</p><p><b>Analiza konkurencji</b>Przyjrzyj się podobnym tytułom, ich pozycjom i sposobom prezentacji.</p><p><b>Plan promocji</b>Zbierz listę fraz, które chcesz przetestować w kampanii Amazon Ads.</p></div></section>
+</main>
 
-
-    <section class="social-proof-section">
-    <div class="social-proof-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="pulse-dot"></div>
-            <h3>Puls Zrzutki</h3>
-        </div>
-        <button id="admin-add-post-btn" onclick="openPostModal()" style="display:none; background: var(--cherry); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-            <i class="fas fa-plus"></i> Dodaj wpis
-        </button>
-    </div>
-    
-    <div style="position: relative;">
-        <button onclick="scrollCarousel(-1)" class="nav-btn left"><i class="fas fa-chevron-left"></i></button>
-        <div class="carousel-container" id="dynamic-posts-container">
-            </div>
-        <button onclick="scrollCarousel(1)" class="nav-btn right"><i class="fas fa-chevron-right"></i></button>
-    </div>
-</section>
-
-<style>
-    /* Naprawa nawigacji na komputerze */
-    .nav-btn {
-        position: absolute; top: 50%; transform: translateY(-50%);
-        background: white; border: 1px solid var(--border-light);
-        width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-        z-index: 10; display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
-    }
-    .nav-btn:hover { background: var(--cherry); color: white; }
-    .nav-btn.left { left: -20px; }
-    .nav-btn.right { right: -20px; }
-
-    /* Ukrywamy strzałki na telefonie, bo tam działa dotyk */
-    @media (max-width: 768px) { .nav-btn { display: none; } }
-</style>
-
-    <div id="how-it-works" class="steps-container">
-<div class="video-wrapper">
-    <video width="100%" height="auto" controls style="border-radius: 20px; display: block;">
-        <source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4">
-        Twoja przeglądarka nie obsługuje odtwarzacza wideo.
-    </video>
-</div>
-
-        <div class="step-row">
-            <div class="step-content">
-                <span class="step-number">Krok 01</span>
-                <h2 class="step-title">Dołącz do obecnej edycji</h2>
-                <p class="step-desc">
-                    Wystarczy podać swój e-mail. Nasz system sprawdzi, czy masz już konto. 
-                    Jeśli nie - stworzysz je w 30 sekund. Prosty formularz to pierwszy krok do ogromnych oszczędności.
-                </p>
-            </div>
-            <div class="step-visual">
-                <div class="light-card">
-                    <img src="images/step1.png" class="step-img" alt="Krok 1">
-                </div>
-            </div>
-        </div>
-
-        <div class="step-row reverse">
-            <div class="step-content">
-                <span class="step-number">Krok 02</span>
-                <h2 class="step-title">Dokonaj wpłaty depozytu</h2>
-                <p class="step-desc">
-                    Bezpieczna płatność przez Stripe (karta). Wpłacasz stały depozyt.
-                    Twoje środki są bezpieczne i czekają na zamknięcie listy uczestników pierwszego dnia miesiąca.
-                </p>
-            </div>
-            <div class="step-visual">
-                <div class="light-card">
-                    <img src="images/step2.png" class="step-img" alt="Krok 2">
-                </div>
-            </div>
-        </div>
-
-        <div class="step-row">
-            <div class="step-content">
-                <span class="step-number">Krok 03</span>
-                <h2 class="step-title">Zajmij miejsce i obserwuj spadek ceny</h2>
-                <p class="step-desc">
-                    Im więcej nas jest, tym mniej płacisz. Po wpłacie w panelu uaktywni się wykres i zobaczysz, jak cena spada z każdą kolejną osobą. To czysta, przyjemna matematyka!
-                </p>
-            </div>
-            <div class="step-visual">
-                <div class="light-card">
-                    <img src="images/step3.png" class="step-img" alt="Krok 3">
-                </div>
-            </div>
-        </div>
-
-        <div class="step-row reverse">
-            <div class="step-content">
-                <span class="step-number">Krok 04</span>
-                <h2 class="step-title">Nadpłacone środki wracają do Ciebie</h2>
-                <p class="step-desc">
-                    Narzędzie po podziale kosztowało zaledwie 35 zł? Różnica automatycznie 
-                    wraca na Twój wirtualny portfel. Możesz z nich opłacić kolejny miesiąc. Loginy otrzymujesz zawsze 5-go dnia miesiąca.
-                </p>
-            </div>
-            <div class="step-visual">
-                <div class="light-card">
-                    <img src="images/step4.png" class="step-img" alt="Krok 4">
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <section id="features" class="features-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Jedno narzędzie, <span style="color:var(--cherry)">wiele możliwości</span></h2>
-                <p style="color: var(--text-muted); font-size: 1.1rem;">Oprócz wspólnego dostępu, otrzymujesz potężne rozszerzenie do przeglądarki Chrome.</p>
-            </div>
-    
-            <div class="feature-grid">
-                
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-search"></i></div>
-                    <h3>Historia BSR</h3>
-                    <p>Zbieraj kluczowe dane (ASIN, BSR, historia) bezpośrednio z wyników wyszukiwania. Oszczędzaj dziesiątki minut na każdym researchu.</p>
-                </div>
-        
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-magic"></i></div>
-                    <h3>Generator AI</h3>
-                    <p>Twórz opisy produktów, które naprawdę sprzedają. Zapomnij o pustce w głowie – sztuczna inteligencja napisze świetny tekst za Ciebie.</p>
-                </div>
-        
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-calculator"></i></div>
-                    <h3>Kalkulatory KDP</h3>
-                    <p>Inteligentny kalkulator sam pobiera cenę i liczbę stron, dając Ci natychmiastową analizę rentowności. Twarde dane zamiast zgadywania.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
-                    <h3>Auto MKL i Symulator PPC</h3>
-                    <p>Twórz Master Keyword List w sekundy. Sprawdź rentowność niszy i szacowane koszty reklamy, zanim wydasz choćby złotówkę na kampanię.</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <section id="register" class="register-section">
+<section id="register" class="register-section">
         <div class="register-box">
-            <h2 style="font-size:1.8rem; margin-bottom:10px; color:var(--text-main); font-weight:800;">Dołącz do społeczności</h2>
-            <p style="color:var(--text-muted);">Zarejestruj się już dziś i zacznij swoją podróż ku niezależności z KDP Wingman.</p>
+            <h2 style="font-size:1.8rem; margin-bottom:10px; color:var(--text-main); font-weight:800;">Załóż darmowe konto</h2>
+            <p style="color:var(--text-muted);">Darmowe konto daje dostęp do panelu i społeczności Wingman.</p>
             
             <form class="register-form">
     <input type="text" id="register-nickname" placeholder="Twoje imię / Nickname" required>
@@ -506,8 +349,8 @@
     <footer>
         <div class="container">
             <p>
-                &copy; 2026 KDP Wingman. Wszelkie prawa zastrzeżone.<br>
-                <a href="terms.html">Regulamin Serwisu</a> | 
+                &copy; 2026 Wingman. Wszelkie prawa zastrzeżone.<br>
+                <a href="dashboard.html?tab=community">Społeczność</a> · <a href="group-buy.html">Szczegóły edycji</a> · <a href="https://chromewebstore.google.com/detail/kdp-wingman/nfjbklpfpcgfeeapkakgcekdkepbjgcm">Rozszerzenie Chrome</a> · <a href="terms.html">Regulamin Serwisu</a> |
                 <a href="privacy.html">Polityka Prywatności</a>
             </p>
         </div>
@@ -565,55 +408,6 @@
         });
 
 // --- ŁADOWANIE POSTÓW Z BAZY ---
-async function loadPulsPosts() {
-    const container = document.getElementById('dynamic-posts-container');
-    if (!container) return;
-    
-    // Sprawdzamy czy to Ty przeglądasz stronę, żeby pokazać kosz na śmieci
-    const isAdmin = localStorage.getItem('admin_secret') === 'super_tajne_haslo_admina';
-
-    try {
-        const res = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/puls/posts');
-        const posts = await res.json();
-        
-        container.innerHTML = posts.map(post => {
-            // Sprawdzamy, czy ten komputer już lajkował post (żeby pokolorować ogień na wiśniowo)
-            const hasLiked = localStorage.getItem(`liked_puls_${post.id}`);
-            const fireColor = hasLiked ? 'var(--cherry)' : 'var(--text-muted)';
-
-            return `
-            <div class="carousel-card" style="position: relative; display: flex; flex-direction: column; max-width: 450px;">
-                
-                ${isAdmin ? `
-                    <button onclick="deletePulsPost(${post.id})" style="position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.95); color:#e11d48; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15); z-index: 10; transition: 0.2s;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                ` : ''}
-                
-                ${post.image_url ? `<img src="${post.image_url}" style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; margin-bottom: 15px; display: block;">` : ''}
-                
-                <span class="card-date" style="margin-bottom: 8px;">
-                    ${new Date(post.created_at).toLocaleDateString('pl-PL', {day: 'numeric', month: 'long', year: 'numeric'})}
-                </span>
-                
-                <h4 class="card-title">${post.title}</h4>
-                <div style="flex-grow: 1; display: flex; flex-direction: column;">
-                    <div id="post-text-${post.id}" class="card-text" style="white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0;">${post.content}</div>
-                    ${post.content.length > 150 ? `<button id="read-more-btn-${post.id}" onclick="togglePostText(${post.id})" style="background: none; border: none; color: var(--cherry); font-weight: 700; cursor: pointer; padding: 8px 0 0 0; text-align: left; font-size: 0.85rem; align-self: flex-start; transition: 0.3s;">Rozwiń tekst <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 3px;"></i></button>` : ''}
-                </div>
-                
-                <div style="border-top: 1px solid var(--border-light); margin-top: 15px; padding-top: 12px; display: flex; justify-content: flex-end;">
-                    <button onclick="likePulsPost(${post.id})" id="like-btn-${post.id}" style="background:none; border:none; color:${fireColor}; cursor:pointer; font-size:1.1rem; font-weight: bold; transition:0.2s; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-fire"></i> <span id="like-count-${post.id}">${post.likes || 0}</span>
-                    </button>
-                </div>
-
-            </div>
-        `}).join('');
-    } catch (e) { console.error("Błąd ładowania postów:", e); }
-}
-
-// --- NOWE FUNKCJE: USUWANIE I LAJKOWANIE ---
 async function deletePulsPost(id) {
     if (!confirm("⚠️ Czy na pewno chcesz trwale usunąć ten post?")) return;
     
@@ -778,7 +572,7 @@ async function submitNewPost() {
 function checkAdminStatus() {
     const secret = localStorage.getItem('admin_secret');
     const btn = document.getElementById('admin-add-post-btn');
-    if (secret === 'super_tajne_haslo_admina' && btn) {
+    if (secret && btn) {
         btn.style.display = 'block';
     }
 }
@@ -792,7 +586,7 @@ function scrollCarousel(direction) {
 }
 
 // --- URUCHOMIENIE PO ZAŁADOWANIU ---
-loadPulsPosts();
+// The homepage loads the feed once its shared script is ready.
 checkAdminStatus();
 
 
