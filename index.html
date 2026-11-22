@@ -281,7 +281,7 @@
 
 <link rel="stylesheet" href="enrollment.css">
 <script src="enrollment.js" defer></script>
-<link rel="icon" href="images/wingman-cherry.png"><link rel="stylesheet" href="home.css"><script src="home.js" defer></script></head>
+<link rel="icon" href="images/wingman-cherry.png"><link rel="stylesheet" href="home.css"><link rel="stylesheet" href="cinema.css"><script src="home.js" defer></script><script src="cinema.js" defer></script></head>
 <body>
 
     <header class="mast"><div class="shell mast-inner">
@@ -300,9 +300,39 @@
 <section class="proof shell" aria-label="Społeczność Wingman"><div class="members"><strong id="registered-total">…</strong><span>zarejestrowanych użytkowników</span></div><div id="edition-history" hidden><h2>Uczestnicy poprzednich edycji</h2><ul id="history-items"></ul></div></section>
 <section id="how-it-works" class="instructions shell"><div class="section-top"><p class="kicker">Od zapisu do rozliczenia</p><h2>Jak działa Wingman?</h2></div><div class="steps"><article><a href="images/step1.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Wybierz edycję"><img loading="lazy" src="images/step1.png" alt="Wybierz edycję — ilustracja z instrukcji Wingman"></a><small>Krok 1</small><h3>Wybierz edycję</h3><p>Sprawdź miesiąc dostępu i liczbę zapisanych osób. Załóż konto przy zapisie lub zaloguj się.</p></article><article><a href="images/step2.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Wpłać depozyt"><img loading="lazy" src="images/step2.png" alt="Wpłać depozyt — ilustracja z instrukcji Wingman"></a><small>Krok 2</small><h3>Wpłać depozyt</h3><p>Rezerwujesz miejsce kwotą 75 zł. Jeśli masz środki w portfelu, zobaczysz potrzebną dopłatę.</p></article><article><a href="images/step3.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Śledź koszt udziału"><img loading="lazy" src="images/step3.png" alt="Śledź koszt udziału — ilustracja z instrukcji Wingman"></a><small>Krok 3</small><h3>Śledź koszt udziału</h3><p>W panelu sprawdzisz liczebność grupy i przewidywany koszt na osobę.</p></article><article><a href="images/step4.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Odbierz nadwyżkę"><img loading="lazy" src="images/step4.png" alt="Odbierz nadwyżkę — ilustracja z instrukcji Wingman"></a><small>Krok 4</small><h3>Odbierz nadwyżkę</h3><p>Po rozliczeniu kosztu narzędzia i opłaty serwisowej nadwyżka trafia do portfela na kolejną edycję.</p></article></div></section>
 <section id="koszty" class="cost-band"><div class="shell"><div class="section-top"><p class="kicker">Kalkulator zrzutki</p><h2>Ile kosztuje Twój udział?</h2><p>Przesuń suwak i sprawdź, jak liczba płacących osób zmienia cenę dostępu.</p></div>
-<div class="calc"><div class="calc-controls"><label for="people">Płacący uczestnicy</label><output id="people-out" for="people">40 osób</output><input type="range" id="people" min="15" max="60" value="40"><div class="range-limits"><span>15 osób</span><span>60 osób</span></div><label id="vote-option" hidden><input type="checkbox" id="one-account"> Grupa przegłosowała jedno konto</label><p id="calc-mode"></p><p class="fine">Symulacja przy kursie 4,00 zł/USD. Zakładamy, że wszyscy uczestnicy płacą. Ostateczne rozliczenie zależy od kursu i składu grupy.</p></div>
+<div class="calc"><div class="calc-controls"><label for="people">Płacący uczestnicy</label><output id="people-out" for="people">40 osób</output><input type="range" id="people" min="15" max="44" value="40"><div class="range-limits"><span>15 osób</span><span>44 osoby</span></div><p>Jedno konto Diamond, do 44 uczestników.</p><p class="fine">Symulacja przy kursie 4,00 zł/USD. Zakładamy, że wszyscy uczestnicy płacą. Ostateczne rozliczenie zależy od kursu i składu grupy.</p></div>
 <div class="calc-results" aria-live="polite"><div class="bar-label"><span>Samodzielny plan Diamond</span><strong id="solo-price"></strong></div><div class="bar"><i></i></div><div class="bar-label"><span>Udział w Wingman</span><strong id="share-price"></strong></div><div class="bar"><i id="share-bar"></i></div><div class="saving"><span>Różnica miesięcznie</span><strong id="saving"></strong></div><p id="refund"></p></div></div>
 <details class="math"><summary>Skąd te kwoty?</summary><p>Samodzielny plan Diamond w rozliczeniu miesięcznym kosztuje 359 USD przed ewentualnymi podatkami. Wingman dzieli koszt 287,20 USD za konto przez liczbę płacących osób i dolicza 10 zł opłaty serwisowej na osobę. Od 45 uczestników domyślnie liczymy dwa konta. Grupa może wybrać jedno większością 80% głosów.</p><a href="https://www.helium10.com/pricing/" target="_blank" rel="noopener">Sprawdź cennik Helium 10</a></details>
+<section id="plan-sal" class="cinema" aria-labelledby="cinema-title">
+  <header class="cinema-intro">
+    <div>
+      <p class="kicker">Podział grupy</p>
+      <h3 id="cinema-title">Jak zapełniają się sale?</h3>
+      <p>Każde miejsce to jedna osoba, a sala to jedno konto Diamond. Przesuń suwak przez próg 44 osób, żeby zobaczyć, jak grupa dzieli się między konta.</p>
+    </div>
+    <ul class="cinema-key" aria-label="Legenda planu">
+      <li><i class="key-full" aria-hidden="true"></i>Zajęte</li>
+      <li><i class="key-empty" aria-hidden="true"></i>Wolne</li>
+    </ul>
+  </header>
+  <div class="cinema-control">
+    <label for="audience">Osoby na planie sal</label>
+    <output for="audience" id="audience-number">40</output>
+    <input id="audience" type="range" min="1" max="132" step="1" value="40" aria-describedby="cinema-hint">
+    <div class="cinema-scale" aria-hidden="true"><span>1</span><span>45</span><span>89</span><span>132</span></div>
+    <div class="cinema-presets" aria-label="Zobacz moment podziału grupy">
+      <button type="button" data-audience="45">Pokaż 45 osób</button>
+      <button type="button" data-audience="89">Pokaż 89 osób</button>
+    </div>
+  </div>
+  <div class="cinema-stage">
+    <div class="cinema-rooms" id="cinema-rooms"></div>
+    <div class="cinema-flights" id="cinema-flights" aria-hidden="true"></div>
+  </div>
+  <p class="cinema-summary" id="cinema-summary" role="status"></p>
+  <p class="cinema-hint" id="cinema-hint">Ten suwak zmienia tylko plan miejsc. Druga sala pokazuje domyślny podział na dwa konta. Trzecia to przykład dalszego podziału grupy.</p>
+</section>
+
 <div class="budget">
   <h3>Co możesz zrobić z różnicą?</h3>
   <p>Przykładowy budżet na premierę książki: po 20 zł dziennie na test słów kluczowych w Amazon Ads przez 30 dni. To 600 zł.</p>

@@ -23,14 +23,10 @@
   const pln = amount => amount.toLocaleString('pl-PL',{style:'currency',currency:'PLN'});
   function calculate() {
     const people = Number(byId('people').value);
-    const canVote = people >= 45;
-    byId('vote-option').hidden = !canVote;
-    const accounts = canVote && !byId('one-account').checked ? 2 : 1;
     const rate = 4, fee = 10, deposit = 75;
     const solo = 359 * rate;
-    const share = Math.round((287.2 * accounts * rate / people + fee) * 100) / 100;
+    const share = Math.round((287.2 * rate / people + fee) * 100) / 100;
     byId('people-out').textContent = people + (people % 10 >= 2 && people % 10 <= 4 && !(people % 100 >= 12 && people % 100 <= 14) ? ' osoby' : ' osób');
-    byId('calc-mode').textContent = accounts === 2 ? 'W tej symulacji grupa utrzymuje dwa konta Diamond.' : 'W tej symulacji grupa utrzymuje jedno konto Diamond.';
     byId('solo-price').textContent = pln(solo);
     byId('share-price').textContent = pln(share);
     byId('share-bar').style.width = share / solo * 100 + '%';
@@ -40,7 +36,6 @@
     byId('refund').textContent = share <= deposit ? 'Z depozytu 75 zł do portfela wróciłoby ' + pln(deposit-share) + '.' : 'Przy tej liczbie osób koszt przekracza depozyt 75 zł. Takiej edycji nie można jeszcze rozliczyć.';
   }
   byId('people').addEventListener('input',calculate);
-  byId('one-account').addEventListener('change',calculate);
   calculate();
   readPublic('stats/total-users').then(data => {
     if (!Number.isSafeInteger(data.total) || data.total < 0) throw new Error();
