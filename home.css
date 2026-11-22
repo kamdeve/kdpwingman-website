@@ -845,3 +845,13 @@ footer .container {
   .steps { grid-template-columns:1fr; gap:26px; }
   .steps h3 { font-size:1.28rem; }
 }
+
+.research-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:22px; }
+.research-grid article { padding:clamp(18px,3vw,32px); border-radius:16px; background:#f2f8f7; }
+.research-grid article:nth-child(2),.research-grid article:nth-child(3) { background:#fbf3f6; }
+.research-grid strong { color:#A0134A; }
+.research-grid h3 { margin:8px 0; font-size:1.35rem; }
+.research-grid p,.pool-note { line-height:1.6; }
+.research-grid p { margin:0; }
+.pool-note { margin-bottom:0; max-width:85ch; }
+@media(max-width:650px){ .research-grid {grid-template-columns:1fr;} }

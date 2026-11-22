@@ -31,6 +31,9 @@
   function setMode(value) {
     mode = value;
     const create = mode === 'register';
+    $('repeat-label').hidden = !create;
+    form.elements.passwordConfirm.disabled = !create;
+    form.elements.passwordConfirm.value = '';
     $('nick-label').hidden = !create;
     form.elements.nickname.disabled = !create;
     form.elements.password.autocomplete = create ? 'new-password' : 'current-password';
@@ -113,6 +116,11 @@
   form.querySelectorAll('[data-mode]').forEach(el => el.onclick = () => { if (!busy) {setMode(el.dataset.mode); message.textContent = '';} });
   form.onsubmit = e => {
     e.preventDefault();
+    if (mode === 'register' && form.elements.passwordConfirm.value !== form.elements.password.value) {
+      message.textContent = 'Hasła się różnią. Wpisz ponownie to samo hasło.';
+      form.elements.passwordConfirm.focus();
+      return;
+    }
     run(async () => {
       const email = form.elements.email.value.trim(), password = form.elements.password.value;
       if (mode === 'register') {
