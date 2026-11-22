@@ -830,3 +830,18 @@ footer .container {
 .budget-ideas b { font-size:1.4rem; }
 .budget .text-link { display:inline-block; margin-top:18px; }
 @media(max-width:550px){ .budget-intro { grid-template-columns:1fr; } .budget-intro img { max-height:145px; object-fit:cover; } }
+
+.steps .step-art {
+  display:block;
+  height:auto;
+  aspect-ratio:3 / 2;
+  padding:0;
+  background: url("images/edition-steps.webp") left top / 200% 200% no-repeat;
+}
+.steps article:nth-child(2) .step-art { background-position:right top; }
+.steps article:nth-child(3) .step-art { background-position:left bottom; }
+.steps article:nth-child(4) .step-art { background-position:right bottom; }
+@media (max-width:550px) {
+  .steps { grid-template-columns:1fr; gap:26px; }
+  .steps h3 { font-size:1.28rem; }
+}
