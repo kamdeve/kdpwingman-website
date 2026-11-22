@@ -32,6 +32,76 @@
     const node = document.createElement(tag);
     node.textContent = text; return node;
   }
+  // Historical editions and corrections from the community dashboard override database rows.
+  const manualEditions = [
+    {month:'2026-04', users:16, price:20.49},
+    {month:'2026-03', users:19, price:17.26},
+    {month:'2026-01', users:26, price:16.04},
+    {month:'2025-12', users:24, price:15.44},
+    {month:'2025-11', users:26, price:11.21},
+    {month:'2025-10', users:29, price:10.80},
+    {month:'2025-09', users:22, price:12.66},
+    {month:'2025-08', users:23, price:13.17},
+    {month:'2025-07', users:26, price:11.59},
+    {month:'2025-06', users:28, price:11.98},
+    {month:'2025-05', users:27, price:11.58},
+    {month:'2025-04', users:21, price:14.72},
+    {month:'2025-03', users:14, price:22.48},
+    {month:'2025-02', users:15, price:21.51},
+    {month:'2025-01', users:20, price:17.23}
+  ];
+  const wholePLN = new Intl.NumberFormat('pl-PL', {style:'currency', currency:'PLN', maximumFractionDigits:0, minimumFractionDigits:0, useGrouping:true});
+  const monthName = new Intl.DateTimeFormat('pl-PL', {month:'long', year:'numeric', timeZone:'UTC'});
+  function archiveCard(row) {
+    const card = document.createElement('li');
+    const label = element('time', monthName.format(new Date(row.month + '-01T00:00:00Z')));
+    label.dateTime = row.month;
+    if (!row.diamond) label.className = 'platinum';
+    const details = document.createElement('dl');
+    for (const [name, value] of [
+      ['Plan samodzielny', row.retail.toLocaleString('pl-PL',{style:'currency',currency:'USD'})],
+      ['Uczestnicy', String(row.users)],
+      ['Cena zrzutkowa', row.price.toLocaleString('pl-PL',{style:'currency',currency:'PLN'})]
+    ]) {
+      const pair = document.createElement('div');
+      pair.append(element('dt', name), element('dd', value));
+      details.append(pair);
+    }
+    card.append(label, element('h4', 'Helium 10 ' + (row.diamond ? 'Diamond' : 'Platinum')), details);
+    return card;
+  }
+  async function loadArchive() {
+    const live = await readPublic('stats/history');
+    if (!Array.isArray(live) || !live.length) throw new Error('Brak historii');
+    const months = new Map();
+    for (const row of [...live, ...manualEditions]) {
+      const users = Number(row.users), price = Number(row.price);
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(row.month) || !Number.isSafeInteger(users) || users <= 0 || row.price == null || !Number.isFinite(price) || price < 0) throw new Error('Błędne dane edycji');
+      const diamond = row.month >= '2026-05';
+      const retail = diamond ? 287.20 : row.month >= '2026-01' ? 90.30 : 79.20;
+      months.set(row.month, {month:row.month, users, price, retail, diamond, saving:retail * 3.95 - price - 10});
+    }
+    const rows = [...months.values()].sort((a,b) => b.month.localeCompare(a.month));
+    const total = rows.reduce((sum,row) => sum + row.saving * row.users, 0);
+    const accesses = rows.reduce((sum,row) => sum + row.users, 0);
+    byId('archive-total').textContent = '≈ ' + wholePLN.format(total);
+    byId('archive-accesses').textContent = 'Łączna liczba dostępów: ' + accesses.toLocaleString('pl-PL');
+    byId('archive-latest').textContent = '≈ ' + wholePLN.format(rows[0].saving);
+    byId('archive-loyal').textContent = '≈ ' + wholePLN.format(rows.reduce((sum,row) => sum + row.saving, 0));
+    byId('archive-first').replaceChildren(...rows.slice(0,3).map(archiveCard));
+    byId('archive-older').replaceChildren(...rows.slice(3).map(archiveCard));
+    byId('archive-older-count').textContent = String(Math.max(0,rows.length - 3));
+    byId('archive-more').hidden = rows.length <= 3;
+    byId('archive-status').hidden = true;
+    byId('archive-content').hidden = false;
+  }
+  loadArchive().catch(() => {
+    byId('archive-status').textContent = 'Nie udało się wczytać historii zrzutek. ';
+    const retry = element('button','Spróbuj ponownie');
+    retry.type = 'button';
+    retry.onclick = () => location.reload();
+    byId('archive-status').append(retry);
+  });
   let posts = [], shown = 3;
   function newsItem(post) {
     const card = element('article',''); card.className = 'entry';

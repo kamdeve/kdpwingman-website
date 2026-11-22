@@ -76,20 +76,6 @@
     $('edition-count').textContent = edition.users;
     $('access-date').textContent = month(edition.targetMonth,true);
     await refreshMember();
-    try {
-      const history = await api('stats/history');
-      const rows = history.filter(row => row.month < edition.targetMonth && row.users > 0).slice(0,3);
-      $('history-items').replaceChildren(...rows.map(row => {
-        const li = document.createElement('li');
-        const label = document.createElement('span');
-        label.textContent = month(row.month);
-        const count = document.createElement('strong');
-        count.textContent = row.users + ' os.';
-        li.append(label, count);
-        return li;
-      }));
-      $('edition-history').hidden = !rows.length;
-    } catch { $('edition-history').hidden = true; }
   }
   async function proceed() {
     const result = await api('enrollment/continue', {edition:edition.targetMonth, due:member.due, free:Boolean(member.free), attempt});

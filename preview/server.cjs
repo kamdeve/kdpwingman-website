@@ -3,13 +3,16 @@ const pages = require('./pages.cjs');
 async function respond(request, assets) {
   const pathname = decodeURIComponent(new URL(request.url).pathname);
   if (!['GET','HEAD'].includes(request.method)) return new Response(null,{status:405});
-  if (['/public-data/stats/total-users','/public-data/puls/posts'].includes(pathname)) {
+  if (['/public-data/stats/total-users','/public-data/stats/history','/public-data/puls/posts'].includes(pathname)) {
     try {
       const path = pathname.slice('/public-data/'.length);
       const res = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/'+path,{signal:AbortSignal.timeout(18000)});
       if (!res.ok) throw new Error();
       const data = await res.json();
-      const result = path === 'stats/total-users' ? {total:data.total} : data.map(({title,content,created_at,image_url})=>({title,content,created_at,image_url}));
+      let result;
+      if (path === 'stats/history') result = data.map(({month,users,price}) => ({month,users,price}));
+      else if (path === 'stats/total-users') result = {total:data.total};
+      else result = data.map(({title,content,created_at,image_url}) => ({title,content,created_at,image_url}));
       return Response.json(result,{headers:{'Cache-Control':'public, max-age=60'}});
     } catch {return Response.json({error:'Źródło chwilowo niedostępne.'},{status:502});}
   }
