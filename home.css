@@ -6,7 +6,7 @@
   --line:#e7dfe2;
   --paper:#fff;
   --rose:#faf4f6;
-  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 
 * {
@@ -846,12 +846,29 @@ footer .container {
   .steps h3 { font-size:1.28rem; }
 }
 
-.research-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:22px; }
-.research-grid article { padding:clamp(18px,3vw,32px); border-radius:16px; background:#f2f8f7; }
-.research-grid article:nth-child(2),.research-grid article:nth-child(3) { background:#fbf3f6; }
-.research-grid strong { color:#A0134A; }
-.research-grid h3 { margin:8px 0; font-size:1.35rem; }
-.research-grid p,.pool-note { line-height:1.6; }
-.research-grid p { margin:0; }
-.pool-note { margin-bottom:0; max-width:85ch; }
-@media(max-width:650px){ .research-grid {grid-template-columns:1fr;} }
+
+h1,h2,h3,.wordmark,.budget-intro h3 {font-family:"Bricolage Grotesque",var(--font);}
+.cover h1 {font-size:clamp(2.65rem,4.8vw,4rem);line-height:1.03;letter-spacing:-.055em;}
+.cover em,.tools h2 em {font-family:"Faustina",Georgia,serif;font-weight:500;color:#A0134A;}
+body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
+.section-top h2,.join-band h2,.tools h2 {font-size:clamp(2.15rem,3.6vw,2.9rem);}
+.cover .primary {box-shadow:0 6px 20px #a0134a28;}
+.proof #history-items strong {font-family:var(--font);}
+.book-study {min-width:0;border:0;margin:24px 0 0;padding:0;}
+.book-study legend {color:var(--muted);margin-bottom:12px;}
+.case-choice {position:absolute;width:1px;height:1px;clip-path:inset(50%);}
+.book-study label {display:inline-block;cursor:pointer;padding:9px 14px;border:1px solid #d8c9ce;border-radius:30px;margin:0 4px 7px 0;font-weight:600;}
+.case-choice:checked + label {background:var(--wine);color:white;border-color:var(--wine);}
+.case-choice:focus-visible + label {outline:3px solid #793855;outline-offset:3px;}
+.case-panel {display:none;grid-template-columns:1.15fr 1fr;align-items:center;gap:clamp(20px,5vw,70px);background:#fbf5f3;border-radius:22px;padding:clamp(20px,4vw,44px);margin-top:10px;}
+#case-0:checked ~ .case-0,#case-1:checked ~ .case-1,#case-2:checked ~ .case-2 {display:grid;}
+.case-panel h3 {font-size:clamp(1.55rem,2.6vw,2.25rem);line-height:1.1;margin:8px 0;}
+.case-panel small {color:var(--wine);font-weight:700;}
+.case-panel p {margin:10px 0;line-height:1.6;}
+.case-panel aside {padding:clamp(18px,3vw,30px);background:white;border-left:4px solid var(--wine);border-radius:5px 15px 15px 5px;}
+.case-panel h4 {margin:0 0 12px;color:var(--muted);font-size:.9rem;}
+.case-panel cite {display:block;font:italic 500 1.65rem/1.18 "Faustina",Georgia,serif;}
+.case-panel ul {padding-left:20px;}
+.pool-note {max-width:80ch;color:var(--muted);}
+@media(max-width:660px){.case-panel {grid-template-columns:1fr;}.book-study label {font-size:.9rem;}}
+@media(prefers-reduced-motion:no-preference){.case-panel,.cover-copy {animation:wing-enter .32s ease-out;}@keyframes wing-enter {from {opacity:0;transform:translateY(6px);}to {opacity:1;transform:none;}}}

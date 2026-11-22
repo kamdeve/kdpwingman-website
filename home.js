@@ -15,6 +15,10 @@
     play.hidden = true;
     try { await film.play(); } catch { film.controls = true; }
   };
+  byId('watch-intro').addEventListener('click', () => {
+    film.focus();
+    play.click();
+  });
   film.addEventListener('ended', () => { play.hidden = false; });
   document.querySelectorAll('.join-link').forEach(link => link.addEventListener('click', () => {
     const action = byId('join-start');
