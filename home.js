@@ -122,6 +122,7 @@
   const zoom = dialog.querySelector('[data-zoom]');
   const viewport = dialog.querySelector('.research-scroll');
   const photo = viewport.querySelector('img');
+  const gallery = viewport.querySelector('.research-shelf-detail');
   function setZoom(enabled) {
     viewport.classList.toggle('is-actual', enabled);
     zoom.setAttribute('aria-pressed', String(enabled));
@@ -130,12 +131,20 @@
   panels.forEach(panel => {
     const frame = panel.querySelector('.research-frame');
     const source = frame.querySelector('img');
+    const row = frame.querySelector('.research-book-row');
+    if (row) frame.querySelector('.shelf-expand').hidden = false;
     frame.querySelectorAll('.research-expand, .research-crop').forEach(link => link.addEventListener('click', event => {
       if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
       dialog.querySelector('strong').textContent = frame.querySelector('.research-caption').textContent;
-      photo.src = source.currentSrc || source.src;
-      photo.alt = source.alt;
+      gallery.hidden = !row;
+      photo.hidden = Boolean(row);
+      if (row) {
+        gallery.replaceChildren(row.cloneNode(true));
+      } else {
+        photo.src = source.currentSrc || source.src;
+        photo.alt = source.alt;
+      }
       setZoom(false);
       dialog.showModal();
       viewport.scrollTo(0, 0);

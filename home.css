@@ -984,3 +984,26 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
 .research-rank-comparison li + li { border-top:1px solid #eee; }
 .research-rank-comparison .research-crop { border:0; border-radius:0; box-shadow:none; display:flex; align-items:center; }
 .research-rank-comparison .research-crop img { height:100%; object-fit:fill; }
+
+.research-find { display:flex; gap:18px; align-items:center; width:fit-content; max-width:100%; margin:14px 0; padding:12px 16px; background:#fff; color:var(--ink); border:1px solid var(--line); border-radius:12px; text-decoration:none; }
+.research-find-cover { width:clamp(68px,7vw,92px); height:auto; border-radius:3px; }
+.research-find > span { display:grid; gap:3px; font-size:.9rem; }
+.research-find-rank { width:135px; height:auto; }
+.research-find small { color:var(--wine); text-decoration:underline; }
+.research-s4 { grid-template-columns:minmax(0,1fr); gap:18px; }
+.research-s4 .research-copy { max-width:80ch; }
+.research-book-row { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(7px,1.3vw,16px); }
+.research-book { padding:clamp(8px,1.3vw,16px); display:flex; flex-direction:column; gap:3px; color:var(--ink); background:white; border-radius:10px; text-decoration:none; font-size:.9rem; line-height:1.4; }
+.research-book img { width:100%; height:auto; aspect-ratio: .78; object-fit:contain; margin-bottom:7px; }
+.research-book .book-title { flex:1; margin-bottom:6px; font-weight:650; }
+.research-book:hover .book-title { text-decoration:underline; }
+.research-book strong { color:#234f41; font-variant-numeric:tabular-nums; }
+.research-book:nth-child(2) strong { color:#66545a; }
+.research-shelf-detail .research-book { font-size:1rem; }
+.research-scroll.is-actual .research-shelf-detail .research-book-row { min-width:1300px; }
+.research-scroll .research-book img,.research-scroll.is-actual .research-book img { width:100%; margin:0 0 7px; }
+@media(max-width:700px){
+  .research-book-row { grid-template-columns:repeat(5,minmax(145px,1fr)); overflow-x:auto; padding:2px 2px 9px; scroll-snap-type:x proximity; }
+  .research-book { scroll-snap-align:start; }
+  .research-shelf { width:100%; }
+}

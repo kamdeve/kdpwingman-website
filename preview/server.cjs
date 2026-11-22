@@ -20,6 +20,9 @@ async function respond(request, assets) {
   if (/^\/images\/niche\/(black-box|amazon-search|xray|cerebro|book-ranks)\.webp$/.test(pathname)) {
     return Response.redirect('https://cdn.jsdelivr.net/gh/kamdeve/kdpwingman-website@eb0a4209af38810cc1ad55ea98746598264ce392'+pathname,302);
   }
+  if (/^\/images\/mechanic-books\/(mechanics|dummies-green|dummies-red|repair-bible|beginners|black-box-bsr)\.webp$/.test(pathname)) {
+    return Response.redirect('https://cdn.jsdelivr.net/gh/kamdeve/kdpwingman-website@82e0c26c787645ba2746840707ccea37bd527aac'+pathname,302);
+  }
   const page = assets[pathname === '/index.html' ? '/' : pathname];
   if (typeof page !== 'string') return new Response('Brak strony',{status:404});
   const ext=pathname.split('.').pop();
