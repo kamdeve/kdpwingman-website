@@ -281,11 +281,11 @@
 
 <link rel="stylesheet" href="enrollment.css">
 <script src="enrollment.js" defer></script>
-<link rel="icon" href="images/wingman-cherry.png"><link rel="stylesheet" href="home.css"><link rel="stylesheet" href="cinema.css"><script src="home.js" defer></script><script src="cinema.js" defer></script></head>
+<link rel="icon" href="images/wingman-wing.png"><link rel="stylesheet" href="home.css"><link rel="stylesheet" href="cinema.css"><script src="home.js" defer></script><script src="cinema.js" defer></script></head>
 <body>
 
     <header class="mast"><div class="shell mast-inner">
-<a class="wordmark" href="index.html" aria-label="Wingman — strona główna"><img src="images/wingman-cherry.png" alt="">Wingman</a>
+<a class="wordmark" href="index.html" aria-label="Wingman — strona główna"><img src="images/wingman-wing.png" alt="">Wingman</a>
 <nav aria-label="Główne menu"><a href="#how-it-works">Jak to działa</a><a href="#koszty">Kalkulator</a><a href="#puls">Puls zrzutki</a></nav>
 <a class="login-link" href="dashboard.html">Zaloguj się</a></div></header>
 <main>
@@ -297,7 +297,7 @@
 <p class="fine">Depozyt 75 zł · Nadwyżka wraca do portfela po rozliczeniu.</p></div>
 <figure class="film"><div class="film-frame"><video id="intro-film" controls playsinline preload="metadata" poster="images/wingman-film.webp" aria-label="Jak działa zrzutka Wingman"><source src="videos/KDPWIngman zapowiedz.mp4" type="video/mp4"></video><button type="button" id="film-play" aria-label="Odtwórz film o zrzutce" hidden><span aria-hidden="true">▶</span></button></div><figcaption><strong>Jak działa zrzutka?</strong><span>Film · 1 min 33 s</span></figcaption></figure>
 </section>
-<section class="proof shell" aria-label="Społeczność Wingman"><div class="members"><strong id="registered-total">…</strong><span>zarejestrowanych użytkowników</span></div><div id="edition-history" hidden><h2>Uczestnicy poprzednich edycji</h2><ul id="history-items"></ul></div></section>
+<section class="proof shell" aria-label="Społeczność Wingman"><div class="members"><span class="community-title">Społeczność Wingman</span><strong id="registered-total">…</strong><span>zarejestrowanych użytkowników</span></div><div id="edition-history" hidden><h2>Uczestnicy poprzednich edycji</h2><ul id="history-items"></ul></div></section>
 <section id="how-it-works" class="instructions shell"><div class="section-top"><p class="kicker">Od zapisu do rozliczenia</p><h2>Jak działa Wingman?</h2></div><div class="steps"><article><a href="images/step1.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Wybierz edycję"><img loading="lazy" src="images/step1.png" alt="Wybierz edycję — ilustracja z instrukcji Wingman"></a><small>Krok 1</small><h3>Wybierz edycję</h3><p>Sprawdź miesiąc dostępu i liczbę zapisanych osób. Załóż konto przy zapisie lub zaloguj się.</p></article><article><a href="images/step2.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Wpłać depozyt"><img loading="lazy" src="images/step2.png" alt="Wpłać depozyt — ilustracja z instrukcji Wingman"></a><small>Krok 2</small><h3>Wpłać depozyt</h3><p>Rezerwujesz miejsce kwotą 75 zł. Jeśli masz środki w portfelu, zobaczysz potrzebną dopłatę.</p></article><article><a href="images/step3.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Śledź koszt udziału"><img loading="lazy" src="images/step3.png" alt="Śledź koszt udziału — ilustracja z instrukcji Wingman"></a><small>Krok 3</small><h3>Śledź koszt udziału</h3><p>W panelu sprawdzisz liczebność grupy i przewidywany koszt na osobę.</p></article><article><a href="images/step4.png" target="_blank" rel="noopener" aria-label="Powiększ ilustrację: Odbierz nadwyżkę"><img loading="lazy" src="images/step4.png" alt="Odbierz nadwyżkę — ilustracja z instrukcji Wingman"></a><small>Krok 4</small><h3>Odbierz nadwyżkę</h3><p>Po rozliczeniu kosztu narzędzia i opłaty serwisowej nadwyżka trafia do portfela na kolejną edycję.</p></article></div></section>
 <section id="koszty" class="cost-band"><div class="shell"><div class="section-top"><p class="kicker">Kalkulator zrzutki</p><h2>Ile kosztuje jedno miejsce?</h2></div>
 <section id="plan-sal" class="cinema" aria-labelledby="cinema-title">
@@ -323,14 +323,14 @@
     </div>
   </div>
   <dl class="seat-prices">
-    <div><dt>Koszt jednego miejsca</dt><dd id="share-price"></dd></div>
+    <div><dt id="seat-label">Koszt jednego miejsca</dt><dd id="share-price"></dd></div>
     <div><dt>Zwrot do portfela z 75 zł</dt><dd id="refund"></dd></div>
   </dl>
+  <p id="solo-note" class="cinema-hint" hidden>Jedna osoba kupuje plan samodzielnie. Depozyt Wingman dotyczy zrzutki grupowej.</p>
   <p id="deposit-note" class="cinema-hint" hidden>Koszt miejsca przekracza depozyt 75 zł. Przy tej liczbie osób edycji nie można jeszcze rozliczyć.</p>
   <dl class="price-breakdown">
     <div><dt>Helium 10 na osobę</dt><dd id="helium-share"></dd></div>
     <div><dt>Opłata serwisowa na osobę</dt><dd id="service-fee"></dd></div>
-    <div><dt>Helium 10 dla całej grupy <span id="account-count"></span></dt><dd id="helium-total"></dd></div>
     <div><dt>Samodzielny plan Diamond</dt><dd id="solo-price"></dd></div>
   </dl>
   <div class="cinema-stage">
@@ -343,9 +343,11 @@
 
 <details class="math"><summary>Jak liczymy cenę?</summary><p>W symulacji przyjmujemy kurs 4,00 zł za dolara. Samodzielny plan Diamond kosztuje 359 USD miesięcznie przed ewentualnymi podatkami. Dla grupy przyjmujemy 287,20 USD za każde konto. Do kosztu Helium 10 na osobę doliczamy 10 zł opłaty serwisowej. Reszta z depozytu 75 zł wraca do portfela Wingman na kolejną edycję.</p><p>Od 45 osób domyślnie liczymy dwa konta. Grupa może wybrać jedno większością 80% głosów. Ostateczne rozliczenie zależy od kursu i liczby płacących osób.</p><a href="https://www.helium10.com/pricing/" target="_blank" rel="noopener">Sprawdź cennik Helium 10</a></details>
 <div class="budget">
-  <h3>Oszczędność względem samodzielnego planu</h3>
-  <p>Przykładowy budżet na premierę książki: po 20 zł dziennie na test słów kluczowych w Amazon Ads przez 30 dni. To 600 zł.</p>
-  <p id="publishing-budget"></p>
+  <div class="budget-intro"><div><h3>Oszczędność względem samodzielnego planu</h3><strong id="monthly-saving"></strong><span> miesięcznie</span></div><img loading="lazy" src="images/wingman-film.webp" alt=""></div>
+  <div id="budget-examples"><h4>Twój przykładowy budżet na premierę książki</h4><div class="budget-ideas">
+    <div><svg aria-hidden="true" viewBox="0 0 80 64" width="80" height="64"><circle cx="39" cy="32" r="29" fill="#b6eef0"/><path d="m29 33 6 18h8l-6-21" fill="#45324d"/><path d="M19 23h13l25-12v36L32 36H19z" fill="#A0134A"/><path d="M53 13h5v34h-5z" fill="#ffb994"/><path d="m63 20 7-4m-6 12h8m-9 9 7 4" stroke="#168489" stroke-width="3" stroke-linecap="round"/></svg><div><b id="ads-budget"></b><p>Na test słów kluczowych w Amazon Ads</p></div></div>
+    <div><svg aria-hidden="true" viewBox="0 0 80 64" width="80" height="64"><circle cx="39" cy="32" r="29" fill="#ffe8ab"/><path d="m21 13 31-5 9 40-32 7q-7 1-8-6l-6-30q-1-4 6-6" fill="#563554"/><path d="m24 15 25-4 8 33-26 5z" fill="#bc4375"/><path d="m29 49 28-6 1 5-29 5z" fill="#fff5da"/><circle cx="38" cy="26" r="6" fill="#ffc963"/><path d="m35 39 12-3" stroke="white" stroke-width="3"/></svg><div><b id="book-budget"></b><p>Na projekt okładki lub egzemplarze próbne</p></div></div>
+  </div></div>
   <a class="text-link join-link" href="#dolacz">Dołącz do najbliższej edycji</a>
 </div></div></section>
 <section id="puls" class="news shell"><div class="section-top"><p class="kicker">Aktualności od organizatora</p><h2>Puls Zrzutki</h2></div><button id="admin-add-post-btn" class="text-link" style="display:none" onclick="openPostModal()">Dodaj wpis</button><div id="news-feed" aria-live="polite"><p>Wczytywanie aktualności…</p></div><button class="secondary" id="more-news" hidden>Pokaż starsze wpisy</button></section>

@@ -91,29 +91,29 @@
     const soloPrice = 359 * exchangeRate;
     const accountPriceGrosze = Math.round(287.2 * exchangeRate * 100);
     const groupPriceGrosze = accountPriceGrosze * accounts;
-    const groupPrice = groupPriceGrosze / 100;
-    const heliumShare = Math.round(groupPriceGrosze / people) / 100;
-    const serviceFee = 10;
+    const solo = people === 1;
+    const heliumShare = solo ? soloPrice : Math.round(groupPriceGrosze / people) / 100;
+    const serviceFee = solo ? 0 : 10;
     const deposit = 75;
     const seatPrice = heliumShare + serviceFee;
     const refund = Math.max(0, deposit - seatPrice);
     const format = amount => currency.format(amount);
 
+    document.getElementById('seat-label').textContent = solo ? 'Koszt samodzielnego planu' : 'Koszt jednego miejsca';
+    document.getElementById('solo-note').hidden = !solo;
     document.getElementById('share-price').textContent = format(seatPrice);
     document.getElementById('refund').textContent = format(refund);
-    document.getElementById('deposit-note').hidden = seatPrice <= deposit;
+    document.getElementById('deposit-note').hidden = solo || seatPrice <= deposit;
     document.getElementById('helium-share').textContent = format(heliumShare);
     document.getElementById('service-fee').textContent = format(serviceFee);
-    const accountLabel = ['1 konto', '2 konta', '3 konta · symulacja'][accounts - 1];
-    document.getElementById('account-count').textContent = '(' + accountLabel + ')';
-    document.getElementById('helium-total').textContent = format(groupPrice);
     document.getElementById('solo-price').textContent = format(soloPrice) + ' / mies.';
 
     const savings = soloPrice - seatPrice;
-    const remainder = savings - 600;
-    document.getElementById('publishing-budget').textContent =
-      'W porównaniu z samodzielnym planem oszczędzasz ' + format(savings) + ' miesięcznie.' +
-      (remainder >= 0 ? ' Po takim teście zostałoby ' + format(remainder) + '.' : '');
+    const adBudget = Math.min(600, savings);
+    document.getElementById('monthly-saving').textContent = format(savings);
+    document.getElementById('budget-examples').hidden = savings === 0;
+    document.getElementById('ads-budget').textContent = format(adBudget);
+    document.getElementById('book-budget').textContent = format(savings - adBudget);
   }
 
   function render() {

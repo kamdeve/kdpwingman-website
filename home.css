@@ -288,7 +288,7 @@ button,a,input,summary {
 .proof #history-items li {
   flex:1;
   color:#46333e;
-  background:linear-gradient(to right,#a62b54 var(--bar,0%),#f0e4e9 var(--bar,0%)) left bottom/100% 4px no-repeat;
+  background:#e3f6f4;
   border:0;
   padding:0 0 8px;
   font-size:.94rem;
@@ -808,3 +808,25 @@ footer .container {
   display: inline-block;
   margin-top: 12px;
 }
+
+:root { --wine:#A0134A; }
+.wordmark img { object-fit:contain; }
+.proof { padding:clamp(18px,3vw,36px); background:#f1faf9; border:0; border-radius:22px; margin-block:24px; }
+.members .community-title { color:#246b68; font-weight:700; }
+.members strong { font-size:clamp(3rem,6vw,5rem); color:#A0134A; }
+.proof #history-items { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(118px,100%),1fr)); gap:10px; }
+.proof #history-items li { display:grid; gap:6px; padding:14px; background:white; border-radius:13px; }
+.proof #history-items strong { font: bold 1.55rem Georgia,serif; color:#196b64; }
+.budget { padding:clamp(16px,4vw,42px); background:#fffaf0; border:0; border-radius:22px; }
+.budget-intro { display:grid; grid-template-columns: 1fr minmax(150px,34%); gap:16px; align-items:center; }
+.budget-intro img { width:100%; border-radius:18px; }
+.budget-intro h3 { font: bold clamp(1.45rem,3vw,2.5rem)/1.13 Georgia,serif; }
+.budget-intro strong { display:block; margin-top:12px; color:#A0134A; font-size:clamp(2.25rem,5.5vw,4.7rem); line-height:1; letter-spacing:-.055em; }
+.budget h4 { margin:24px 0 12px; }
+.budget-ideas { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)); gap:12px; }
+.budget-ideas > div { display:flex; gap:10px; align-items:center; padding:14px; border-radius:14px; background:#e0f4f2; }
+.budget-ideas > div + div { background:#ffedce; }
+.budget-ideas svg { flex:0 0 60px; }
+.budget-ideas b { font-size:1.4rem; }
+.budget .text-link { display:inline-block; margin-top:18px; }
+@media(max-width:550px){ .budget-intro { grid-template-columns:1fr; } .budget-intro img { max-height:145px; object-fit:cover; } }

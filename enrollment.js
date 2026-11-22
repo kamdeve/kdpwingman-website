@@ -78,9 +78,12 @@
       const rows = history.filter(row => row.month < edition.targetMonth && row.users > 0).slice(0,3);
       $('history-items').replaceChildren(...rows.map(row => {
         const li = document.createElement('li');
-        const largest = Math.max(...rows.map(item => item.users), 1);
-        li.style.setProperty('--bar', Math.min(100,row.users/largest*100) + '%');
-        li.textContent = month(row.month) + ' · ' + row.users + ' os.'; return li;
+        const label = document.createElement('span');
+        label.textContent = month(row.month);
+        const count = document.createElement('strong');
+        count.textContent = row.users + ' os.';
+        li.append(label, count);
+        return li;
       }));
       $('edition-history').hidden = !rows.length;
     } catch { $('edition-history').hidden = true; }
