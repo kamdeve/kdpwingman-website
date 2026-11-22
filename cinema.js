@@ -4,7 +4,7 @@
   const capacity = 44;
   const seatsPerRow = 11;
   const audience = document.getElementById('audience');
-  const priceSlider = document.getElementById('people');
+  const currency = new Intl.NumberFormat('pl-PL', {style: 'currency', currency: 'PLN'});
   const roomList = document.getElementById('cinema-rooms');
   const flights = document.getElementById('cinema-flights');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -86,10 +86,41 @@
     flights.append(fragment);
   }
 
+  function renderPrice(people, accounts) {
+    const exchangeRate = 4;
+    const soloPrice = 359 * exchangeRate;
+    const accountPriceGrosze = Math.round(287.2 * exchangeRate * 100);
+    const groupPriceGrosze = accountPriceGrosze * accounts;
+    const groupPrice = groupPriceGrosze / 100;
+    const heliumShare = Math.round(groupPriceGrosze / people) / 100;
+    const serviceFee = 10;
+    const deposit = 75;
+    const seatPrice = heliumShare + serviceFee;
+    const refund = Math.max(0, deposit - seatPrice);
+    const format = amount => currency.format(amount);
+
+    document.getElementById('share-price').textContent = format(seatPrice);
+    document.getElementById('refund').textContent = format(refund);
+    document.getElementById('deposit-note').hidden = seatPrice <= deposit;
+    document.getElementById('helium-share').textContent = format(heliumShare);
+    document.getElementById('service-fee').textContent = format(serviceFee);
+    const accountLabel = ['1 konto', '2 konta', '3 konta · symulacja'][accounts - 1];
+    document.getElementById('account-count').textContent = '(' + accountLabel + ')';
+    document.getElementById('helium-total').textContent = format(groupPrice);
+    document.getElementById('solo-price').textContent = format(soloPrice) + ' / mies.';
+
+    const savings = soloPrice - seatPrice;
+    const remainder = savings - 600;
+    document.getElementById('publishing-budget').textContent =
+      'W porównaniu z samodzielnym planem oszczędzasz ' + format(savings) + ' miesięcznie.' +
+      (remainder >= 0 ? ' Po takim teście zostałoby ' + format(remainder) + '.' : '');
+  }
+
   function render() {
     frame = 0;
     const total = Number(audience.value);
     const next = distribution(total);
+    renderPrice(total, next.length);
     const transfer = previous.length && previous.length !== next.length && !reducedMotion.matches;
     const origins = transfer ? movingSeats(previous, next).map(seat => seat.getBoundingClientRect()) : [];
     if (previous.length !== next.length) flights.replaceChildren();
@@ -105,7 +136,8 @@
     document.getElementById('audience-number').value = total;
     let summary = next.length === 1 ? 'Jedna sala' : next.length === 2 ? 'Dwie sale' : 'Trzy sale (symulacja)';
     summary += ' · ' + next.join(' + ') + (next.length === 1 ? ' / 44' : ' = ' + total);
-    document.getElementById('cinema-summary').textContent = summary;
+    document.getElementById('cinema-summary').textContent = summary + ' · Miejsce: ' +
+      document.getElementById('share-price').textContent + ' · Zwrot: ' + document.getElementById('refund').textContent;
     if (transfer) animateTransfer(origins, movingSeats(next, previous));
     previous = next;
   }
@@ -115,10 +147,6 @@
   }
 
   audience.addEventListener('input', scheduleRender);
-  priceSlider.addEventListener('input', () => {
-    audience.value = priceSlider.value;
-    scheduleRender();
-  });
   document.querySelectorAll('[data-audience]').forEach(button => {
     button.addEventListener('click', () => {
       audience.value = button.dataset.audience;

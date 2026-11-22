@@ -116,6 +116,50 @@
   outline: 3px solid #ffd7ab;
   outline-offset: 3px;
 }
+.seat-prices, .price-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 2vw, 18px);
+  margin: 16px 0;
+}
+.seat-prices > div {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: clamp(10px, 2vw, 22px);
+  border-radius: 12px;
+  background: #ffe3d7;
+  color: #41182c;
+}
+.seat-prices > div + div {
+  background: #d2eddf;
+  color: #183d34;
+}
+.seat-prices dt, .price-breakdown dt {
+  font-size: clamp(.82rem, 1.35vw, 1.05rem);
+  line-height: 1.35;
+}
+.seat-prices dd, .price-breakdown dd {
+  margin: 5px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.seat-prices dd {
+  font-size: clamp(1.25rem, 4.3vw, 3rem);
+  font-weight: 750;
+  letter-spacing: -.045em;
+  line-height: 1.1;
+}
+.price-breakdown {
+  margin-bottom: 24px;
+}
+.price-breakdown > div {
+  padding-top: 9px;
+  border-top: 1px solid #ffffff38;
+}
+.price-breakdown dt { color: #e3ced7; }
+.price-breakdown dd { font-weight: 650; }
+@media (min-width: 760px) {
+  .price-breakdown { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 .cinema-stage {
   position: relative;
 }
