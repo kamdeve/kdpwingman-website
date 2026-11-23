@@ -69,11 +69,12 @@
   }
   async function refreshMember() {
     member = null;
+    window.dispatchEvent(new Event('wingman-session-change'));
     if (!localStorage.getItem(sessionKey)) return;
     try { member = await api('enrollment/me'); }
     catch (err) {
       if (err.status !== 401) throw err;
-      localStorage.removeItem(sessionKey);
+      localStorage.removeItem(sessionKey); window.dispatchEvent(new Event('wingman-session-change'));
     }
   }
   const dateLabel = new Intl.DateTimeFormat('pl-PL', {day:'numeric', month:'long', year:'numeric', timeZone:'UTC'});
@@ -215,7 +216,7 @@
     try { await task(); }
     catch (err) {
       if (err.status === 401 && member) {
-        member = null; localStorage.removeItem(sessionKey); setMode('login'); form.hidden = false;
+        member = null; localStorage.removeItem(sessionKey); window.dispatchEvent(new Event('wingman-session-change')); setMode('login'); form.hidden = false;
       }
       message.textContent = err.message || 'Wystąpił błąd. Spróbuj ponownie.';
     } finally { busy = false; render(); }

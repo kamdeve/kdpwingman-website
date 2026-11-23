@@ -10,11 +10,12 @@ const landing = home.slice(home.indexOf('<header class="mast">'),home.indexOf('<
   .replace('href="terms.html"','href="https://kdpwingman.com/terms.html"')
   .replace('href="privacy.html"','href="https://kdpwingman.com/privacy.html"');
 module.exports = {
-  '/':head+controls+landing+'<script src="/enrollment.js"></script><script src="/home.js"></script><script src="/cinema.js"></script></body></html>',
+  '/':head+controls+landing+'<script src="/member-session.js"></script><script src="/enrollment.js"></script><script src="/home.js"></script><script src="/cinema.js"></script></body></html>',
   ...require('./confirmation-pages.cjs')(read('success.html'),read('dashboard.html')),
   '/enrollment-success.css':read('enrollment-success.css'), '/enrollment-success.js':read('enrollment-success.js'),
   '/cinema.css':read('cinema.css'), '/cinema.js':read('cinema.js'),
   '/home.css':read('home.css'), '/enrollment.css':read('enrollment.css'), '/home.js':read('home.js'),
+  '/member-session.js':read('member-session.js'),
   '/panel-dev.js':read('preview/panel-dev.js'), '/enrollment.js':read('enrollment.js'),
   '/images/wingman-wing.png':fs.readFileSync(path.join(root,'images/wingman-wing.png')).toString('base64'),
   '/images/edition-steps.webp':fs.readFileSync(path.join(root,'images/edition-steps.webp')).toString('base64'),
