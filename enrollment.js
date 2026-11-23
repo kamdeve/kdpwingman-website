@@ -96,6 +96,13 @@
     countdownTimer = setInterval(tick, 15000);
     tick();
   }
+  const dollars = new Intl.NumberFormat('pl-PL', {style:'currency', currency:'USD', currencyDisplay:'code'});
+  function seatQuote(id, toolCents, toolUSD, rate) {
+    const available = Number.isFinite(toolCents) && toolCents > 0 && Number.isFinite(toolUSD) && toolUSD > 0 && Number.isFinite(rate) && rate > 0;
+    $(id).textContent = available ? money(toolCents + 1000) : '—';
+    $(id + '-usd').textContent = available ? '≈ ' + dollars.format(toolUSD + 10 / rate) : '';
+    $(id + '-parts').textContent = available ? 'Helium: ' + money(toolCents) + ' (' + dollars.format(toolUSD) + ') + 10 zł opłaty' : '';
+  }
   function showGoals(users, payers, estimate) {
     const freePlaces = users - payers;
     const start = Math.max(15, Math.floor(users / 5) * 5 - 10);
@@ -104,8 +111,9 @@
       const label = document.createElement('span');
       label.textContent = goal + ' osób';
       const price = document.createElement('b');
-      price.textContent = goal > freePlaces ? estimate(goal, goal - freePlaces) : '—';
+      price.textContent = goal > freePlaces ? money(estimate(goal, goal - freePlaces).cents) : '—';
       const progress = document.createElement('progress');
+      progress.className = users >= goal ? 'goal-reached' : 'goal-pending';
       progress.max = goal;
       progress.value = Math.min(goal, users);
       progress.setAttribute('aria-label', 'Postęp do celu ' + goal + ' osób');
@@ -119,7 +127,7 @@
   }
   function updateEstimate(status) {
     const users = status.users;
-    const fee = 1000;
+    const rate = Number(status.rate);
     const toolPLN = Number.parseFloat(status.pricePLN);
     const toolUSD = Number.parseFloat(status.priceUSD);
     const accounts = status.isSplitActive ? 2 : 1;
@@ -128,17 +136,19 @@
     const votes = Number(status.votes);
     const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Number.isFinite(toolPLN) && toolPLN > 0;
     const unknownPayer = status.payingUsers == null && payers === 1 && users > 0;
-    $('edition-current').textContent = valid && payers > 0 && !unknownPayer ? money(Math.round(toolPLN * 100) + fee) : '—';
-    $('edition-next').textContent = '—';
+    seatQuote('edition-current', valid && payers && !unknownPayer ? Math.round(toolPLN * 100) : null, toolUSD, rate);
+    seatQuote('edition-next', null, null, rate);
     $('edition-goals').hidden = true;
     if (!valid || unknownPayer || !Number.isFinite(votes)) return;
     const accountCost = payers ? toolPLN * payers / accounts : 287.20 * Number(status.rate);
     if (Number.isFinite(accountCost) && accountCost > 0) {
       const estimate = (total, paying) => {
         const count = total >= 45 && votes < Math.ceil(total * .8) ? 2 : 1;
-        return money(Math.round(accountCost * count * 100 / paying) + fee);
+        return {cents:Math.round(accountCost * count * 100 / paying), usd:287.20 * count / paying};
       };
-      $('edition-next').textContent = estimate(users + 1, payers + 1);
+      const next = estimate(users + 1, payers + 1);
+      seatQuote('edition-next', next.cents, next.usd, rate);
+      $('edition-goal-note').textContent = 'Płacące osoby: ' + payers + ' z ' + users + '. Progi zakładają, że każda kolejna osoba płaci. Do podanych kwot dolicz 10 zł za obsługę.';
       showGoals(users, payers, estimate);
     }
   }
