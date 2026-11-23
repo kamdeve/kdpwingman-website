@@ -28,7 +28,12 @@
     const data=get();
     const due=data.free||data.joined ? 0 : Math.max(0,7500-data.balance);
     switch(path) {
-      case 'group-buy/status': return {users:24+(data.joined?1:0),targetMonth:ym(1),isLocked:data.scenario==='closed'};
+      case 'group-buy/status': {
+        const res = await fetch('/public-data/group-buy/status', {credentials:'omit'});
+        if (!res.ok) fail('Nie udało się wczytać bieżącej edycji. Spróbuj ponownie.');
+        const status = await res.json();
+        return {...status, isLocked:status.isLocked || data.scenario === 'closed'};
+      }
       case 'stats/history': return [{month:'2026-11',users:40},{month:'2026-10',users:49},{month:'2026-09',users:43}];
       case 'register':
         if (data.registered || body.email==='test@example.com') fail('To konto już istnieje. Wybierz „Mam konto”.');

@@ -46,6 +46,7 @@
     start.disabled = busy;
     submit.disabled = busy;
     $('join-panel').hidden = true;
+    $('edition-next-wrap').hidden = Boolean(member?.joined || member?.free || edition?.isLocked);
     if (retryLoad) { start.textContent = 'Spróbuj ponownie'; return; }
     if (!edition) { start.disabled = true; return; }
     if (member?.joined) {
@@ -69,11 +70,32 @@
       localStorage.removeItem(sessionKey);
     }
   }
+  function updateEstimate(status) {
+    const users = status.users;
+    const fee = 1000;
+    const toolPLN = Number.parseFloat(status.pricePLN);
+    const toolUSD = Number.parseFloat(status.priceUSD);
+    const accounts = status.isSplitActive ? 2 : 1;
+    // The public status expresses the current tool share in USD per paying member.
+    const payers = status.payingUsers ?? (users === 0 ? 0 : Math.round(accounts * 287.20 / toolUSD));
+    const votes = Number(status.votes);
+    const nextAccounts = users + 1 >= 45 && votes < Math.ceil((users + 1) * .8) ? 2 : 1;
+    const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Number.isFinite(toolPLN) && toolPLN > 0;
+    const unknownPayer = status.payingUsers == null && payers === 1 && users > 0;
+    $('edition-current').textContent = valid && payers > 0 && !unknownPayer ? money(Math.round(toolPLN * 100) + fee) : '—';
+    $('edition-next').textContent = '—';
+    if (!valid || unknownPayer || !Number.isFinite(votes)) return;
+    const accountCost = payers ? toolPLN * payers / accounts : 287.20 * Number(status.rate);
+    if (Number.isFinite(accountCost) && accountCost > 0) {
+      $('edition-next').textContent = money(Math.round(accountCost * nextAccounts / (payers + 1) * 100) + fee);
+    }
+  }
   async function load() {
     retryLoad = false; message.textContent = '';
     edition = await api('group-buy/status');
     $('edition-title').textContent = month(edition.targetMonth);
     $('edition-count').textContent = edition.users;
+    updateEstimate(edition);
     $('access-date').textContent = month(edition.targetMonth,true);
     await refreshMember();
   }
@@ -85,7 +107,7 @@
       location.assign(dest.href);
     } else if (result.joined) {
       member.joined = true;
-      $('edition-count').textContent = (await api('group-buy/status')).users;
+      await load();
     } else throw new Error('Nie udało się potwierdzić zapisu.');
   }
   async function run(task) {
@@ -129,9 +151,13 @@
       const session = params.get('enrollment_session');
       if (session) {
         await api('payment-success',{session_id:session});
-        await refreshMember(); history.replaceState(null,'',location.pathname+'#dolacz');
+        await load(); history.replaceState(null,'',location.pathname+'#dolacz');
         if (!member?.joined) message.textContent = 'Wpłata zaksięgowana. Szczegóły znajdziesz w panelu.';
       } else if (params.has('cancelled')) message.textContent = 'Płatność anulowana. Możesz wrócić do zapisu.';
+      if (!member && !edition.isLocked) {
+        setMode(localStorage.getItem('wingman_user') ? 'login' : 'register');
+        form.hidden = false;
+      }
     } catch (err) { retryLoad = true; throw err; }
   }
   start.onclick = () => run(async () => {

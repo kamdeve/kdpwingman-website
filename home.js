@@ -15,15 +15,7 @@
     play.hidden = true;
     try { await film.play(); } catch { film.controls = true; }
   };
-  byId('watch-intro').addEventListener('click', () => {
-    film.focus();
-    play.click();
-  });
   film.addEventListener('ended', () => { play.hidden = false; });
-  document.querySelectorAll('.join-link').forEach(link => link.addEventListener('click', () => {
-    const action = byId('join-start');
-    if (action && !action.hidden && !action.disabled) action.click();
-  }));
   readPublic('stats/total-users').then(data => {
     if (!Number.isSafeInteger(data.total) || data.total < 0) throw new Error();
     byId('registered-total').textContent = data.total.toLocaleString('pl-PL');
