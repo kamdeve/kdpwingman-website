@@ -10,6 +10,7 @@
     logout.hidden = !displayed;
   }
   logout.onclick = () => {
+    WingmanPuls.clear();
     localStorage.removeItem(key);
     history.replaceState(null, '', '/#dolacz');
     location.reload();

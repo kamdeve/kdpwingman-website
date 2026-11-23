@@ -115,7 +115,7 @@
     if (!preview && Number.isSafeInteger(post.id)) {
       const like=element('button','Polub · ');const count=element('span',String(post.likes||0));count.id='like-count-'+post.id;
       like.id='like-btn-'+post.id;like.append(count);like.onclick=()=>window.likePulsPost(post.id);card.append(like);
-      if (localStorage.getItem('admin_secret')) {
+      if (window.WingmanPuls.allowed()) {
         const remove=element('button','Usuń wpis');remove.onclick=()=>window.deletePulsPost(post.id);card.append(remove);
       }
     }
@@ -126,6 +126,7 @@
     if(!posts.length) feed.append(element('p','Nowe wiadomości od organizatora pojawią się tutaj.'));
     byId('more-news').hidden=shown>=posts.length;
   }
+  window.addEventListener('wingman-puls-permissions', () => { if (posts.length) renderNews(); });
   window.loadPulsPosts = async () => {
     try { posts=await readPublic('puls/posts');if(!Array.isArray(posts)) throw new Error();renderNews(); }
     catch { const retry=element('button','Spróbuj ponownie');retry.onclick=window.loadPulsPosts;byId('news-feed').replaceChildren(element('p','Nie udało się pobrać aktualności.'),retry); }

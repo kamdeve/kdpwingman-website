@@ -76,7 +76,7 @@
 </script>
 
 <link rel="stylesheet" href="enrollment.css">
-<script src="member-session.js" defer></script><script src="enrollment.js" defer></script>
+<script src="puls-session.js" defer></script><script src="member-session.js" defer></script><script src="enrollment.js" defer></script>
 <link rel="icon" href="images/wingman-wing.png"><link rel="stylesheet" href="home.css"><link rel="stylesheet" href="cinema.css"><script src="home.js" defer></script><script src="cinema.js" defer></script></head>
 <body>
 
@@ -202,7 +202,7 @@
   <article><a class="step-art" href="images/step3.png" target="_blank" rel="noopener" aria-label="Zobacz ekran z instrukcji — Sprawdź koszt miejsca"></a><small>Krok 3</small><h3>Sprawdź koszt miejsca</h3><p>W panelu zobaczysz liczbę uczestników i przewidywany koszt jednego miejsca.</p></article>
   <article><a class="step-art" href="images/step4.png" target="_blank" rel="noopener" aria-label="Zobacz ekran z instrukcji — Odbierz zwrot do portfela"></a><small>Krok 4</small><h3>Odbierz zwrot do portfela</h3><p>Po rozliczeniu dostępu i opłaty serwisowej reszta depozytu wraca do portfela Wingman na kolejną edycję.</p></article>
 </div></section>
-<section id="puls" class="news shell"><div class="section-top"><h2>Puls Zrzutki</h2></div><button id="admin-add-post-btn" class="text-link" style="display:none" onclick="openPostModal()">Dodaj wpis</button><div id="news-feed" aria-live="polite"><p>Wczytywanie aktualności…</p></div><button class="secondary" id="more-news" hidden>Pokaż starsze wpisy</button></section>
+<section id="puls" class="news shell"><div class="section-top"><h2>Puls Zrzutki</h2></div><button id="admin-add-post-btn" class="text-link" hidden onclick="openPostModal()">Dodaj wpis</button><div id="news-feed" aria-live="polite"><p>Wczytywanie aktualności…</p></div><button class="secondary" id="more-news" hidden>Pokaż starsze wpisy</button></section>
 <section id="dolacz" class="join-band"><div class="shell join-grid" id="register"><div class="join-intro"><h2>Zarezerwuj miejsce<br>w zrzutce.</h2>
     <div class="edition-live" aria-labelledby="edition-live-title">
       <h3 id="edition-live-title">Szacowany koszt Helium 10 na osobę</h3>
@@ -270,16 +270,10 @@
 async function deletePulsPost(id) {
     if (!confirm("⚠️ Czy na pewno chcesz trwale usunąć ten post?")) return;
     
-    const secret = localStorage.getItem('admin_secret');
     try {
-        const res = await fetch(`https://kdpwingmanv2backend-production.up.railway.app/api/puls/post/${id}`, {
-            method: 'DELETE',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ secret })
-        });
-        if (res.ok) loadPulsPosts(); // Odświeża karuzelę po usunięciu
-        else alert("Błąd usuwania!");
-    } catch (e) { console.error(e); }
+        await WingmanPuls.remove(id);
+        loadPulsPosts();
+    } catch (err) { alert(err.message); }
 }
 
 
@@ -338,6 +332,7 @@ function togglePostText(id) {
 let base64ImageString = ""; 
 
 function openPostModal() {
+    if (!WingmanPuls.allowed()) return;
     const modal = document.getElementById('admin-post-modal');
     if(modal) modal.style.display = 'flex';
     
@@ -401,8 +396,6 @@ function handleFileUpload(file, imagePreview, dropZone) {
 async function submitNewPost() {
     const title = document.getElementById('post-title').value;
     const content = document.getElementById('post-content').value;
-    const secret = localStorage.getItem('admin_secret');
-
     if (!title || !content) return alert("Wypełnij temat i treść!");
 
     const btn = document.querySelector('.btn-save');
@@ -410,31 +403,15 @@ async function submitNewPost() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zapisywanie...';
 
     try {
-        const res = await fetch('https://kdpwingmanv2backend-production.up.railway.app/api/puls/post', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ title, content, image_url: base64ImageString, secret })
-        });
-        
-        if (res.ok) {
-            closePostModal();
-            loadPulsPosts(); 
-        } else {
-            alert("Błąd zapisu! Upewnij się, że zaktualizowałeś index.js na serwerze.");
-        }
-    } catch (e) { console.error(e); }
-    
+        await WingmanPuls.add({ title, content, image_url: base64ImageString });
+        closePostModal();
+        loadPulsPosts();
+    } catch (err) { alert(err.message); }
+
     btn.innerHTML = originalText;
 }
 
 // --- SYSTEM ADMINA I NAWIGACJI ---
-function checkAdminStatus() {
-    const secret = localStorage.getItem('admin_secret');
-    const btn = document.getElementById('admin-add-post-btn');
-    if (secret && btn) {
-        btn.style.display = 'block';
-    }
-}
 
 function scrollCarousel(direction) {
     const container = document.getElementById('dynamic-posts-container');
@@ -446,7 +423,7 @@ function scrollCarousel(direction) {
 
 // --- URUCHOMIENIE PO ZAŁADOWANIU ---
 // The homepage loads the feed once its shared script is ready.
-checkAdminStatus();
+
 
 
     </script>

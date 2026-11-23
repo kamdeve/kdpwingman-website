@@ -243,6 +243,7 @@
       if (!session.email || !session.token) throw new Error('Nie udało się potwierdzić logowania.');
       authenticatedEmail = session.email;
       localStorage.setItem('wingman_user', session.email);
+      WingmanPuls.signedIn(session);
       window.dispatchEvent(new Event('wingman-session-change'));
       form.elements.password.value = '';
       await refreshMember();

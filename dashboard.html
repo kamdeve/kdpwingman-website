@@ -424,6 +424,7 @@
     })
 </script>
 
+<script src="puls-session.js" defer></script>
 </head>
 <body>
 
@@ -1068,14 +1069,13 @@
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ email, password: pass })
                 });
-                if (res.ok) {
-                userEmail = email;
-                localStorage.setItem('wingman_user', email); // ZMIANA: używamy jednego, wspólnego klucza
+                if (!res.ok) throw new Error('Błędne dane logowania.');
+                const session = await res.json();
+                userEmail = session.email;
+                localStorage.setItem('wingman_user', session.email);
+                WingmanPuls.signedIn(session);
                 initDashboard();
-                switchAppTab('panel', null); // Przekieruj od razu do "Mój Panel"
-            }
-                
-                initDashboard(); // Uruchom widok
+                switchAppTab('panel', null);
             } catch(e) { document.getElementById('login-msg').innerText = "Błędne dane"; }
         }
 
@@ -1602,6 +1602,7 @@ if (data.has_free_ticket) {
         
         // Obsługa wylogowania
         document.getElementById('logout-btn').addEventListener('click', function() {
+            WingmanPuls.clear();
             localStorage.removeItem('wingman_user');
             window.location.href = "index.html";
         });
@@ -3235,8 +3236,10 @@ function showLoginPanel() {
                         body: JSON.stringify({ email, password })
                     });
                     if (loginRes.ok) {
-                        userEmail = email;
-                        localStorage.setItem('wingman_user', email);
+                        const session = await loginRes.json();
+                        userEmail = session.email;
+                        localStorage.setItem('wingman_user', session.email);
+                        WingmanPuls.signedIn(session);
                         showLoginFromRegister();
                         initDashboard();
                         switchAppTab('panel', null);
