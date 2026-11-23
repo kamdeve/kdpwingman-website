@@ -442,16 +442,9 @@
 
     </style>
 
-<script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Mi Ri init Vi Gi Rr Wi Ji Bi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync un identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Xi createPersonProfile setInternalOrTestUser sn Hi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ki debug Lr rn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('phc_oYerNzYJWaJzr6PafVdVLMzb3nwSWsSGgJaNyHyw582D', {
-        api_host: 'https://analityka.kdpwingman.com',
-        defaults: '2026-01-30',
-        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-    })
-</script>
 
-</head>
+
+<style>.seat-confirmation{font-weight:800;color:#116548;font-size:1.2rem;margin-bottom:.3rem}.seat-confirmation+p{margin-top:0;color:#665d65}.ticket-status{color:#79500d;font-weight:700}.join-link{display:block;text-align:center;text-decoration:none}.history-table td,#wallet-history-body td{font-variant-numeric:tabular-nums}.lottery-card{background:#fffbf1!important}.btn:focus-visible,.skool-tab:focus-visible{outline:3px solid #a0134a;outline-offset:3px}</style></head>
 <body>
 
     <div class="background-glow"></div>
@@ -510,7 +503,7 @@
         
         <div class="skool-top-bar">
             <a href="index.html" class="logo">
-                <img src="images/wingman-cherry.png" width="28" height="28" alt=""> <span>Wingman</span>
+                <img src="/images/wingman-wing.png" width="28" height="28" alt=""> <span>Wingman</span>
             </a>
 
             <div class="desktop-actions" style="display: flex; align-items: center; gap: 20px;">
@@ -617,12 +610,12 @@
 
 <div class="lottery-card" style="background: #ffffff; border: 2px solid var(--cherry); border-radius: 16px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; overflow: hidden;">
     <h3 style="color: #b45309; display: flex; align-items: center; font-weight: 800; font-size: 1.5rem; margin-bottom: 10px;">
-        🎟️ LOTERIA: ZŁOTY BILET
+        🎟️ Złoty Bilet
     </h3>
     <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
-        Opłać swoją zrzutkę na czas (do <strong>5. dnia miesiąca</strong>), aby automatycznie wziąć udział w losowaniu. Zwycięzca otrzymuje kolejną zrzutkę <strong>całkowicie za darmo!</strong>
+        Wpłata 5. dnia miesiąca daje udział w losowaniu darmowego miejsca na kolejną edycję.
     </p>
-    <div style="background-color: var(--cherry-light); padding: 10px 15px; border-radius: 8px; display: inline-block;">
+    <p id="ticket-status" class="ticket-status" role="status"></p><div style="background-color: var(--cherry-light); padding: 10px 15px; border-radius: 8px; display: inline-block;">
         <span style="color: var(--text-main); font-size: 13px; font-weight: 600;">🏆 Zwycięzca w poprzednim miesiącu: <strong id="lottery-winner-name" style="color: var(--cherry);">Oczekujemy na wyniki...</strong></span>
     </div>
 </div>
@@ -1079,10 +1072,12 @@
 
 
 
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="/dashboard-session.js"></script>
 
     <script>
-        const API = "https://kdpwingmanv2backend-production.up.railway.app";
+        const API = "";
         let userEmail = "";
 
         // Przełączanie zakładek
@@ -1102,11 +1097,12 @@
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
             try {
-                const res = await fetch(`${API}/api/login`, {
+                const res = await dashboardFetch(`${API}/api/login`, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ email, password: pass })
                 });
-                if (res.ok) {
+                if (!res.ok) throw new Error('Błędne dane');
+            if (res.ok) {
                 userEmail = email;
                 localStorage.setItem('wingman_join_token', (await res.json()).token);
                 localStorage.setItem('wingman_user', email); // ZMIANA: używamy jednego, wspólnego klucza
@@ -1114,7 +1110,7 @@
                 switchAppTab('panel', null); // Przekieruj od razu do "Mój Panel"
             }
                 
-                initDashboard(); // Uruchom widok
+
             } catch(e) { document.getElementById('login-msg').innerText = "Błędne dane"; }
         }
 
@@ -1128,22 +1124,16 @@
             // --- LOGIKA STARTOWA (SKOOL STYLE) ---
             // Sprawdzamy, czy w linku przekazano konkretną zakładkę (np. ?tab=community)
             const urlParams = new URLSearchParams(window.location.search);
-            const targetTab = urlParams.get('tab') || 'community'; // Jeśli brak, domyślnie to 'community'
+            const targetTab = urlParams.get('tab') || 'panel'; // Jeśli brak, domyślnie to 'community'
             
             // Przełączamy od razu na wybraną zakładkę
             switchAppTab(targetTab, null);
         }
 
         // --- 3. AUTOMATYCZNY START ---
-        const savedUser = localStorage.getItem('wingman_user');
-        if(savedUser) {
-            userEmail = savedUser;
-            initDashboard();
-        }
-
         async function loadDashboardData() {
     // 1. Pobieranie danych z backendu
-    const res = await fetch(`${API}/api/user/status`, {
+    const res = await dashboardFetch(`${API}/api/user/status`, {
         method: 'POST', 
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ email: userEmail })
@@ -1151,13 +1141,17 @@
     
     // BEZPIECZNIK: Jeśli serwer zwróci błąd, przerywamy funkcję, by nie wywalić strony
     if (!res.ok) {
-        console.error("Błąd pobierania statusu");
+        document.getElementById('status-badge').textContent = 'Nie udało się pobrać statusu. Odśwież stronę.';
         return; 
     }
 
     // NAJPIERW pobieramy 'data'
     const data = await res.json();
     checkUserNickname(data);
+    document.getElementById('ticket-status').textContent = data.has_free_ticket ? 'Masz Złoty Bilet do wykorzystania.' :
+      data.has_joined && Number(data.stats?.deposit) === 0 ? 'Twoje miejsce w tej edycji zostało opłacone Złotym Biletem.' :
+      data.lottery_eligible ? 'Bierzesz udział w losowaniu za tę edycję.' :
+      data.has_joined ? 'Twoja wpłata przypadła poza dniem otwarcia zapisów.' : 'Bilet możesz zdobyć w dniu otwarcia zapisów.';
 
     // DOPIERO POTEM odczytujemy pasek postępu z 'data'
     if (data.gamification) {
@@ -1187,7 +1181,7 @@
     }
 
   
-    document.getElementById('current-month-label').innerText = "Edycja: " + data.month;
+    document.getElementById('current-month-label').innerText = "Edycja · " + new Date(data.month+"-05T12:00:00Z").toLocaleDateString("pl-PL",{month:"long",year:"numeric"});
 
 // Aktualizacja imienia zwycięzcy loterii
 if (data.lottery_winner) {
@@ -1243,7 +1237,7 @@ if (data.has_free_ticket) {
                 accessInfo.classList.remove('hidden');
 
                 // NOWE: Pobieramy dane globalne o zrzutce (aby sprawdzić, czy głosowanie jest aktywne)
-                const gbRes = await fetch(`${API}/api/group-buy/status`);
+                const gbRes = await dashboardFetch(`${API}/api/group-buy/status`);
                 const gbData = await gbRes.json();
 
                 let votingHtml = "";
@@ -1280,14 +1274,14 @@ if (data.has_free_ticket) {
 
                 if (data.stats) {
                     accessInfo.innerHTML = `
-                        <div id="dash-countdown" style="font-size:1.5rem; font-weight:800; text-align:center; color:var(--cherry); margin-bottom:20px;">Ładowanie...</div>
+                        <p class="seat-confirmation">✓ Masz miejsce w tej edycji</p><p>Wysyłka dostępu e-mailem · ${editionDate(data.month)}</p>
                         
                         ${votingHtml}
 
                         <div style="background: #ffffff; border: 1px solid var(--glass-border); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--glass-border); padding-bottom:10px;">
                                 <div style="text-align:left;">
-                                    <span style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Twój Numer</span>
+                                    <span style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Twoje miejsce na liście</span>
                                     <div style="font-size:1.8rem; font-weight:bold; color:var(--text-main);">#${data.stats.my_number}</div>
                                 </div>
                                 <div style="text-align:right;">
@@ -1302,16 +1296,16 @@ if (data.has_free_ticket) {
                                     <div style="font-size:1.1rem; font-weight:bold; color:var(--text-main);">${data.stats.deposit} zł</div>
                                 </div>
                                 <div style="background:#f8fafc; border:1px solid var(--glass-border); padding:10px; border-radius:8px;">
-                                    <div style="font-size:0.7rem; color:var(--text-muted);">Cena na wejściu</div>
-                                    <div style="font-size:1.1rem; font-weight:bold; color:var(--text-main);">${data.stats.price_when_joined} zł</div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted);">Helium na osobę</div>
+                                    <div style="font-size:1.1rem; font-weight:bold; color:var(--text-main);">${formatUSD(data.stats.current_usd)}</div>
                                 </div>
                                 <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; padding:10px; border-radius:8px;">
-                                    <div style="font-size:0.7rem; color:#10b981;">📉 Aktualny rachunek</div>
-                                    <div style="font-size:1.2rem; font-weight:bold; color:#10b981;">ok. ${data.stats.current_price} zł</div>
+                                    <div style="font-size:0.7rem; color:#10b981;">Szacowany koszt Helium</div>
+                                    <div style="font-size:1.2rem; font-weight:bold; color:#10b981;">${estimatePLN(data.stats.current_price)}</div>
                                 </div>
                                 <div style="background:rgba(160, 19, 74, 0.1); border:1px solid var(--cherry); padding:10px; border-radius:8px;">
                                     <div style="font-size:0.7rem; color:var(--cherry);">Przewidywany Zwrot</div>
-                                    <div style="font-size:1.2rem; font-weight:bold; color:var(--cherry);">ok. ${data.stats.projected_refund} zł</div>
+                                    <div style="font-size:1.2rem; font-weight:bold; color:var(--cherry);">${estimatePLN(data.stats.projected_refund)}</div>
                                 </div>
                             </div>
                             <p style="margin-top:15px; font-size:0.75rem; color:var(--text-muted); text-align:center;">
@@ -1320,121 +1314,19 @@ if (data.has_free_ticket) {
                         </div>
                         ${subHtml} 
                     `;
-                    startDashCountdown();
+
                 } else {
                      accessInfo.innerHTML = '<strong style="color: var(--success)">✅ Dostęp aktywny!</strong>' + subHtml;
                 }
 
             } 
             
-           // --- SCENARIUSZ 2: NIE DOŁĄCZYŁEŚ, ALE MASZ ŚRODKI LUB ZŁOTY BILET ---
-            else if (data.wallet_balance >= 75 || data.has_free_ticket) {
-                 container.classList.remove('hidden'); 
-                 
-                 let headerText = data.has_free_ticket ? "🎟️ Masz Złoty Bilet!" : "Masz środki w portfelu!";
-                 let subText = data.has_free_ticket ? "Wygrałeś loterię. Dołączasz do tej edycji za 0 zł." : "Możesz dołączyć do obecnej edycji bez dopłacania.";
-
-                 container.innerHTML = `
-                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 20px; border-radius: 10px; text-align: center;">
-                        <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 1rem;">${headerText}</h3>
-                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">${subText}</p>
-                        <button id="instant-join-btn" class="btn btn-primary" style="width: 100%; background: #10b981; border: none; margin-top: 0;">
-                            🚀 Dołącz teraz (kliknij raz)
-                        </button>
-                    </div>
-                    ${subHtml}
-                `;
-
-                // Obsługa AUTO-JOIN
-                document.getElementById('instant-join-btn').onclick = async function() {
-                    const btn = this;
-                    btn.disabled = true;
-                    btn.innerText = "Przetwarzanie...";
-
-                    try {
-                        const joinRes = await fetch(`${API}/api/group-buy/join`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: userEmail })
-                        });
-
-                        if (joinRes.ok) {
-                            const joinData = await joinRes.json();
-                            const statusRes = await fetch(`${API}/api/group-buy/status`);
-                            const statusData = await statusRes.json();
-
-                            document.getElementById('modal-number').innerText = "#" + joinData.number;
-                            document.getElementById('modal-price').innerText = statusData.pricePLN;
-
-                            const modal = document.getElementById('success-modal');
-                            modal.classList.remove('hidden');
-                            modal.style.display = 'flex'; 
-                            
-                            loadDashboardData(); 
-                        } else {
-                            const errData = await joinRes.json();
-                            alert("Błąd: " + (errData.error || "Nie udało się dołączyć"));
-                            btn.disabled = false;
-                            btn.innerText = "🚀 Dołącz teraz";
-                        }
-                    } catch (e) {
-                        alert("Błąd połączenia: " + e.message);
-                        btn.disabled = false;
-                        btn.innerText = "🚀 Dołącz teraz";
-                    }
-                };
-
-            } 
-            
-            // --- SCENARIUSZ 3: BRAKUJE ŚRODKÓW (DOPŁATA) ---
             else {
+                document.getElementById('status-badge').textContent = 'Brak rezerwacji';
+                document.getElementById('status-badge').className = 'status-badge status-wait';
+                accessInfo.classList.add('hidden');
                 container.classList.remove('hidden');
-                
-                const missing = (75.00 - data.wallet_balance).toFixed(2);
-                let payAmount = parseFloat(missing);
-                if(payAmount < 5) payAmount = 5.00;
-
-                container.innerHTML = `
-                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 10px; text-align: center;">
-                        <h3 style="color: #ef4444; margin: 0 0 10px 0; font-size: 1rem;">Dołącz do zrzutki</h3>
-                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 5px;">
-                            W portfelu: <strong>${data.wallet_balance.toFixed(2)} zł</strong>
-                        </p>
-                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-                            Brakuje: <strong>${missing} zł</strong>
-                        </p>
-                        <button id="stripe-pay-btn" class="btn btn-primary" style="width: 100%; margin-top: 0;">
-                            💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)
-                        </button>
-                    </div>
-                    ${subHtml}
-                `;
-
-                document.getElementById('stripe-pay-btn').onclick = async function() {
-                    const btn = this;
-                    btn.disabled = true;
-                    btn.innerText = "Łączenie z bankiem...";
-
-                    try {
-                        const payRes = await fetch(`${API}/api/create-checkout-session`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: userEmail, amount: payAmount }) 
-                        });
-                        const payData = await payRes.json();
-                        
-                        if(payData.url) window.location.href = payData.url;
-                        else {
-                            alert("Błąd płatności");
-                            btn.disabled = false;
-                            btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
-                        }
-                    } catch(err) {
-                        alert("Błąd: " + err.message);
-                        btn.disabled = false;
-                        btn.innerText = `💳 Dopłać ${payAmount.toFixed(2)} zł (Stripe)`;
-                    }
-                };
+                container.innerHTML = '<a class="btn btn-primary join-link" href="/#dolacz">Zarezerwuj miejsce →</a>' + subHtml;
             }
 
             // --- 4. AKTYWACJA PRZYCISKU ANULOWANIA (Jeśli istnieje) ---
@@ -1446,7 +1338,7 @@ if (data.has_free_ticket) {
                         if(!confirm("Czy na pewno chcesz wyłączyć Autopilota? W przyszłym miesiącu będziesz musiał dołączyć ręcznie.")) return;
                         this.innerText = "Anulowanie...";
                         try {
-                            const res = await fetch(`${API}/api/cancel-subscription`, {
+                            const res = await dashboardFetch(`${API}/api/cancel-subscription`, {
                                 method: 'POST', headers: {'Content-Type': 'application/json'},
                                 body: JSON.stringify({ email: userEmail })
                             });
@@ -1494,40 +1386,16 @@ if (data.has_free_ticket) {
         }
 
         // --- FUNKCJA ODLICZANIA ---
-        function startDashCountdown() {
-            const el = document.getElementById('dash-countdown');
-            if(!el) return;
-
-            function update() {
-                const now = new Date();
-                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-                const diff = lastDay - now;
-
-                if (diff < 0) { el.innerText = "KONIEC ZAPISÓW"; return; }
-
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                el.innerText = `Koniec za: ${days}d ${hours}h ${minutes}m`;
-            }
-            update();
-            setInterval(update, 60000); 
-        }
-
-
-
-
-
-
         async function loadHistory() {
             try {
-                const res = await fetch(`${API}/api/user/history`, {
+                const res = await dashboardFetch(`${API}/api/user/history`, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ email: userEmail })
                 });
                 const data = await res.json();
                 const list = document.getElementById('history-list');
                 
+                if (!res.ok) throw new Error();
                 if(data.history && data.history.length > 0) {
                     list.innerHTML = data.history.map(h => `
                         <tr>
@@ -1535,15 +1403,15 @@ if (data.has_free_ticket) {
                                 <strong>Helium 10</strong><br>
                                 <span class="date-col">Edycja: ${h.month_target}</span>
                             </td>
-                            <td style="text-align:right; font-weight:bold; color: var(--success);">
-                                -${h.amount_paid} zł
+                            <td style="text-align:right; font-weight:bold; color: ${Number(h.amount_paid) ? "var(--cherry)" : "#865300"};">
+                                ${Number(h.amount_paid) ? moneyPLN(-Number(h.amount_paid)) : "Złoty Bilet · 0 zł"}
                             </td>
                         </tr>
                     `).join('');
                 } else {
                     list.innerHTML = '<tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Brak historii wpłat.</td></tr>';
                 }
-            } catch(e) { console.log(e); }
+            } catch(e) { document.getElementById('history-list').innerHTML='<tr><td colspan="2">Nie udało się wczytać historii edycji.</td></tr>'; }
         }
 
         async function withdraw() {
@@ -1559,11 +1427,11 @@ if (data.has_free_ticket) {
             if(!confirm(`Wypłacić ${amount} zł?`)) return;
 
             try {
-                const res = await fetch(`${API}/api/wallet/withdraw`, {
+                const res = await dashboardFetch(`${API}/api/wallet/withdraw`, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ email: userEmail, amount, accountNumber: accountStr })
                 });
-                if(res.ok) { alert("Zlecenie przyjęte! 24h."); loadDashboardData(); } 
+                if(res.ok) { alert('Zlecenie zapisane w środowisku testowym.'); loadDashboardData(); loadDetailedWalletHistory(); } 
                 else { const d = await res.json(); alert("Błąd: " + d.error); }
             } catch(e) { alert("Błąd sieci"); }
         }
@@ -1595,7 +1463,7 @@ if (data.has_free_ticket) {
             
             try {
                 // Zapytanie do naszego nowego endpointu w index.js
-                const res = await fetch(`${API}/api/forgot-password`, {
+                const res = await dashboardFetch(`${API}/api/forgot-password`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })
@@ -1631,7 +1499,7 @@ if (data.has_free_ticket) {
             }
             
             try {
-                const res = await fetch(`${API}/api/create-subscription-session`, {
+                const res = await dashboardFetch(`${API}/api/create-subscription-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail })
@@ -1666,60 +1534,15 @@ if (data.has_free_ticket) {
         }
 
         // --- OBSŁUGA OKNA SUKCESU AUTOPILOTA ---
-        function checkUrlForActions() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const action = urlParams.get('action');
-
-            if (action === 'autopilot_enabled') {
-                const modal = document.getElementById('success-modal');
-                if (modal) {
-                    modal.classList.remove('hidden');
-                    modal.style.display = 'flex';
-
-                    modal.querySelector('.card').innerHTML = `
-                        <div style="font-size: 4rem; margin-bottom: 10px;">✈️</div>
-                        <h2 style="color: white; font-size: 2rem; margin: 0;">AUTOPILOT WŁĄCZONY!</h2>
-                        <p style="color: #4ade80; margin-bottom: 30px; font-weight:bold;">Twoja subskrypcja jest aktywna.</p>
-
-                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--glass-border); text-align: left;">
-                            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 10px;">
-                                ✅ <strong>Płatność przyjęta:</strong> Środki będą pobierane automatycznie co miesiąc.
-                            </p>
-                            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 0;">
-                                🔑 <strong>Dostęp:</strong> Dopóki subskrypcja jest aktywna, 
-                                <span style="color: #a0134a; font-weight: bold;">każdego 5-go dnia miesiąca</span> 
-                                otrzymasz dane logowania do Helium 10 na swojego maila.
-                            </p>
-                        </div>
-
-                        <button onclick="closeModalCleanUrl()" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px;">
-                            Wchodzę do Panelu 🚀
-                        </button>
-                    `;
-                }
-            }
-            
-            // Obsługa standardowego sukcesu (zrzutka jednorazowa)
-            if (urlParams.get('success')) {
-                 const modal = document.getElementById('success-modal');
-                 if(modal) {
-                     modal.classList.remove('hidden');
-                     modal.style.display = 'flex';
-                     // Dane (numer i cena) zostaną uzupełnione przez funkcję auto-join lub pobranie statusu
-                     // Tutaj pobieramy aktualny status, żeby uzupełnić modal
-                     fetch(`${API}/api/group-buy/status`)
-                        .then(r => r.json())
-                        .then(statusData => {
-                             // Jeśli backend nie zwraca mojego numeru w tym endpoincie, 
-                             // to numer i tak zostanie pobrany przy "loadDashboardData" jeśli user dołączył.
-                             // Tutaj tylko upewniamy się, że cena jest aktualna.
-                             const priceSpan = document.getElementById('modal-price');
-                             if(priceSpan) priceSpan.innerText = statusData.pricePLN;
-                        });
-                 }
-                 // Wyczyść URL
-                 window.history.replaceState({}, document.title, window.location.pathname);
-            }
+        async function checkUrlForActions() {
+            const session = new URLSearchParams(location.search).get('subscription_session');
+            if (!session || !localStorage.getItem('wingman_join_token')) return;
+            try {
+                const response = await dashboardFetch('/api/subscription-receipt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:session})});
+                if (!response.ok || !(await response.json()).active) throw new Error();
+                history.replaceState(null,'','/dashboard.html?tab=panel');
+                await loadDashboardData();
+            } catch { document.getElementById('status-badge').textContent='Sprawdź status Autopilota po odświeżeniu.'; }
         }
 
         async function loadDetailedWalletHistory() {
@@ -1732,7 +1555,7 @@ if (data.has_free_ticket) {
             }
 
             try {
-                const res = await fetch(`${API}/api/user/wallet-history`, {
+                const res = await dashboardFetch(`${API}/api/user/wallet-history`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail })
@@ -1740,7 +1563,8 @@ if (data.has_free_ticket) {
         
         const data = await res.json();
         
-        if (data.error || !data.transactions || data.transactions.length === 0) {
+        if (!res.ok || data.error) throw new Error();
+        if (!data.transactions || data.transactions.length === 0) {
             historyBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Brak zarejestrowanych transakcji w historii.</td></tr>`;
             return;
         }
@@ -1752,22 +1576,22 @@ if (data.has_free_ticket) {
             
             // Stylizacja kolorów dla kwot
             const isPositive = parseFloat(t.amount) > 0;
-            const amountColor = isPositive ? '#10b981' : '#f43f5e';
+            const amountColor = isPositive ? '#08794f' : Number(t.amount) < 0 ? '#a0134a' : t.transaction_type === 'NAGRODA' ? '#865300' : '#555';
             const amountSign = isPositive ? '+' : '';
 
             const row = document.createElement('tr');
-            row.style.borderBottom = "1px solid #334155";
+            row.style.borderBottom = "1px solid #e9e0e4";
             row.innerHTML = `
                 <td style="padding: 15px 10px; color: var(--text-muted);">${date}</td>
                 <td style="padding: 15px 10px; font-weight: bold; color: ${amountColor};">
-                    ${amountSign}${parseFloat(t.amount).toFixed(2)} zł
+                    ${amountSign}${moneyPLN(t.amount)}
                 </td>
                 <td style="padding: 15px 10px;">
                     <div style="font-weight: bold; color: var(--text-main);">${t.transaction_type}</div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">${t.description}</div>
                 </td>
                 <td style="padding: 15px 10px; font-weight: bold; color: var(--text-main);">
-                    ${parseFloat(t.balance_after).toFixed(2)} zł
+                    ${moneyPLN(t.balance_after)}
                 </td>
             `;
             historyBody.appendChild(row);
@@ -1813,7 +1637,7 @@ async function saveRequiredNickname() {
     }
 
     try {
-        const res = await fetch(`${API}/api/user/update-nickname`, {
+        const res = await dashboardFetch(`${API}/api/user/update-nickname`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, nickname })
@@ -1834,6 +1658,12 @@ async function saveRequiredNickname() {
 
 // --- NOWY SYSTEM ZARZĄDZANIA WIDOKAMI (SINGLE PAGE APP) ---
         function switchAppTab(tabName, clickedElement) {
+            if (!['panel','community','members','calendar','leaderboards','classroom','platform-history'].includes(tabName)) tabName='panel';
+            if (userEmail || tabName==='community') {
+                const url = new URL(location.href);
+                url.searchParams.set('tab',tabName);
+                history.replaceState(null,'',url);
+            }
             // 1. Zmiana podświetlenia w górnych zakładkach
             document.querySelectorAll('.skool-tab').forEach(btn => btn.classList.remove('active'));
             if(clickedElement && clickedElement.classList.contains('skool-tab')) {
@@ -1846,6 +1676,7 @@ async function saveRequiredNickname() {
                     (tabName === 'calendar' && t.innerText.includes('Kalendarz')) ||
                     (tabName === 'members' && t.innerText.includes('Członkowie')) ||
                     (tabName === 'leaderboards' && t.innerText.includes('Ranking')) ||
+                    (tabName === 'platform-history' && t.innerText.includes('Historia Edycji')) ||
                     (tabName === 'panel' && t.innerText.includes('Mój Panel'))
                 );
                 if(targetTab) targetTab.classList.add('active');
@@ -1945,7 +1776,7 @@ async function saveRequiredNickname() {
             };
 
             try {
-                const res = await fetch(`${API}/api/leaderboard`);
+                const res = await dashboardFetch(`${API}/api/leaderboard`);
                 const data = await res.json();
                 
                 if(data.length === 0) {
@@ -1994,7 +1825,7 @@ async function saveRequiredNickname() {
                             </div>
 
                             ${!isMe ? `
-                            <button onclick="openPrivateChat(${user.id}, '${alias}')" class="btn-primary" style="width:100%; justify-content:center; padding: 10px; border-radius: 8px; font-size: 0.95rem;">
+                            <button onclick="openPrivateChat(${user.id}, decodeURIComponent('${encodeURIComponent(alias).replaceAll("\u0027","%27")}'))" class="btn-primary" style="width:100%; justify-content:center; padding: 10px; border-radius: 8px; font-size: 0.95rem;">
                                 <i class="far fa-comment-dots"></i> Napisz Wiadomość
                             </button>
                             ` : `
@@ -2114,7 +1945,7 @@ async function saveRequiredNickname() {
         async function loadCommunityMembers() {
             const list = document.getElementById('members-list');
             try {
-                const res = await fetch(`${API}/api/community/members`);
+                const res = await dashboardFetch(`${API}/api/community/members`);
                 const members = await res.json();
                 
                 // --- NOWY KOD: Sortowanie użytkowników (Aktywni na górę) ---
@@ -2178,7 +2009,7 @@ async function saveRequiredNickname() {
                                 </div>
                             </div>
                         </div>
-                        <button onclick="openPrivateChat(${m.id}, '${displayName}')" style="background: var(--cherry-light); border: 1px solid var(--cherry); color: var(--cherry); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
+                        <button onclick="openPrivateChat(${m.id}, decodeURIComponent('${encodeURIComponent(displayName).replaceAll("\u0027","%27")}'))" style="background: var(--cherry-light); border: 1px solid var(--cherry); color: var(--cherry); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;">
                             Czat <i class="far fa-comment"></i>
                         </button>
                     </div>
@@ -2234,7 +2065,7 @@ async function saveRequiredNickname() {
             const body = document.getElementById('chat-messages-body');
             
             try {
-                const res = await fetch(`${API}/api/messages/history`, {
+                const res = await dashboardFetch(`${API}/api/messages/history`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ myEmail: userEmail, otherUserId: currentChatReceiverId })
@@ -2284,7 +2115,7 @@ async function saveRequiredNickname() {
             input.value = ''; // Czyszczenie pola od razu dla lepszego UX
 
             try {
-                const res = await fetch(`${API}/api/messages/send`, {
+                const res = await dashboardFetch(`${API}/api/messages/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ myEmail: userEmail, receiverId: currentChatReceiverId, content: content })
@@ -2303,7 +2134,7 @@ async function saveRequiredNickname() {
 async function updateUnreadCount() {
     if (!userEmail) return;
     try {
-        const res = await fetch(`${API}/api/messages/unread-count`, {
+        const res = await dashboardFetch(`${API}/api/messages/unread-count`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ myEmail: userEmail })
@@ -2331,7 +2162,7 @@ async function openInbox() {
     list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Ładowanie...</div>';
 
     try {
-        const res = await fetch(`${API}/api/messages/inbox`, {
+        const res = await dashboardFetch(`${API}/api/messages/inbox`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ myEmail: userEmail })
         });
@@ -2350,7 +2181,7 @@ async function openInbox() {
             const dateStr = new Date(conv.created_at).toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
 
             return `
-            <div onclick="document.getElementById('inbox-modal').style.display='none'; openPrivateChat(${conv.other_user_id}, '${alias}')" style="padding: 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: #ffffff;" onmouseover="this.style.background='var(--bg-light)'" onmouseout="this.style.background='#ffffff'">
+            <div onclick="document.getElementById('inbox-modal').style.display='none'; openPrivateChat(${conv.other_user_id}, decodeURIComponent('${encodeURIComponent(alias).replaceAll("\u0027","%27")}'))" style="padding: 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: #ffffff;" onmouseover="this.style.background='var(--bg-light)'" onmouseout="this.style.background='#ffffff'">
                 <div style="width: 45px; height: 45px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; flex-shrink: 0;">
                     ${initial}
                 </div>
@@ -2391,7 +2222,7 @@ async function openInbox() {
             list.innerHTML = '<div style="padding: 15px; text-align: center; color: #94a3b8; font-size: 0.85rem;"><i class="fas fa-spinner fa-spin"></i> Szukam nowości...</div>';
             
             try {
-                const res = await fetch(`${API}/api/notifications`, {
+                const res = await dashboardFetch(`${API}/api/notifications`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ myEmail: userEmail })
@@ -2408,7 +2239,7 @@ async function openInbox() {
                     // KAFELEK WIADOMOŚCI (Wiśniowy)
                     if (n.type === 'message') {
                         return `
-                        <div onclick="openPrivateChat(${n.sender_id}, '${n.nickname}'); document.getElementById('notifications-dropdown').style.display='none'; updateUnreadCount();" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                        <div onclick="openPrivateChat(${n.sender_id}, decodeURIComponent('${encodeURIComponent(n.nickname).replaceAll("\u0027","%27")}')); document.getElementById('notifications-dropdown').style.display='none'; updateUnreadCount();" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
                             <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--cherry); color: white; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
                                 <i class="fas fa-comment"></i>
                             </div>
@@ -2421,7 +2252,7 @@ async function openInbox() {
                     // KAFELEK FORUM/SYSTEMOWY (Złoty)
                     else if (n.type === 'forum') {
                         return `
-                        <div onclick="window.location.href='forum.html'; document.getElementById('notifications-dropdown').style.display='none';" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                        <div onclick="window.location.href='/dashboard.html?tab=community'; document.getElementById('notifications-dropdown').style.display='none';" style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
                             <div style="width: 36px; height: 36px; border-radius: 50%; background: #eab308; color: #0f172a; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
                                 <i class="fas fa-bullhorn"></i>
                             </div>
@@ -2451,7 +2282,7 @@ async function openInbox() {
         async function sendHeartbeat() {
             if (!userEmail) return;
             try {
-                await fetch(`${API}/api/user/heartbeat`, {
+                await dashboardFetch(`${API}/api/user/heartbeat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail })
@@ -2463,7 +2294,7 @@ async function openInbox() {
         sendHeartbeat();
         setInterval(sendHeartbeat, 60000);
 
-        const adminSecret = localStorage.getItem('admin_secret');
+        const adminSecret = null;
         const isAdmin = Boolean(adminSecret);
 
         let currentTab = 'admin';
@@ -2572,8 +2403,8 @@ async function openInbox() {
             try {
                 // 1. Pobieramy posty z bazy wiedzy i forum jednocześnie
                 const [knowRes, forumRes] = await Promise.all([
-                    fetch(`${API}/api/knowledge/posts`),
-                    fetch(`${API}/api/forum/posts`)
+                    dashboardFetch(`${API}/api/knowledge/posts`),
+                    dashboardFetch(`${API}/api/forum/posts`)
                 ]);
                 const knowPosts = await knowRes.json();
                 const forumPosts = await forumRes.json();
@@ -2593,7 +2424,7 @@ async function openInbox() {
                 forumPosts.forEach(p => {
                     const hasNickname = p.nickname && p.nickname.trim() !== "";
                     const displayName = hasNickname ? p.nickname : p.email.split('@')[0];
-                    const isPostAdmin = p.email === 'kamil.sznicer@o2.pl'; // System rozpozna Twoje posty!
+                    const isPostAdmin = p.role === 'admin'; // System rozpozna Twoje posty!
 
                     // --- AUTOMATYCZNA MINIATURKA ---
                     // Szukamy pierwszego zdjęcia w tekście i wyciągamy je przed przycisk "Czytaj więcej"
@@ -2666,7 +2497,7 @@ async function openInbox() {
                                                 <div style="color:var(--text-muted); font-size:0.8rem; margin-top:2px;">Członek społeczności</div>
                                             </div>
                                         </div>
-                                        <button onclick="openPrivateChat(${p.authorId}, '${p.authorName}')" class="btn-primary" style="width:100%; justify-content:center; background:#fef08a; color:#b45309; border:none;">
+                                        <button onclick="openPrivateChat(${p.authorId}, decodeURIComponent('${encodeURIComponent(p.authorName).replaceAll("\u0027","%27")}'))" class="btn-primary" style="width:100%; justify-content:center; background:#fef08a; color:#b45309; border:none;">
                                             <i class="far fa-comment-dots"></i> Wyślij Wiadomość
                                         </button>
                                     </div>
@@ -2711,7 +2542,7 @@ async function openInbox() {
                             
                             <div style="display: flex; gap: 15px;">
                                 ${userEmail && p.type === 'forum' && (userEmail === p.authorEmail || isAdmin) ? `
-                                    <button class="action-btn" onclick="editForumPost(${p.id}, '${p.tag}')" style="font-size: 0.85rem;"><i class="fas fa-edit"></i> Edytuj</button>
+                                    <button class="action-btn" onclick="editForumPost(${p.id}, decodeURIComponent('${encodeURIComponent(p.tag).replaceAll("\u0027","%27")}'))" style="font-size: 0.85rem;"><i class="fas fa-edit"></i> Edytuj</button>
                                     <button class="action-btn" onclick="deleteForumPost(${p.id})" style="color: var(--danger); font-size: 0.85rem;"><i class="fas fa-trash"></i> Usuń</button>
                                 ` : ''}
                             </div>
@@ -2770,7 +2601,7 @@ function togglePostText(type, id) {
             if (localStorage.getItem(`liked_knowledge_${id}`)) return alert("Już to polubiłeś!");
             try {
                 // WYSYŁAMY LAJKA DO NOWEGO MIEJSCA
-                const res = await fetch(`${API}/api/knowledge/like`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ id }) });
+                const res = await dashboardFetch(`${API}/api/knowledge/like`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ id }) });
                 if (res.ok) {
                     localStorage.setItem(`liked_knowledge_${id}`, 'true');
                     const countSpan = document.getElementById(`admin-like-count-${id}`);
@@ -2783,7 +2614,7 @@ function togglePostText(type, id) {
         async function deleteKnowledgePost(id) {
             if(!confirm("Trwale usunąć ten artykuł?")) return;
             try {
-                const res = await fetch(`${API}/api/knowledge/post/${id}`, {
+                const res = await dashboardFetch(`${API}/api/knowledge/post/${id}`, {
                     method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ secret: adminSecret })
                 });
                 if(res.ok) loadUnifiedFeed();
@@ -2843,7 +2674,7 @@ function togglePostText(type, id) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publikowanie...';
 
             try {
-                const res = await fetch(`${API}/api/knowledge/post`, {
+                const res = await dashboardFetch(`${API}/api/knowledge/post`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ title, content, image_url: knowledgeImageBase64, secret: adminSecret })
                 });
@@ -2897,7 +2728,7 @@ function togglePostText(type, id) {
             if (!confirm("Czy na pewno chcesz usunąć ten wpis? Tej akcji nie cofniesz.")) return;
             
             try {
-                const res = await fetch(`${API}/api/forum/post/${postId}`, {
+                const res = await dashboardFetch(`${API}/api/forum/post/${postId}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail, secret: adminSecret })
@@ -2971,7 +2802,7 @@ function togglePostText(type, id) {
                 endpoint = `${API}/api/forum/post/${currentEditingPostId}`;
             }
 
-            const res = await fetch(endpoint, {
+            const res = await dashboardFetch(endpoint, {
                 method: method, 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail, secret: adminSecret, topic, content })
@@ -3034,7 +2865,7 @@ function togglePostText(type, id) {
                 return false;
             }
             try {
-                const res = await fetch(`${API}/api/forum/like`, {
+                const res = await dashboardFetch(`${API}/api/forum/like`, {
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail, postId: id })
@@ -3061,7 +2892,7 @@ function togglePostText(type, id) {
                 return false;
             }
             try {
-                const res = await fetch(`${API}/api/knowledge/like`, { 
+                const res = await dashboardFetch(`${API}/api/knowledge/like`, { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ id }) 
@@ -3084,7 +2915,7 @@ function togglePostText(type, id) {
             threadContent.innerHTML = '<p style="text-align: center;">Ładowanie wątku...</p>';
 
             try {
-                const res = await fetch(`${API}/api/forum/post/${postId}`);
+                const res = await dashboardFetch(`${API}/api/forum/post/${postId}`);
                 const data = await res.json();
                 
                 // Logika profilowa twórcy posta
@@ -3140,7 +2971,7 @@ function togglePostText(type, id) {
             const content = document.getElementById('comment-content').value;
             if (content.length < 3) return alert("Komentarz jest za krótki!");
 
-            const res = await fetch(`${API}/api/forum/comment`, {
+            const res = await dashboardFetch(`${API}/api/forum/comment`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail, postId: currentThreadId, content })
             });
@@ -3171,11 +3002,11 @@ function showLoginPanel() {
         const urlParams = new URLSearchParams(window.location.search);
         const hasTabParam = urlParams.get('tab'); // Sprawdzamy czy użytkownik przyszedł z konkretnego linku
 
-        if (savedEmail) {
+        if (savedEmail && localStorage.getItem('wingman_join_token')) {
             // 1. Stały użytkownik: Logujemy automatycznie i włączamy Społeczność
             userEmail = savedEmail;
             initDashboard();
-            switchAppTab(hasTabParam || 'community', null);
+            
         } else if (hasTabParam === 'community') {
             // 2. Osoba z ulicy klika "Społeczność": Wpuszczamy jako Gościa bez pytania o hasło
             userEmail = null;
@@ -3233,7 +3064,7 @@ function showLoginPanel() {
             btn.innerHTML = "Rejestracja...";
 
             try {
-                const res = await fetch(`${API}/api/register`, {
+                const res = await dashboardFetch(`${API}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password, nickname }),
@@ -3247,7 +3078,7 @@ function showLoginPanel() {
 
                 // Zaloguj automatycznie nową osobę
                 setTimeout(async () => {
-                    const loginRes = await fetch(`${API}/api/login`, {
+                    const loginRes = await dashboardFetch(`${API}/api/login`, {
                         method: 'POST', headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ email, password })
                     });
@@ -3294,7 +3125,7 @@ function showLoginPanel() {
             // Pobieranie własnych wydarzeń z bazy (Dodanych przez Ciebie ręcznie)
             let customEvents = [];
             try {
-                const res = await fetch(`${API}/api/calendar/events`);
+                const res = await dashboardFetch(`${API}/api/calendar/events`);
                 if (res.ok) customEvents = await res.json();
             } catch(e) { console.log("Brak customowych wydarzeń"); }
 
@@ -3363,7 +3194,7 @@ function showLoginPanel() {
                 // --- WYDARZENIA DODANE RĘCZNIE PRZEZ ADMINA ---
                 const todaysCustom = customEvents.filter(e => e.date === dateStr);
                 todaysCustom.forEach(e => {
-                    cellHtml += `<div class="cal-event event-${e.type}" onclick="showEventDetails('${e.title}', '${e.date}', '${e.type}', ${e.id})">${e.title}</div>`;
+                    cellHtml += `<div class="cal-event event-${e.type}" onclick="showEventDetails(decodeURIComponent('${encodeURIComponent(e.title).replaceAll("\u0027","%27")}'), '${e.date}', '${e.type}', ${e.id})">${e.title}</div>`;
                 });
 
                 cellHtml += `</div></div>`;
@@ -3402,7 +3233,7 @@ function showLoginPanel() {
         async function getFullHistory() {
             let dynamicStats = [];
             try {
-                const res = await fetch(`${API}/api/stats/history`);
+                const res = await dashboardFetch(`${API}/api/stats/history`);
                 if(res.ok) {
                     const data = await res.json();
                     // Z bazy lecą same liczby, dopisujemy nazwę na podstawie miesiąca
@@ -3650,7 +3481,7 @@ function showLoginPanel() {
             if(!title || !date) return alert("Wypełnij dane!");
 
             try {
-                const res = await fetch(`${API}/api/calendar/event`, {
+                const res = await dashboardFetch(`${API}/api/calendar/event`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ secret: adminSecret, title, date, type })
                 });
@@ -3664,7 +3495,7 @@ function showLoginPanel() {
         async function deleteCalendarEvent(id) {
             if(!confirm("Usunąć to wydarzenie?")) return;
             try {
-                const res = await fetch(`${API}/api/calendar/event/${id}`, {
+                const res = await dashboardFetch(`${API}/api/calendar/event/${id}`, {
                     method: 'DELETE', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ secret: adminSecret })
                 });
@@ -3710,7 +3541,7 @@ function showLoginPanel() {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zapisywanie...';
 
             try {
-                const res = await fetch(`${API}/api/group-buy/vote`, {
+                const res = await dashboardFetch(`${API}/api/group-buy/vote`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail, voteType: currentVoteType })
@@ -3754,37 +3585,10 @@ function showLoginPanel() {
 </script>
 
 
-<script src="//code.tidio.co/q6vbfqclwkzfcgohcacijiwzgaqcvhrz.js" async></script>
 
 
-<div id="admin-lottery-panel" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 20px; border: 2px solid #eab308; border-radius: 12px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <h3 style="color: #eab308; margin-top: 0;">👑 Zarządzaj Loterią</h3>
-    <input type="text" id="admin-winner-name" placeholder="Imię (np. Michał K.)" style="width: 100%; margin-bottom: 10px; padding: 10px;">
-    <input type="email" id="admin-winner-email" placeholder="Email zwycięzcy" style="width: 100%; margin-bottom: 10px; padding: 10px;">
-    <input type="password" id="admin-secret" placeholder="Hasło admina" style="width: 100%; margin-bottom: 10px; padding: 10px;">
-    <button onclick="setLotteryWinner()" class="btn btn-primary" style="background: #eab308; color: #0f172a;">Zapisz Zwycięzcę i daj darmowy bilet</button>
-    <button onclick="document.getElementById('admin-lottery-panel').style.display='none'" class="btn" style="background: transparent; color: white; margin-top: 5px;">Zamknij</button>
-</div>
 
-<script>
-    // Wpisz w konsoli przeglądarki "showAdmin()" aby wysunąć panel
-    function showAdmin() { document.getElementById('admin-lottery-panel').style.display = 'block'; }
-    
-    async function setLotteryWinner() {
-        const name = document.getElementById('admin-winner-name').value;
-        const email = document.getElementById('admin-winner-email').value;
-        const secret = document.getElementById('admin-secret').value;
-        
-        const res = await fetch(`${API}/api/admin/set-winner`, {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ secret, winnerName: name, winnerEmail: email })
-        });
-        if(res.ok) { alert("Gotowe! System zapisał zwycięzcę."); location.reload(); } 
-        else { alert("Błąd!"); }
-    }
 
-    
-</script>
 
 <div id="nickname-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center;">
     <div style="background: #ffffff; padding: 40px 30px; border-radius: 16px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.08);">

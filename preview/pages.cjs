@@ -16,7 +16,7 @@ module.exports = {
   '/cinema.css':read('cinema.css'), '/cinema.js':read('cinema.js'),
   '/home.css':read('home.css'), '/enrollment.css':read('enrollment.css'), '/home.js':read('home.js'),
   '/member-session.js':read('member-session.js'),
-  '/panel-dev.js':read('preview/panel-dev.js'), '/enrollment.js':read('enrollment.js'),
+  '/dashboard-session.js':read('dashboard-session.js'), '/enrollment.js':read('enrollment.js'),
   '/images/wingman-wing.png':fs.readFileSync(path.join(root,'images/wingman-wing.png')).toString('base64'),
   '/images/edition-steps.webp':fs.readFileSync(path.join(root,'images/edition-steps.webp')).toString('base64'),
   '/images/wingman-film.webp':fs.readFileSync(path.join(root,'images/wingman-film.webp')).toString('base64')
