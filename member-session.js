@@ -11,6 +11,7 @@
   }
   logout.onclick = () => {
     WingmanPuls.clear();
+    localStorage.removeItem("wingman_tools_session");
     localStorage.removeItem(key);
     history.replaceState(null, '', '/#dolacz');
     location.reload();

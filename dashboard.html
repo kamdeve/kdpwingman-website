@@ -1603,6 +1603,7 @@ if (data.has_free_ticket) {
         // Obsługa wylogowania
         document.getElementById('logout-btn').addEventListener('click', function() {
             WingmanPuls.clear();
+            localStorage.removeItem("wingman_tools_session");
             localStorage.removeItem('wingman_user');
             window.location.href = "index.html";
         });

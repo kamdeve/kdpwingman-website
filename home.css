@@ -1148,3 +1148,6 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
   .mast-tools .login-link { padding:5px 9px; font-size:.82rem; }
 }
 
+
+@media (max-width:850px){.mast nav{display:flex;margin-left:auto}.mast nav a:not(.member-tools-link){display:none}.mast .member-tools-link{font-size:.85rem}.mast-tools{margin-left:0}}
+@media (max-width:420px){.mast .member-tools-link{max-width:5em;line-height:1.12}.mast .extension-link,.mast .channel-link{min-width:32px}}

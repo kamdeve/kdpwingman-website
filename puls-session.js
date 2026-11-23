@@ -43,6 +43,8 @@
   }
 
   function signedIn(session) {
+    if (session.toolsToken) localStorage.setItem("wingman_tools_session", JSON.stringify({email: session.email, token: session.toolsToken}));
+    else localStorage.removeItem("wingman_tools_session");
     clear();
     if (session.canManagePuls === true && session.token) {
       sessionStorage.setItem(storageKey, JSON.stringify({ email: session.email, token: session.token }));

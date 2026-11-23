@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a0134a">
+  <title>Darmowe narzędzia KDP · Wingman</title>
+  <link rel="icon" href="../images/wingman-wing.png">
+  <link rel="stylesheet" href="tools.css">
+  <script defer src="../puls-session.js"></script>
+  <script defer src="access.js"></script>
+  <script defer src="tools.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">Przejdź do formularza</a>
+  <header class="mast"><div class="mast-inner">
+    <a class="wordmark" href="../index.html"><img src="../images/wingman-wing.png" alt="">Wingman</a>
+    <a class="home-link" href="../index.html">Strona główna</a>
+  </div></header>
+  <main>
+    <section id="access" class="access" aria-labelledby="access-title">
+      <h1 id="access-title">Narzędzia KDP</h1>
+      <p id="access-status" role="status">Sprawdzamy dostęp…</p>
+      <form id="access-login" hidden>
+        <label>E-mail<input name="email" type="email" required autocomplete="username"></label>
+        <label>Hasło<input name="password" type="password" required autocomplete="current-password"></label>
+        <button type="submit">Zaloguj się</button>
+        <a href="/dashboard.html">Załóż konto lub odzyskaj hasło</a>
+      </form>
+      <button type="button" id="access-retry" hidden>Spróbuj ponownie</button>
+      <noscript>Włącz JavaScript, aby skorzystać z narzędzi.</noscript>
+    </section>
+    <div class="layout" hidden>
+      <aside>
+        <h1>Narzędzia KDP</h1>
+        <nav class="desktop" aria-label="Narzędzia KDP">
+          <p>Analiza książki</p>
+          <a href="#bsr">Kalkulator sprzedaży BSR</a>
+          <a href="#royalty">Kalkulator tantiem</a>
+          <a href="#categories">Wyszukiwarka kategorii</a>
+          <p>Przygotowanie publikacji</p>
+          <a href="#cover">Szablon okładki</a>
+          <a href="#qr">Generator kodów QR</a>
+          <a href="#cloud">Chmura słów</a>
+          <a href="#planner">Planer książek</a>
+        </nav>
+        <label class="mobile">Wybierz narzędzie<select id="choice"></select></label>
+      </aside>
+      <section id="workspace" tabindex="-1" aria-labelledby="active-title">
+        <h2 id="active-title">Kalkulator sprzedaży BSR</h2>
+        <div id="form-slot"></div>
+        <noscript>Do uruchomienia narzędzi potrzebna jest obsługa JavaScript.</noscript>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
