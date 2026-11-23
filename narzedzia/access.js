@@ -17,6 +17,24 @@
       return entry && entry.email === localStorage.getItem('wingman_user') ? entry.token : null;
     } catch { return null; }
   }
+  function previousLogin() {
+    try {
+      const entry = JSON.parse(sessionStorage.getItem('wingman_puls_session'));
+      return entry && entry.email === localStorage.getItem('wingman_user') ? entry.token : null;
+    } catch { return null; }
+  }
+  function remember(session) {
+    localStorage.setItem(key, JSON.stringify({ email: session.email, token: session.toolsToken }));
+  }
+  async function exchange(token, email) {
+    const response = await fetch(api + 'member-tools/from-login', {
+      method: 'POST', headers: {Authorization: 'Bearer ' + token}, cache: 'no-store', credentials: 'omit'
+    });
+    if (!response.ok) throw Object.assign(new Error(), {status: response.status});
+    const session = await response.json();
+    if (session.email !== email || !session.toolsToken) throw Object.assign(new Error(), {status: 401});
+    return session;
+  }
   function promptLogin(message) {
     form.hidden = false;
     retry.hidden = true;
@@ -41,9 +59,18 @@
   }
   async function check() {
     retry.hidden = true;
-    const token = credential();
-    if (!token) return promptLogin('Zaloguj się na konto Wingmana, aby otworzyć wybrane narzędzie.');
     try {
+      let token = credential();
+      if (!token && previousLogin()) {
+        const email = localStorage.getItem('wingman_user');
+        const session = await exchange(previousLogin(), email);
+        if (email !== localStorage.getItem('wingman_user')) return location.reload();
+        remember(session);
+        token = session.toolsToken;
+      }
+      if (!token) return promptLogin(localStorage.getItem('wingman_user')
+        ? 'Potwierdź hasło do swojego konta, aby otworzyć narzędzia.'
+        : 'Zaloguj się na konto Wingmana, aby otworzyć wybrane narzędzie.');
       const { expiresAt } = await (await fetchFile('session')).json();
       if (token !== credential()) return location.reload();
       activeToken = token;
@@ -68,9 +95,11 @@
       if (response.status === 401) return promptLogin('Sprawdź adres e-mail i hasło.');
       if (!response.ok) throw Error();
       const session = await response.json();
-      if (!session.toolsToken) throw Error();
+      const toolsSession = session.toolsToken ? session : await exchange(session.token, session.email);
       localStorage.setItem('wingman_user', session.email);
-      WingmanPuls.signedIn(session);
+      remember(toolsSession);
+      try { window.WingmanPuls?.signedIn?.({...session, toolsToken: toolsSession.toolsToken}); }
+      catch { /* Sesja narzędzi działa również bez sesji redaktora Pulsu. */ }
       form.elements.password.value = '';
       await check();
     } catch { networkError(); }
