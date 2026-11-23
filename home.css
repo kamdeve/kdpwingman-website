@@ -1089,3 +1089,39 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
 .edition-goals progress.goal-pending::-moz-progress-bar { background:var(--wine); }
 
 .edition-live .fee-line { margin:7px 0 0; font-size:.92rem; color:var(--ink); }
+
+
+.cover .split-cost {
+  display:inline-block;
+  white-space:nowrap;
+  padding-block:.09em .06em;
+}
+.split-cost span { display:inline-block; }
+.split-cost span:first-child { transform:rotate(-6deg); transform-origin:right center; }
+.split-cost span:last-child { transform:rotate(6deg); transform-origin:left center; }
+
+@media (min-width:851px) {
+  .join-grid { grid-template-areas:"intro enroll" "goals enroll"; row-gap:0; }
+  .join-intro { grid-area:intro; align-self:end; }
+  .join-thresholds { grid-area:goals; align-self:start; }
+  .join-grid .enroll-card { grid-area:enroll; }
+}
+.join-thresholds .edition-goals {
+  background:#fffafb;
+  border:1px solid #e8cfd9;
+  border-radius:16px;
+  padding:clamp(15px,2vw,24px);
+  margin-top:8px;
+}
+.join-thresholds .edition-goals ul { margin-bottom:0; }
+
+@media (max-width:850px) {
+  .join-grid { row-gap:16px; }
+  .join-intro .edition-live { margin:12px 0 0; }
+  .edition-prices > #edition-next-wrap { order:-1; }
+  .join-grid .enroll-card { display:flex; flex-direction:column; }
+  .enroll-card .edition-info { order:1; }
+  .enroll-card .member-logout { align-self:flex-start; }
+  .join-thresholds .edition-goals { margin-top:0; }
+}
+
