@@ -11,8 +11,8 @@ async function respond(request, assets) {
   const route = Object.hasOwn(routes,pathname) && routes[pathname];
   if (route) {
     if (route[0] !== request.method) return new Response(null,{status:405});
-    if (request.headers.has('origin') && request.headers.get('origin') !== new URL(request.url).origin)
-      return new Response(null,{status:403});
+    if (request.headers.has('origin') && request.headers.get('origin') !== 'https://wingman-zapisy-podglad-production.up.railway.app')
+      return Response.json({error:'Niepoprawne źródło zapisu.'},{status:403});
     const headers = new Headers();
     for (const name of ['content-type','authorization','stripe-signature']) {
       if (request.headers.has(name)) headers.set(name,request.headers.get(name));
