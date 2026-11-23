@@ -15,6 +15,7 @@ module.exports = {
   '/enrollment-success.css':read('enrollment-success.css'), '/enrollment-success.js':read('enrollment-success.js'),
   '/cinema.css':read('cinema.css'), '/cinema.js':read('cinema.js'),
   '/home.css':read('home.css'), '/enrollment.css':read('enrollment.css'), '/home.js':read('home.js'),
+  '/reset.html':read('reset.html'), '/reset.js':read('reset.js'),
   '/member-session.js':read('member-session.js'),
   '/dashboard-session.js':read('dashboard-session.js'), '/enrollment.js':read('enrollment.js'),
   '/images/wingman-wing.png':fs.readFileSync(path.join(root,'images/wingman-wing.png')).toString('base64'),

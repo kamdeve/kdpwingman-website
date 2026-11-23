@@ -444,7 +444,7 @@
 
 
 
-<style>.seat-confirmation{font-weight:800;color:#116548;font-size:1.2rem;margin-bottom:.3rem}.seat-confirmation+p{margin-top:0;color:#665d65}.ticket-status{color:#79500d;font-weight:700}.join-link{display:block;text-align:center;text-decoration:none}.history-table td,#wallet-history-body td{font-variant-numeric:tabular-nums}.lottery-card{background:#fffbf1!important}.btn:focus-visible,.skool-tab:focus-visible{outline:3px solid #a0134a;outline-offset:3px}</style></head>
+<style>.seat-confirmation{font-weight:800;color:#116548;font-size:1.2rem;margin-bottom:.3rem}.seat-confirmation+p{margin-top:0;color:#665d65}.ticket-status{color:#79500d;font-weight:700}.join-link{display:block;text-align:center;text-decoration:none}.history-table td,#wallet-history-body td{font-variant-numeric:tabular-nums}.lottery-card{background:#fffbf1!important}.btn:focus-visible,.skool-tab:focus-visible{outline:3px solid #a0134a;outline-offset:3px}</style><style>@media(max-width:768px){.skool-tabs-bar{display:flex!important;overflow-x:auto;white-space:nowrap;position:static!important}.skool-tab{flex:none;min-height:44px}.card{max-width:100%;min-width:0}#wallet-history-body td{overflow-wrap:anywhere}}.seat-confirmation{margin-top:.5rem}</style></head>
 <body>
 
     <div class="background-glow"></div>
@@ -570,7 +570,7 @@
                             <div style="font-weight: bold; font-size: 1rem; color: var(--text-main);">Helium 10 Diamond</div>
                             <div id="current-month-label" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
                         </div>
-                        <div id="status-badge" class="status-badge status-wait">NIE DOŁĄCZYŁEŚ</div>
+                        <div id="status-badge" class="status-badge">Sprawdzam miejsce…</div>
                     </div>
 
                     <div id="access-info" class="hidden" style="margin-top: 20px;"></div>
@@ -1247,7 +1247,7 @@ if (data.has_free_ticket) {
                     
                     let voteBtnHtml = "";
                     if (!wantsOne && !changedMind) {
-                        voteBtnHtml = `<button onclick="openVoteModal('one_account')" class="btn" style="background: transparent; border: 2px solid #eab308; color: #b45309; font-weight: 800; width: 100%; margin-top: 10px; transition: 0.2s;" onmouseover="this.style.background='rgba(234,179,8,0.1)'" onmouseout="this.style.background='transparent'">⚡ W tym miesiącu wolę jedno konto (~${gbData.priceIfOnePLN} zł)</button>`;
+                        voteBtnHtml = `<button onclick="openVoteModal('one_account')" class="btn" style="background: transparent; border: 2px solid #eab308; color: #b45309; font-weight: 800; width: 100%; margin-top: 10px; transition: 0.2s;" onmouseover="this.style.background='rgba(234,179,8,0.1)'" onmouseout="this.style.background='transparent'">⚡ W tym miesiącu wolę jedno konto (~${estimatePLN(data.stats.single_account_pln)})</button>`;
                     } else if (wantsOne && !changedMind) {
                         voteBtnHtml = `
                             <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid #eab308; padding: 10px; border-radius: 8px; color: #b45309; font-size: 0.85rem; margin-top: 10px; text-align: center; font-weight: bold;">

@@ -3,6 +3,7 @@ const pages = require('./pages.cjs');
 async function respond(request, assets) {
   const pathname = decodeURIComponent(new URL(request.url).pathname);
   const routes = {
+    '/api/forgot-password':['POST','/api/forgot-password'], '/api/reset-password':['POST','/api/reset-password'],
     '/api/register':['POST','/api/register'], '/api/login':['POST','/api/login'],
     '/api/group-buy/status':['GET','/api/enrollment/status'], '/public-data/group-buy/status':['GET','/api/enrollment/status'],
     '/api/enrollment/panel':['GET','/api/enrollment/panel'], '/api/enrollment/me':['GET','/api/enrollment/me'], '/api/enrollment/continue':['POST','/api/enrollment/continue'],
@@ -84,7 +85,7 @@ async function respond(request, assets) {
   const binary=type.startsWith('image/');
   return new Response(binary ? Buffer.from(page,'base64') : page,{headers:{
     'Content-Type':type+(binary?'':'; charset=utf-8'),'Cache-Control':'no-store','X-Robots-Tag':'noindex',
-    'Content-Security-Policy':pathname === '/dashboard.html' ? "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js https://cdn.quilljs.com/1.3.6/quill.js; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'" : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; media-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'"
+    'Content-Security-Policy':['/dashboard.html','/reset.html'].includes(pathname) ? "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js https://cdn.quilljs.com/1.3.6/quill.js; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'" : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; media-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'"
   }});
 }
 if (process.argv.includes('--railway')) {

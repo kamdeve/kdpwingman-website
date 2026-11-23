@@ -53,14 +53,7 @@
         .hidden { display: none !important; }
     </style>
 
-<script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Mi Ri init Vi Gi Rr Wi Ji Bi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync un identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Xi createPersonProfile setInternalOrTestUser sn Hi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ki debug Lr rn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('phc_oYerNzYJWaJzr6PafVdVLMzb3nwSWsSGgJaNyHyw582D', {
-        api_host: 'https://analityka.kdpwingman.com',
-        defaults: '2026-01-30',
-        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-    })
-</script>
+
 
 </head>
 <body>
@@ -93,78 +86,8 @@
         </div>
     </div>
 
-    <script>
-        // Pamiętaj o podmianie adresu API, jeśli używasz innego w projekcie
-        const API = "https://kdpwingmanv2backend-production.up.railway.app";
-        
-        // Wyciągamy token (tajny kod) z linku URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+    
 
-        if (!token) {
-            document.getElementById('reset-form-container').innerHTML = 
-                "<p style='color: var(--danger); font-weight: bold;'>Błąd: Brakujący lub nieprawidłowy link.</p>";
-        }
-
-        async function saveNewPassword() {
-            const pass1 = document.getElementById('new-pass').value;
-            const pass2 = document.getElementById('new-pass-confirm').value;
-            const msgEl = document.getElementById('msg');
-
-            if (!pass1 || !pass2) {
-                msgEl.innerText = "Uzupełnij oba pola!";
-                msgEl.style.color = "var(--danger)";
-                return;
-            }
-
-            if (pass1 !== pass2) {
-                msgEl.innerText = "Hasła nie są identyczne!";
-                msgEl.style.color = "var(--danger)";
-                return;
-            }
-
-            msgEl.innerText = "Zapisywanie...";
-            msgEl.style.color = "var(--text-muted)";
-
-            try {
-                const res = await fetch(`${API}/api/reset-password`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: token, newPassword: pass1 })
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    document.getElementById('reset-form-container').classList.add('hidden');
-                    document.getElementById('success-container').classList.remove('hidden');
-                } else {
-                    msgEl.innerText = data.error || "Wystąpił błąd.";
-                    msgEl.style.color = "var(--danger)";
-                }
-            } catch (e) {
-                msgEl.innerText = "Błąd połączenia z serwerem.";
-                msgEl.style.color = "var(--danger)";
-            }
-        }
-    </script>
-
-    <script>
-    function toggleVisibility(inputId, iconId) {
-        const input = document.getElementById(inputId);
-        const icon = document.getElementById(iconId);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash");
-            icon.style.color = "white"; // Podświetla ikonkę po kliknięciu
-        } else {
-            input.type = "password";
-            icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye");
-            icon.style.color = "var(--text-muted)";
-        }
-    }
-</script>
-</body>
+    
+<script src="/reset.js"></script></body>
 </html>

@@ -21,7 +21,7 @@ async function dashboardFetch(path,options={}) {
   const token=localStorage.getItem('wingman_join_token');
   if (path==='/api/login'||path==='/api/register'||path==='/api/group-buy/status') return fetch(path,options);
   if (path==='/api/stats/history') return fetch('/public-data/stats/history',options);
-  if (path==='/api/forgot-password') return Response.json({error:'Wysyłka linków do resetu hasła w DEV jest wyłączona.'},{status:503});
+  if (path==='/api/forgot-password') return fetch(path,options);
   const publicPath=!token && ['/api/forum/posts','/api/knowledge/posts'].includes(path);
   const base=publicPath ? '/api/dashboard-public/' : '/api/enrollment/member/';
   const headers=new Headers(options.headers);
