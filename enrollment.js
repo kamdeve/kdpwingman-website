@@ -9,6 +9,7 @@
   const sessionKey = 'wingman_join_token';
   const attempt = crypto.randomUUID();
   let edition, member, mode = 'register', busy = false, retryLoad = false;
+  let receipt;
   const money = n => new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(n / 100);
   const month = (ym, day) => new Intl.DateTimeFormat('pl-PL', day ? {day:'numeric', month:'long',year:'numeric',timeZone:'UTC'} : {month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(ym + (day ? '-05' : '-01') + 'T12:00:00Z'));
 
@@ -38,21 +39,21 @@
     form.elements.nickname.disabled = !create;
     form.elements.password.autocomplete = create ? 'new-password' : 'current-password';
     form.elements.password.minLength = create ? 6 : 1;
-    submit.textContent = create ? 'Załóż konto i przejdź do płatności' : 'Zaloguj się i kontynuuj';
+    submit.textContent = create ? 'Załóż konto i wpłać 75 zł' : 'Zaloguj się i kontynuuj';
     form.querySelectorAll('[data-mode]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.mode === mode)));
   }
   function render() {
     start.hidden = !form.hidden;
     start.disabled = busy;
     submit.disabled = busy;
-    $('join-panel').hidden = true;
+    $('join-panel').hidden = !receipt?.success;
     $('edition-next-wrap').hidden = Boolean(member?.joined || member?.free || edition?.isLocked);
     $('edition-fee-line').hidden = $('edition-next-wrap').hidden;
-    if (retryLoad) { start.textContent = 'Spróbuj ponownie'; return; }
+    if (retryLoad) { form.hidden = true; start.hidden = false; start.textContent = 'Spróbuj ponownie'; return; }
     if (!edition) { start.disabled = true; return; }
-    if (member?.joined) {
+    if (member?.joined || receipt?.joined) {
       start.hidden = true; form.hidden = true; $('join-panel').hidden = false;
-      message.textContent = 'Masz miejsce w tej edycji. Dane dostępu otrzymasz e-mailem.';
+      message.textContent = 'Masz miejsce w tej edycji. Dostęp otrzymasz e-mailem ' + month(receipt?.edition || edition.targetMonth,true) + '.';
     } else if (edition.isLocked) {
       start.disabled = true; form.hidden = true; start.hidden = false;
       start.textContent = 'Zapisy są teraz zamknięte';
@@ -175,6 +176,8 @@
       const count = total >= 45 && votes < Math.ceil(total * .8) ? 2 : 1;
       return {cents:quote.shareCents(count, paying), usd:accountUSD * count / paying};
     };
+    window.wingmanCinemaStart = {payers:payers + 1};
+    window.dispatchEvent(new Event('wingman-cinema-start'));
     const next = estimate(users + 1, payers + 1);
     seatQuote('edition-next', next.cents, next.usd);
     $('edition-fee-line').textContent = 'Z opłatą serwisową 10 zł: ' + money(next.cents + 1000) + ' po Twoim dołączeniu.';
@@ -242,11 +245,11 @@
       const params = new URLSearchParams(location.search);
       const session = params.get('enrollment_session');
       if (session) {
-        await api('payment-success',{session_id:session});
+        receipt = await api('enrollment/receipt',{session_id:session});
         await load(); history.replaceState(null,'',location.pathname+'#dolacz');
-        if (!member?.joined) message.textContent = 'Wpłata zaksięgowana. Szczegóły znajdziesz w panelu.';
+        if (!receipt?.joined && !member?.joined) { $('join-panel').hidden = false; message.textContent = 'Wpłata zaksięgowana. Sprawdź saldo i status miejsca w panelu.'; }
       } else if (params.has('cancelled')) message.textContent = 'Płatność anulowana. Możesz wrócić do zapisu.';
-      if (!member && !edition.isLocked) {
+      if (!member && !receipt?.joined && !edition.isLocked) {
         setMode(localStorage.getItem('wingman_user') ? 'login' : 'register');
         form.hidden = false;
       }

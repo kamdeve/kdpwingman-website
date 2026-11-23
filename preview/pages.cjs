@@ -14,7 +14,7 @@ const landing = home.slice(home.indexOf('<header class="mast">'),home.indexOf('<
 module.exports = {
   '/':head+controls+landing+'<script src="/demo.js"></script><script src="/enrollment.js"></script><script src="/home.js"></script><script src="/cinema.js"></script></body></html>',
   '/checkout':simple('<main class="screen"><p>Podgląd DEV · symulacja</p><h1>Płatność za zrzutkę</h1><p>Depozyt do wpłaty: <strong id="demo-amount"></strong></p><button class="primary" id="demo-pay">Potwierdź wpłatę testową</button><p><a href="/?cancelled=1#dolacz">Anuluj i wróć</a></p></main>'),
-  '/dashboard.html':simple('<main class="screen"><h1>Panel uczestnika</h1><p>To koniec demonstracji zapisu. Konta i płatności w tym podglądzie są przykładowe.</p><a href="/">Wróć na stronę Wingman</a></main>'),
+  '/dashboard.html':simple('<main class="screen"><h1>Panel uczestnika</h1><p><span id="demo-member-email"></span></p><p id="demo-membership">Wczytuję status miejsca…</p><p>Panel testowy Wingmana.</p><a href="/">Wróć na stronę Wingman</a></main>'),
   '/cinema.css':read('cinema.css'), '/cinema.js':read('cinema.js'),
   '/home.css':read('home.css'), '/enrollment.css':read('enrollment.css'), '/home.js':read('home.js'),
   '/demo.js':read('preview/demo.js'), '/enrollment.js':read('enrollment.js'),

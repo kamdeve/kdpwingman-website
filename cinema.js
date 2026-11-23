@@ -142,9 +142,19 @@
   }
 
   window.addEventListener('wingman-pricing', scheduleRender);
-  audience.addEventListener('input', scheduleRender);
+  let edited = false;
+  function useEditionSize() {
+    const payers = window.wingmanCinemaStart?.payers;
+    if (edited || !Number.isInteger(payers) || payers < 1) return;
+    audience.value = Math.min(Number(audience.max), payers);
+    scheduleRender();
+  }
+  window.addEventListener('wingman-cinema-start', useEditionSize);
+  useEditionSize();
+  audience.addEventListener('input', () => { edited = true; scheduleRender(); });
   document.querySelectorAll('[data-audience]').forEach(button => {
     button.addEventListener('click', () => {
+      edited = true;
       audience.value = button.dataset.audience;
       scheduleRender();
     });

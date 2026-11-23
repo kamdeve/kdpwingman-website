@@ -47,11 +47,11 @@
       case 'enrollment/continue':
         if (localStorage.getItem('wingman_join_token')!=='demo') fail('Zaloguj się ponownie.',401);
         if(data.scenario==='closed') fail('Zapisy zamknięte.');
-        if (!due) {data.joined=true;save(data);return {joined:true};}
-        data.pending=due;save(data);return {url:'/checkout'};
-      case 'payment-success':
+        if (!due) {data.joined=true;data.edition=body.edition;save(data);return {joined:true};}
+        data.pending=due;data.edition=body.edition;save(data);return {url:'/checkout'};
+      case 'enrollment/receipt':
         if(!data.paid || body.session_id!=='demo') fail('Brak potwierdzenia płatności.');
-        data.joined=true;save(data);return {success:true};
+        data.joined=true;save(data);return {success:true,joined:true,edition:data.edition};
       default: fail('Nieznany ekran podglądu.');
     }
   };
@@ -67,6 +67,12 @@
     try { await window.enrollmentDemo('register',{nickname,email,password}); freeForm.reset(); alert('Utworzono konto testowe. Możesz wybrać „Mam konto” przy zapisie.'); }
     catch(err){alert(err.message);}
   };
+  const panel = document.getElementById('demo-membership');
+  if (panel) {
+    const member = get();
+    panel.textContent = member.joined ? 'Masz miejsce w edycji ' + (member.edition || ym(1)) + '.' : 'Nie masz jeszcze miejsca w tej edycji.';
+    document.getElementById('demo-member-email').textContent = localStorage.getItem('wingman_user') || '';
+  }
   const pay = document.getElementById('demo-pay');
   if (pay) {
     const data=get();
