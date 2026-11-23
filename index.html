@@ -407,12 +407,18 @@
       <p class="edition-attendance">Zapisane osoby <strong id="edition-count">—</strong></p>
       <dl class="edition-prices"><div><dt>Teraz za osobę</dt><dd id="edition-current">—</dd></div><div id="edition-next-wrap"><dt>Po Twoim dołączeniu</dt><dd id="edition-next">—</dd></div></dl>
       <small>Szacunkowy koszt miejsca obejmuje Helium 10 i 10 zł opłaty serwisowej. Ostateczna cena zależy od liczby płacących osób, liczby kont i kursu dolara.</small>
+      <div id="edition-goals" class="edition-goals" hidden>
+        <h4>Cele cenowe edycji</h4><ul id="edition-goal-list"></ul>
+        <small>Szacunek przy obecnym kursie i liczbie darmowych miejsc. Każdy kolejny uczestnik płaci za swoje miejsce.</small>
+      </div>
     </div><details><summary>Mam już środki w portfelu. Ile dopłacę?</summary><p>Po zalogowaniu zobaczysz kwotę do wpłaty z uwzględnieniem salda. Jeśli środki pokrywają depozyt, potwierdzisz udział z portfela.</p></details></div><article class="enroll-card" aria-labelledby="edition-title">
     <p class="eyeline">Zapisy na edycję</p>
     <h2 id="edition-title">Wczytuję edycję…</h2>
+    <div class="edition-clock" id="edition-clock" hidden><span id="edition-clock-label">Do końca zapisów</span><strong id="edition-time-left"></strong><small id="edition-window"></small></div>
     <dl>
-    <div><dt>Dostęp e-mailem</dt><dd id="access-date">—</dd></div>
+    <div><dt>Wysyłka dostępu e-mailem</dt><dd id="access-date">—</dd></div>
     <div><dt>Depozyt za miejsce</dt><dd>75 zł</dd></div></dl>
+    <p class="opening-draw"><strong>Szansa na kolejną edycję gratis</strong>Każdy, kto opłaci miejsce w dniu otwarcia zapisów (5. dnia miesiąca), ma szansę wygrać darmowy dostęp na kolejną edycję.</p>
     <button id="join-start" class="enroll-primary" disabled>Dołącz do zrzutki</button>
     <form id="join-form" hidden>
       <div class="mode-picker"><button type="button" data-mode="register" aria-pressed="true">Nowe konto</button><button type="button" data-mode="login" aria-pressed="false">Mam konto</button></div>

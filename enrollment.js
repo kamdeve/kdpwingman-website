@@ -70,6 +70,53 @@
       localStorage.removeItem(sessionKey);
     }
   }
+  const dateLabel = new Intl.DateTimeFormat('pl-PL', {day:'numeric', month:'long', year:'numeric', timeZone:'UTC'});
+  const warsawClock = new Intl.DateTimeFormat('en-GB', {hour:'2-digit', hourCycle:'h23', timeZone:'Europe/Warsaw'});
+  let countdownTimer;
+  function showSchedule(status) {
+    clearInterval(countdownTimer);
+    const [year, monthNumber] = status.targetMonth.split('-').map(Number);
+    const first = Date.UTC(year, monthNumber - 1, 1);
+    // At 00:00 UTC Warsaw is one or two hours ahead, depending on the edition.
+    const close = first - Number(warsawClock.format(first)) * 3600000;
+    const opening = Date.UTC(year, monthNumber - 2, 5);
+    $('edition-window').textContent = 'Zapisy od ' + dateLabel.format(opening) + ' do ' + dateLabel.format(first - 86400000) + ', do godz. 23:59 czasu polskiego.';
+    $('edition-clock').hidden = false;
+    function tick() {
+      const minutes = Math.max(0, Math.ceil((close - Date.now()) / 60000));
+      if (status.isLocked || !minutes) {
+        $('edition-clock-label').textContent = 'Status zapisów';
+        $('edition-time-left').textContent = status.isLocked ? 'Zapisy zamknięte' : 'Planowy termin minął';
+        clearInterval(countdownTimer);
+        return;
+      }
+      $('edition-clock-label').textContent = 'Do końca zapisów';
+      $('edition-time-left').textContent = Math.floor(minutes / 1440) + ' dni · ' + Math.floor(minutes % 1440 / 60) + ' godz. · ' + minutes % 60 + ' min';
+    }
+    countdownTimer = setInterval(tick, 15000);
+    tick();
+  }
+  function showGoals(users, payers, estimate) {
+    const freePlaces = users - payers;
+    const start = Math.max(15, Math.floor(users / 5) * 5 - 10);
+    const cards = [start, start+5, start+10, start+15].map(goal => {
+      const card = document.createElement('li');
+      const label = document.createElement('span');
+      label.textContent = goal + ' osób';
+      const price = document.createElement('b');
+      price.textContent = goal > freePlaces ? estimate(goal, goal - freePlaces) : '—';
+      const progress = document.createElement('progress');
+      progress.max = goal;
+      progress.value = Math.min(goal, users);
+      progress.setAttribute('aria-label', 'Postęp do celu ' + goal + ' osób');
+      const note = document.createElement('small');
+      note.textContent = users >= goal ? 'Cel osiągnięty' : 'Do celu: ' + (goal - users);
+      card.append(label, price, progress, note);
+      return card;
+    });
+    $('edition-goal-list').replaceChildren(...cards);
+    $('edition-goals').hidden = false;
+  }
   function updateEstimate(status) {
     const users = status.users;
     const fee = 1000;
@@ -79,15 +126,20 @@
     // The public status expresses the current tool share in USD per paying member.
     const payers = status.payingUsers ?? (users === 0 ? 0 : Math.round(accounts * 287.20 / toolUSD));
     const votes = Number(status.votes);
-    const nextAccounts = users + 1 >= 45 && votes < Math.ceil((users + 1) * .8) ? 2 : 1;
     const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Number.isFinite(toolPLN) && toolPLN > 0;
     const unknownPayer = status.payingUsers == null && payers === 1 && users > 0;
     $('edition-current').textContent = valid && payers > 0 && !unknownPayer ? money(Math.round(toolPLN * 100) + fee) : '—';
     $('edition-next').textContent = '—';
+    $('edition-goals').hidden = true;
     if (!valid || unknownPayer || !Number.isFinite(votes)) return;
     const accountCost = payers ? toolPLN * payers / accounts : 287.20 * Number(status.rate);
     if (Number.isFinite(accountCost) && accountCost > 0) {
-      $('edition-next').textContent = money(Math.round(accountCost * nextAccounts / (payers + 1) * 100) + fee);
+      const estimate = (total, paying) => {
+        const count = total >= 45 && votes < Math.ceil(total * .8) ? 2 : 1;
+        return money(Math.round(accountCost * count * 100 / paying) + fee);
+      };
+      $('edition-next').textContent = estimate(users + 1, payers + 1);
+      showGoals(users, payers, estimate);
     }
   }
   async function load() {
@@ -96,6 +148,7 @@
     $('edition-title').textContent = month(edition.targetMonth);
     $('edition-count').textContent = edition.users;
     updateEstimate(edition);
+    showSchedule(edition);
     $('access-date').textContent = month(edition.targetMonth,true);
     await refreshMember();
   }
