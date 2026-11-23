@@ -1,7 +1,34 @@
 const pages = require('./pages.cjs');
-// Keep all preview writes inside the browser. Only these public resources are read upstream.
+// Only the explicitly listed enrollment routes can reach the private DEV service.
 async function respond(request, assets) {
   const pathname = decodeURIComponent(new URL(request.url).pathname);
+  const routes = {
+    '/api/register':['POST','/api/register'], '/api/login':['POST','/api/login'],
+    '/api/group-buy/status':['GET','/api/enrollment/status'], '/public-data/group-buy/status':['GET','/api/enrollment/status'],
+    '/api/enrollment/me':['GET','/api/enrollment/me'], '/api/enrollment/continue':['POST','/api/enrollment/continue'],
+    '/api/enrollment/receipt':['POST','/api/enrollment/receipt'], '/api/enrollment/webhook':['POST','/api/enrollment/webhook']
+  };
+  const route = Object.hasOwn(routes,pathname) && routes[pathname];
+  if (route) {
+    if (route[0] !== request.method) return new Response(null,{status:405});
+    if (request.headers.has('origin') && request.headers.get('origin') !== new URL(request.url).origin)
+      return new Response(null,{status:403});
+    const headers = new Headers();
+    for (const name of ['content-type','authorization','stripe-signature']) {
+      if (request.headers.has(name)) headers.set(name,request.headers.get(name));
+    }
+    try {
+      const response = await fetch('http://kdpwingman-v2-backend.railway.internal:8080'+route[1],{
+        method:request.method,headers,body:request.method==='POST'?request.body:undefined,duplex:'half',
+        redirect:'error',signal:AbortSignal.timeout(18000)
+      });
+      if (!response.ok && !response.headers.get('content-type')?.includes('application/json')) {
+        return Response.json({error:'Nie udało się obsłużyć żądania.'},{status:response.status});
+      }
+      return new Response(response.body,{status:response.status,headers:{'Content-Type':response.headers.get('content-type')||'application/json','Cache-Control':'no-store'}});
+    } catch { return Response.json({error:'Backend testowy jest chwilowo niedostępny.'},{status:502}); }
+  }
+  if (pathname === '/dashboard') return Response.redirect(new URL('/dashboard.html',request.url),302);
   if (!['GET','HEAD'].includes(request.method)) return new Response(null,{status:405});
   if (pathname === '/public-data/nbp-usd') {
     try {
@@ -52,7 +79,8 @@ if (process.argv.includes('--railway')) {
     '\nBun.serve({hostname:"0.0.0.0",port:Number(process.env.PORT || 8080),fetch:req=>respond(req,assets)});');
 } else {
   require('node:http').createServer(async(req,res)=>{
-    const result=await respond(new Request(new URL(req.url,'http://localhost'),{method:req.method}),pages);
+    const body=['GET','HEAD'].includes(req.method)?undefined:req;
+    const result=await respond(new Request(new URL(req.url,'http://localhost'),{method:req.method,headers:req.headers,body,duplex:'half'}),pages);
     res.writeHead(result.status,Object.fromEntries(result.headers));
     res.end(Buffer.from(await result.arrayBuffer()));
   }).listen(Number(process.env.PORT || 4375),'127.0.0.1');
