@@ -1087,3 +1087,5 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
 .edition-goals progress.goal-pending { color:var(--wine); accent-color:var(--wine); }
 .edition-goals progress.goal-pending::-webkit-progress-value { background:var(--wine); }
 .edition-goals progress.goal-pending::-moz-progress-bar { background:var(--wine); }
+
+.edition-live .fee-line { margin:7px 0 0; font-size:.92rem; color:var(--ink); }

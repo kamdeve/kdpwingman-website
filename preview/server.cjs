@@ -3,6 +3,14 @@ const pages = require('./pages.cjs');
 async function respond(request, assets) {
   const pathname = decodeURIComponent(new URL(request.url).pathname);
   if (!['GET','HEAD'].includes(request.method)) return new Response(null,{status:405});
+  if (pathname === '/public-data/nbp-usd') {
+    try {
+      const upstream = await fetch('https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json', {signal:AbortSignal.timeout(4500)});
+      if (!upstream.ok) throw new Error();
+      const {effectiveDate,mid} = (await upstream.json()).rates[0];
+      return Response.json({rates:[{effectiveDate,mid}]}, {headers:{'Cache-Control':'public, max-age=900'}});
+    } catch { return Response.json({error:'Brak kursu NBP'}, {status:503}); }
+  }
   if (['/public-data/stats/total-users','/public-data/stats/history','/public-data/group-buy/status','/public-data/puls/posts'].includes(pathname)) {
     try {
       const path = pathname.slice('/public-data/'.length);

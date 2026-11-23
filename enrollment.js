@@ -47,6 +47,7 @@
     submit.disabled = busy;
     $('join-panel').hidden = true;
     $('edition-next-wrap').hidden = Boolean(member?.joined || member?.free || edition?.isLocked);
+    $('edition-fee-line').hidden = $('edition-next-wrap').hidden;
     if (retryLoad) { start.textContent = 'Spróbuj ponownie'; return; }
     if (!edition) { start.disabled = true; return; }
     if (member?.joined) {
@@ -97,11 +98,23 @@
     tick();
   }
   const dollars = new Intl.NumberFormat('pl-PL', {style:'currency', currency:'USD', currencyDisplay:'code'});
-  function seatQuote(id, toolCents, toolUSD, rate) {
-    const available = Number.isFinite(toolCents) && toolCents > 0 && Number.isFinite(toolUSD) && toolUSD > 0 && Number.isFinite(rate) && rate > 0;
-    $(id).textContent = available ? money(toolCents + 1000) : '—';
-    $(id + '-usd').textContent = available ? '≈ ' + dollars.format(toolUSD + 10 / rate) : '';
-    $(id + '-parts').textContent = available ? 'Helium: ' + money(toolCents) + ' (' + dollars.format(toolUSD) + ') + 10 zł opłaty' : '';
+  let nbpQuote;
+  async function fetchReferenceRate() {
+    const preview = document.documentElement.dataset.preview === 'true';
+    const url = preview ? '/public-data/nbp-usd' : 'https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json';
+    const response = await fetch(url, {credentials:'omit', signal:AbortSignal.timeout(6500)});
+    if (!response.ok) return;
+    const row = (await response.json()).rates?.[0];
+    if (!row || !(row.mid > 0) || !Number.isFinite(row.mid) || !/^\d{4}-\d{2}-\d{2}$/.test(row.effectiveDate)) return;
+    const ageDays = (Date.now() - Date.parse(row.effectiveDate + 'T00:00:00Z')) / 86400000;
+    if (!(ageDays >= -1 && ageDays <= 7)) return;
+    nbpQuote = row;
+    if (edition) updateEstimate(edition);
+  }
+  function seatQuote(id, toolCents, toolUSD) {
+    const available = Number.isFinite(toolCents) && toolCents > 0 && Number.isFinite(toolUSD) && toolUSD > 0;
+    $(id).textContent = available ? money(toolCents) : '—';
+    $(id + '-usd').textContent = available ? dollars.format(toolUSD) : '';
   }
   function showGoals(users, payers, estimate) {
     const freePlaces = users - payers;
@@ -127,28 +140,33 @@
   }
   function updateEstimate(status) {
     const users = status.users;
-    const rate = Number(status.rate);
-    const toolPLN = Number.parseFloat(status.pricePLN);
+    const rate = nbpQuote?.mid ?? Number(status.rate);
     const toolUSD = Number.parseFloat(status.priceUSD);
     const accounts = status.isSplitActive ? 2 : 1;
     // The public status expresses the current tool share in USD per paying member.
     const payers = status.payingUsers ?? (users === 0 ? 0 : Math.round(accounts * 287.20 / toolUSD));
     const votes = Number(status.votes);
-    const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Number.isFinite(toolPLN) && toolPLN > 0;
+    const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Number.isFinite(rate) && rate > 0;
     const unknownPayer = status.payingUsers == null && payers === 1 && users > 0;
-    seatQuote('edition-current', valid && payers && !unknownPayer ? Math.round(toolPLN * 100) : null, toolUSD, rate);
-    seatQuote('edition-next', null, null, rate);
+    const oneAccountUSD = 287.20;
+    const accountCost = oneAccountUSD * rate;
+    const perPayerUSD = payers > 0 ? oneAccountUSD * accounts / payers : 0;
+    seatQuote('edition-current', valid && !unknownPayer ? Math.round(perPayerUSD * rate * 100) : null, perPayerUSD);
+    const source = nbpQuote ? 'Kurs średni NBP z ' + dateLabel.format(new Date(nbpQuote.effectiveDate + 'T12:00:00Z')) : 'Kurs podany przez system zapisów';
+    $('edition-plan-cost').textContent = valid ? 'Jedno konto Diamond po rabacie: 287,20 USD ≈ ' + money(Math.round(accountCost * 100)) + '. ' + source + ': ' + rate.toLocaleString('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:4}) + ' zł za dolara.' : 'Plan Diamond po rabacie kosztuje 287,20 USD za konto.';
+    $('edition-fee-line').textContent = 'Opłata serwisowa: 10 zł za miejsce.';
+    seatQuote('edition-next', null, null);
     $('edition-goals').hidden = true;
     if (!valid || unknownPayer || !Number.isFinite(votes)) return;
-    const accountCost = payers ? toolPLN * payers / accounts : 287.20 * Number(status.rate);
     if (Number.isFinite(accountCost) && accountCost > 0) {
       const estimate = (total, paying) => {
         const count = total >= 45 && votes < Math.ceil(total * .8) ? 2 : 1;
         return {cents:Math.round(accountCost * count * 100 / paying), usd:287.20 * count / paying};
       };
       const next = estimate(users + 1, payers + 1);
-      seatQuote('edition-next', next.cents, next.usd, rate);
-      $('edition-goal-note').textContent = 'Płacące osoby: ' + payers + ' z ' + users + '. Progi zakładają, że każda kolejna osoba płaci. Do podanych kwot dolicz 10 zł za obsługę.';
+      seatQuote('edition-next', next.cents, next.usd);
+      $('edition-fee-line').textContent = 'Z opłatą serwisową 10 zł: ' + money(next.cents + 1000) + ' po Twoim dołączeniu.';
+      $('edition-goal-note').textContent = 'Płacące osoby: ' + payers + ' z ' + users + '. Szacunek zakłada, że kolejna osoba wpłaci depozyt.';
       showGoals(users, payers, estimate);
     }
   }
@@ -230,5 +248,6 @@
     setMode(localStorage.getItem('wingman_user') ? 'login' : 'register');
     (mode === 'login' ? form.elements.email : form.elements.nickname).focus();
   });
+  fetchReferenceRate().catch(() => {});
   run(initialize);
 })();
