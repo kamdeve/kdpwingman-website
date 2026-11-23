@@ -98,7 +98,22 @@
     tick();
   }
   const dollars = new Intl.NumberFormat('pl-PL', {style:'currency', currency:'USD', currencyDisplay:'code'});
+  const accountUSD = 287.20;
   let nbpQuote;
+
+  function publishPricing() {
+    const rate = nbpQuote?.mid ?? Number(edition?.rate);
+    if (!Number.isFinite(rate) || rate <= 0) return;
+    const source = nbpQuote ? 'Kurs średni NBP z ' + dateLabel.format(new Date(nbpQuote.effectiveDate + 'T12:00:00Z')) : 'Kurs podany przez system zapisów';
+    const rateLabel = source + ': ' + rate.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits:4}) + ' zł za dolara.';
+    const quote = {
+      accountUSD, rateLabel,
+      shareCents(accounts, payers) { return Math.round(accountUSD * rate * accounts / payers * 100); }
+    };
+    window.wingmanHeliumQuote = quote;
+    window.dispatchEvent(new Event('wingman-pricing'));
+    return quote;
+  }
   async function fetchReferenceRate() {
     const preview = document.documentElement.dataset.preview === 'true';
     const url = preview ? '/public-data/nbp-usd' : 'https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json';
@@ -110,6 +125,7 @@
     if (!(ageDays >= -1 && ageDays <= 7)) return;
     nbpQuote = row;
     if (edition) updateEstimate(edition);
+    else publishPricing();
   }
   function seatQuote(id, toolCents, toolUSD) {
     const available = Number.isFinite(toolCents) && toolCents > 0 && Number.isFinite(toolUSD) && toolUSD > 0;
@@ -140,35 +156,30 @@
   }
   function updateEstimate(status) {
     const users = status.users;
-    const rate = nbpQuote?.mid ?? Number(status.rate);
+    const quote = publishPricing();
     const toolUSD = Number.parseFloat(status.priceUSD);
     const accounts = status.isSplitActive ? 2 : 1;
     // The public status expresses the current tool share in USD per paying member.
-    const payers = status.payingUsers ?? (users === 0 ? 0 : Math.round(accounts * 287.20 / toolUSD));
+    const payers = status.payingUsers ?? (users === 0 ? 0 : Math.round(accounts * accountUSD / toolUSD));
     const votes = Number(status.votes);
-    const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Number.isFinite(rate) && rate > 0;
+    const valid = Number.isInteger(users) && users >= 0 && Number.isInteger(payers) && payers >= 0 && payers <= users && Boolean(quote);
     const unknownPayer = status.payingUsers == null && payers === 1 && users > 0;
-    const oneAccountUSD = 287.20;
-    const accountCost = oneAccountUSD * rate;
-    const perPayerUSD = payers > 0 ? oneAccountUSD * accounts / payers : 0;
-    seatQuote('edition-current', valid && !unknownPayer ? Math.round(perPayerUSD * rate * 100) : null, perPayerUSD);
-    const source = nbpQuote ? 'Kurs średni NBP z ' + dateLabel.format(new Date(nbpQuote.effectiveDate + 'T12:00:00Z')) : 'Kurs podany przez system zapisów';
-    $('edition-plan-cost').textContent = valid ? 'Jedno konto Diamond po rabacie: 287,20 USD ≈ ' + money(Math.round(accountCost * 100)) + '. ' + source + ': ' + rate.toLocaleString('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:4}) + ' zł za dolara.' : 'Plan Diamond po rabacie kosztuje 287,20 USD za konto.';
+    const perPayerUSD = payers > 0 ? accountUSD * accounts / payers : 0;
+    seatQuote('edition-current', valid && payers > 0 && !unknownPayer ? quote.shareCents(accounts, payers) : null, perPayerUSD);
+    $('edition-plan-cost').textContent = quote ? 'Jedno konto Diamond po rabacie: 287,20 USD ≈ ' + money(quote.shareCents(1, 1)) + '. ' + quote.rateLabel : 'Plan Diamond po rabacie kosztuje 287,20 USD za konto.';
     $('edition-fee-line').textContent = 'Opłata serwisowa: 10 zł za miejsce.';
     seatQuote('edition-next', null, null);
     $('edition-goals').hidden = true;
     if (!valid || unknownPayer || !Number.isFinite(votes)) return;
-    if (Number.isFinite(accountCost) && accountCost > 0) {
-      const estimate = (total, paying) => {
-        const count = total >= 45 && votes < Math.ceil(total * .8) ? 2 : 1;
-        return {cents:Math.round(accountCost * count * 100 / paying), usd:287.20 * count / paying};
-      };
-      const next = estimate(users + 1, payers + 1);
-      seatQuote('edition-next', next.cents, next.usd);
-      $('edition-fee-line').textContent = 'Z opłatą serwisową 10 zł: ' + money(next.cents + 1000) + ' po Twoim dołączeniu.';
-      $('edition-goal-note').textContent = 'Płacące osoby: ' + payers + ' z ' + users + '. Szacunek zakłada, że kolejna osoba wpłaci depozyt.';
-      showGoals(users, payers, estimate);
-    }
+    const estimate = (total, paying) => {
+      const count = total >= 45 && votes < Math.ceil(total * .8) ? 2 : 1;
+      return {cents:quote.shareCents(count, paying), usd:accountUSD * count / paying};
+    };
+    const next = estimate(users + 1, payers + 1);
+    seatQuote('edition-next', next.cents, next.usd);
+    $('edition-fee-line').textContent = 'Z opłatą serwisową 10 zł: ' + money(next.cents + 1000) + ' po Twoim dołączeniu.';
+    $('edition-goal-note').textContent = 'Płacące osoby: ' + payers + ' z ' + users + '. Szacunek zakłada, że kolejna osoba wpłaci depozyt.';
+    showGoals(users, payers, estimate);
   }
   async function load() {
     retryLoad = false; message.textContent = '';

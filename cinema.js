@@ -87,33 +87,28 @@
   }
 
   function renderPrice(people, accounts) {
-    const exchangeRate = 4;
-    const soloPrice = 359 * exchangeRate;
-    const accountPriceGrosze = Math.round(287.2 * exchangeRate * 100);
-    const groupPriceGrosze = accountPriceGrosze * accounts;
+    const quote = window.wingmanHeliumQuote;
     const solo = people === 1;
-    const heliumShare = solo ? soloPrice : Math.round(groupPriceGrosze / people) / 100;
-    const serviceFee = solo ? 0 : 10;
-    const deposit = 75;
-    const seatPrice = heliumShare + serviceFee;
-    const refund = Math.max(0, deposit - seatPrice);
-    const format = amount => currency.format(amount);
-
-    document.getElementById('seat-label').textContent = solo ? 'Koszt samodzielnego planu' : 'Koszt jednego miejsca';
+    const fee = solo ? 0 : 1000;
+    const helium = quote?.shareCents(accounts, people);
+    const full = quote?.shareCents(1, 1);
+    const seat = helium + fee;
+    const saving = full - seat;
+    const format = cents => Number.isFinite(cents) ? currency.format(cents / 100) : '—';
+    document.getElementById('seat-label').textContent = solo ? 'Koszt całego konta po rabacie' : 'Koszt jednego miejsca';
     document.getElementById('solo-note').hidden = !solo;
-    document.getElementById('share-price').textContent = format(seatPrice);
-    document.getElementById('refund').textContent = format(refund);
-    document.getElementById('deposit-note').hidden = solo || seatPrice <= deposit;
-    document.getElementById('helium-share').textContent = format(heliumShare);
-    document.getElementById('service-fee').textContent = format(serviceFee);
-    document.getElementById('solo-price').textContent = format(soloPrice) + ' / mies.';
-
-    const savings = soloPrice - seatPrice;
-    const adBudget = Math.min(600, savings);
-    document.getElementById('monthly-saving').textContent = format(savings);
-    document.getElementById('budget-examples').hidden = savings === 0;
+    document.getElementById('share-price').textContent = format(seat);
+    document.getElementById('refund').textContent = format(Math.max(0, 7500 - seat));
+    document.getElementById('deposit-note').hidden = solo || !(seat > 7500);
+    document.getElementById('helium-share').textContent = format(helium);
+    document.getElementById('service-fee').textContent = format(fee);
+    document.getElementById('solo-price').textContent = '287,20 USD' + (quote ? ' ≈ ' + format(full) : '') + ' / mies.';
+    document.getElementById('cinema-rate').textContent = quote?.rateLabel || '';
+    document.getElementById('monthly-saving').textContent = format(saving);
+    document.getElementById('budget-examples').hidden = !(saving > 0);
+    const adBudget = Math.min(60000, saving);
     document.getElementById('ads-budget').textContent = format(adBudget);
-    document.getElementById('book-budget').textContent = format(savings - adBudget);
+    document.getElementById('book-budget').textContent = format(saving - adBudget);
   }
 
   function render() {
@@ -146,6 +141,7 @@
     if (!frame) frame = requestAnimationFrame(render);
   }
 
+  window.addEventListener('wingman-pricing', scheduleRender);
   audience.addEventListener('input', scheduleRender);
   document.querySelectorAll('[data-audience]').forEach(button => {
     button.addEventListener('click', () => {

@@ -355,12 +355,12 @@
     <div><dt id="seat-label">Koszt jednego miejsca</dt><dd id="share-price"></dd></div>
     <div><dt>Zwrot do portfela z 75 zł</dt><dd id="refund"></dd></div>
   </dl>
-  <p id="solo-note" class="cinema-hint" hidden>Jedna osoba kupuje plan samodzielnie. Depozyt Wingman dotyczy zrzutki grupowej.</p>
+  <p id="solo-note" class="cinema-hint" hidden>Przy jednej osobie pokazujemy cenę całego konta po rabacie.</p>
   <p id="deposit-note" class="cinema-hint" hidden>Koszt miejsca przekracza depozyt 75 zł. Przy tej liczbie osób edycji nie można jeszcze rozliczyć.</p>
   <dl class="price-breakdown">
     <div><dt>Helium 10 na osobę</dt><dd id="helium-share"></dd></div>
     <div><dt>Opłata serwisowa na osobę</dt><dd id="service-fee"></dd></div>
-    <div><dt>Samodzielny plan Diamond</dt><dd id="solo-price"></dd></div>
+    <div><dt>Diamond po rabacie · całe konto</dt><dd id="solo-price"></dd></div>
   </dl>
   <div class="cinema-stage">
     <div class="cinema-rooms" id="cinema-rooms"></div>
@@ -370,9 +370,9 @@
   <p class="cinema-hint" id="cinema-hint">Przy 45 osobach cena uwzględnia drugie konto. Od 89 osób pokazujemy symulację z trzecim kontem.</p>
 </section>
 
-<details class="math"><summary>Jak liczymy cenę?</summary><p>W symulacji przyjmujemy kurs 4,00 zł za dolara. Samodzielny plan Diamond kosztuje 359 USD miesięcznie przed ewentualnymi podatkami. Dla grupy przyjmujemy 287,20 USD za każde konto. Do kosztu Helium 10 na osobę doliczamy 10 zł opłaty serwisowej. Reszta z depozytu 75 zł wraca do portfela Wingman na kolejną edycję.</p><p>Od 45 osób domyślnie liczymy dwa konta. Grupa może wybrać jedno większością 80% głosów. Ostateczne rozliczenie zależy od kursu i liczby płacących osób.</p><a href="https://www.helium10.com/pricing/" target="_blank" rel="noopener">Sprawdź cennik Helium 10</a></details>
+<details class="math"><summary>Jak liczymy cenę?</summary><p>Jedno konto Diamond kosztuje 287,20 USD po rabacie. <span id="cinema-rate"></span> W grupie dzielimy koszt kont między płacące osoby i doliczamy po 10 zł opłaty serwisowej. Nadwyżka z depozytu 75 zł wraca do portfela Wingman.</p><p>Od 45 osób domyślnie liczymy dwa konta. Grupa może wybrać jedno większością 80% głosów. Ostateczne rozliczenie zależy od kursu i liczby płacących osób.</p><a href="https://www.helium10.com/pricing/" target="_blank" rel="noopener">Sprawdź cennik Helium 10</a></details>
 <div class="budget">
-  <div class="budget-intro"><div><h3>Oszczędność względem samodzielnego planu</h3><strong id="monthly-saving"></strong><span> miesięcznie</span></div><img loading="lazy" src="images/wingman-film.webp" alt=""></div>
+  <div class="budget-intro"><div><h3>Oszczędność względem całego konta po rabacie</h3><strong id="monthly-saving"></strong><span> miesięcznie</span></div><img loading="lazy" src="images/wingman-film.webp" alt=""></div>
   <div id="budget-examples"><h4>Jak możesz podzielić zaoszczędzoną kwotę?</h4><div class="budget-ideas">
     <div><svg aria-hidden="true" viewBox="0 0 80 64" width="80" height="64"><circle cx="39" cy="32" r="29" fill="#b6eef0"/><path d="m29 33 6 18h8l-6-21" fill="#45324d"/><path d="M19 23h13l25-12v36L32 36H19z" fill="#A0134A"/><path d="M53 13h5v34h-5z" fill="#ffb994"/><path d="m63 20 7-4m-6 12h8m-9 9 7 4" stroke="#168489" stroke-width="3" stroke-linecap="round"/></svg><div><b id="ads-budget"></b><p>Na test słów kluczowych w Amazon Ads</p></div></div>
     <div><svg aria-hidden="true" viewBox="0 0 80 64" width="80" height="64"><circle cx="40" cy="32" r="29" fill="#ffe7ad"/><path d="M16 16h46v29H35l-12 9v-9h-7z" fill="#63334f"/><path d="m40 19 3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#ffe7ad"/></svg><div><b id="book-budget"></b><p>Na subskrypcję AI, np. ChatGPT Pro lub Claude Max</p></div></div>
