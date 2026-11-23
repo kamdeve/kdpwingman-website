@@ -98,12 +98,10 @@
       const name=`wingman-okladka-${f.binding.value}-${f.trim.value}-${f.stock.value}-${f.pages.value}str`;
       const fmt=n=>n.toLocaleString('pl-PL',{maximumFractionDigits:4});
       const measurements=[['Szerokość okładki',d.width],['Wysokość okładki',d.height],['Szerokość grzbietu',d.spine]];
-      const titansNote=f.stock.value==='standard'
-        ? `<details><summary>Porównaj grzbiet z Self Publishing Titans</summary><p>Przy ${Number(f.pages.value)} stronach Titans pokazuje ${fmt(Number(f.pages.value)*.00225)}″. W szablonie stosujemy współczynnik KDP dla koloru standardowego (0,002252″ na stronę).</p></details>` : '';
       result.innerHTML=`<div style="overflow:auto"><table><thead><tr><th>Wymiar</th><th>Cale</th><th>cm</th><th>px (300 ppi)</th><th>pt</th></tr></thead><tbody>
         ${measurements.map(([label,v])=>`<tr><th scope="row">${label}</th><td>${fmt(v)}</td><td>${fmt(v*2.54)}</td><td>${Math.round(v*300)}</td><td>${fmt(v*72)}</td></tr>`).join('')}
         </tbody></table></div><div data-preview></div><p>Bordo oznacza krawędzie i grzbiet. Zielone obrysy wyznaczają bezpieczne pole tekstu. Usuń warstwę szablonu z gotowej okładki.</p>
-        <button type="button" data-download-svg>Pobierz SVG</button> <button type="button" data-download-png>Pobierz PNG</button><p role="status" data-export-status></p>${titansNote}`;
+        <button type="button" data-download-svg>Pobierz SVG</button> <button type="button" data-download-png>Pobierz PNG</button><p role="status" data-export-status></p>`;
       const preview=result.querySelector('[data-preview]');
       preview.innerHTML=svg;
       Object.assign(preview.firstElementChild.style,{width:'100%',height:'auto',maxHeight:'400px'});

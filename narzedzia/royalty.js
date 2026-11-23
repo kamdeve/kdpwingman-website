@@ -12,7 +12,7 @@
       premium: [.0435,.0598], standard: [.020,.027], hardBase: 4.15, hardShort: [5.23,5.45], hardColor: [.045,.060] },
     ca: { name: 'Amazon.ca', currency: 'CAD', threshold: 13.99, max: 350,
       base: 1.26, short: [2.99,3.53], black: [.016,.021], shortPremium: [4.66,5.26], premium: [.085,.10], standard: [.037,.052] },
-    eu: { name: 'Amazon UE (EUR)', currency: 'EUR', threshold: 9.99, max: 250,
+    eu: { name: 'Amazon UE w EUR (.de, .es, .fr, .it, .nl, .ie, .com.be)', currency: 'EUR', threshold: 9.99, max: 250,
       base: .75, short: [2.05,2.48], black: [.012,.016], shortPremium: [2.85,3.61],
       premium: [.0525,.0715], standard: [.024,.035], hardBase: 4.65, hardShort: [5.95,6.35], hardColor: [.057,.072] },
     au: { name: 'Amazon.com.au', currency: 'AUD', threshold: 13.99, max: 350,
@@ -39,26 +39,6 @@
     if (ink === 'premium' && pages <= 40) return market.shortPremium[size];
     return market.base + market[ink][size] * pages;
   }
-  // Published reference snapshot, November 2026. Show its estimate separately wherever its assumptions differ.
-  function referenceCost(data, market) {
-    const { pages, ink, size, format } = data;
-    if (format === 'ebook') return Math.max(0, data.price*data.plan - (data.plan === .7 ? data.delivery : 0));
-    let base = format === 'hard' ? market.hardBase : market.base;
-    let rate = market[ink][size];
-    if (ink === 'black' && pages < 110) return (format === 'hard' ? market.hardShort : market.short)[size];
-    if (ink === 'standard') {
-      if (pages >= 600) return 0;
-      if (data.market === 'us') rate = [.027,.042][size];
-    }
-    if (ink === 'premium') {
-      if (pages < 42 && format === 'soft') {
-        return ({uk:[2.65,3.25],eu:[3.03,3.63]}[data.market] || market.shortPremium)[size];
-      }
-      if (format === 'hard' && pages >= 550) return 0;
-      rate = ({uk:[.045,.060],eu:[.057,.072]}[data.market] || market.premium)[size];
-    }
-    return base + (pages-rate)*rate;
-  }
   function estimate(data) {
     const market = markets[data.market], unit = market.currency === 'JPY' ? 1 : 100;
     const rate = data.format === 'ebook' ? data.plan : data.price >= market.threshold ? .6 : .5;
@@ -66,10 +46,8 @@
     const royalty = cent(data.format === 'ebook' ? rate * (data.price - (rate === .7 ? data.delivery : 0)) : rate*data.price - cost, unit);
     const halfFloor = cent(cost/.5,unit,Math.ceil);
     const minimum = halfFloor < market.threshold ? halfFloor : Math.max(market.threshold,cent(cost/.6,unit,Math.ceil));
-    const reference = ['us','uk','ca','eu','au'].includes(data.market) ? referenceCost(data, market) : null;
     return {rate,cost,royalty,minimum,total:cent(royalty*data.sold,unit),
-      expanded:cent(.4*data.price-cost, unit), expandedMin:cent(cost/.4,unit,Math.ceil),
-      reference:reference === null ? null : Number((data.format === 'ebook' ? reference : rate*data.price - Number(reference.toFixed(2))).toFixed(2))};
+      expanded:cent(.4*data.price-cost, unit), expandedMin:cent(cost/.4,unit,Math.ceil)};
   }
   function royaltyTool(root) {
     root.innerHTML = `<form class="tool-form"><label>Format<select name="format"><option value="soft">Miękka oprawa</option><option value="hard">Twarda oprawa</option><option value="ebook">Kindle eBook</option></select></label>
@@ -86,6 +64,9 @@
     function visible(field, show) {field.disabled=!show; field.closest('label').hidden=!show;}
     function sync() {
       const ebook=f.format.value==='ebook', hard=f.format.value==='hard';
+      f.market.querySelector('[value="eu"]').textContent = ebook
+        ? 'Amazon UE w EUR (.de, .es, .fr, .it, .nl)' : markets.eu.name;
+      f.size.options[0].textContent = hard ? 'Standardowy (np. 6 × 9 cali)' : 'Standardowy (np. 5 × 8 lub 6 × 9 cali)';
       for (const option of f.market.options) {
         option.disabled = (hard && !markets[option.value].hardBase) || (ebook && ['pl','se'].includes(option.value));
       }
@@ -121,7 +102,6 @@
         html+=`<details><summary>Dystrybucja rozszerzona (dla kwalifikujących się tytułów)</summary>${view('Minimalna cena przy stawce 40%',money(out.expandedMin))}
           ${data.price>=out.expandedMin?view('Tantiemy za egzemplarz',money(out.expanded))+view('Tantiemy łącznie',money(out.expanded*data.sold)):'<p>Cena jest poniżej minimum dla tego kanału.</p>'}</details>`;
       }
-      if (out.reference!==null) html+=`<details><summary>Porównaj z Self Publishing Titans</summary>${view('Szacunek Titans za egzemplarz',money(out.reference))}<p>Model odczytany w listopadzie 2026 r. Stawki i zaokrąglenia Titans mogą się różnić od aktualnych zasad Amazon.</p></details>`;
       result.innerHTML=html;
     }
     form.addEventListener('input',()=>{sync();result.replaceChildren();});

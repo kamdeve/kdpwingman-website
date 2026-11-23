@@ -2,7 +2,6 @@
   'use strict';
   window.WingmanTools ||= {};
 
-  // Monthly results read from the authenticated Titans calculator on 2026-11-23.
   // The sales form uses the marketplace and BSR only. Format in the royalty
   // form does not participate in its sales estimate.
   const samplesByMarket = {
@@ -60,22 +59,18 @@
         <label>Rynek Amazon <select name="market"></select></label>
         <label>Ranking bestsellerów (BSR) <input name="rank" type="number" min="1" max="3000000" step="1" required value="50000"></label>
         <details data-settings><summary>Źródło danych i własne pomiary</summary>
-        <label>Źródło <select name="source"><option value="reference">Sprawdzone wyniki Self Publishing Titans</option><option value="custom">Moje punkty odniesienia</option></select></label>
+        <label>Źródło <select name="source"><option value="reference">Dane referencyjne</option><option value="custom">Moje punkty odniesienia</option></select></label>
         <div data-calibration hidden>
           <label>Ranking dla własnych pomiarów <select name="format"><option value="books">Books (książki drukowane)</option><option value="paperback">Oprawa miękka</option><option value="hardcover">Oprawa twarda</option><option value="kindle">Kindle Store (e-booki)</option></select></label>
           <label>BSR i sprzedaż w 30 dni <textarea name="pairs" rows="4" placeholder="BSR;sprzedaż w 30 dni"></textarea></label>
-          <p>Wklej po jednej parze w wierszu, osobno dla każdego rynku i formatu. Możesz użyć własnych pomiarów albo wyników Titans. Punkty zostaną zapisane w tej przeglądarce po obliczeniu.</p>
+          <p>Wklej po jednej parze w wierszu, osobno dla każdego rynku i formatu. Punkty zostaną zapisane w tej przeglądarce po obliczeniu.</p>
         </div>
         <p data-coverage></p>
         </details>
         <button type="submit">Oszacuj sprzedaż</button>
       </form>
       <div data-result role="status" aria-live="polite"></div>
-      <details><summary>Skąd pochodzi wynik?</summary>
-        <p>23 listopada 2026 r. sprawdziliśmy wyniki kalkulatora Self Publishing Titans dla ośmiu rynków. Ich kalkulator sprzedaży uwzględnia rynek i BSR. Formaty oprawy dotyczą osobnego obliczenia tantiem.</p>
-        <p>Dla sprawdzonego rankingu pokazujemy odczytaną wartość. Pozostałe wyniki pomiędzy sąsiednimi pomiarami wyznaczamy przez interpolację w skali logarytmicznej. Mogą się różnić od bieżącej prognozy Titans. Poza zakresem danych kalkulator nie podaje prognozy.</p>
-        <a href="https://www.selfpublishingtitans.com/pl/tools/KDP-BSR-Sales-Calculator" target="_blank" rel="noopener noreferrer">Porównaj w kalkulatorze Self Publishing Titans</a>
-      </details>`;
+      <p><strong>Notatka:</strong> Są to szacunkowe dane dotyczące sprzedaży oparte na BSR. Rzeczywista sprzedaż może się różnić w zależności od sezonowości, marketingu i innych czynników.</p>`;
     const form = root.querySelector('form');
     const {market, format, source, rank, pairs} = form.elements;
     const result = root.querySelector('[data-result]');
@@ -99,7 +94,7 @@
         ? 'Dostępne punkty: ' + points.length + '. Zakres BSR: ' + formatNumber.format(points[0][0]) + '–' + formatNumber.format(points.at(-1)[0]) + '.'
         : 'Dodaj punkty odniesienia dla wybranego rynku i rankingu, aby obliczyć wynik.';
       if (market.value === 'pl' && !points.length) {
-        coverage.textContent = 'W kalkulatorze Self Publishing Titans nie ma rynku Amazon.pl. Tutaj możesz dodać własne pomiary dla Polski.';
+        coverage.textContent = 'Aby oszacować sprzedaż na Amazon.pl, dodaj własne pomiary dla Polski.';
       }
     }
 
@@ -145,7 +140,7 @@
       headline.textContent = formatNumber.format(sales.monthly) + ' szt. / 30 dni · ' + dayLabel + ' szt. / dzień';
       const explanation = document.createElement('p');
       explanation.textContent = sales.exact ? (source.value === 'reference'
-        ? 'Wynik sprawdzony w Self Publishing Titans 23 listopada 2026 r.'
+        ? 'Szacunek na podstawie punktu odniesienia dla tego rankingu.'
         : 'Wynik z Twojego pomiaru dla tego rankingu.')
         : 'Szacunek Wingmana pomiędzy BSR ' + formatNumber.format(sales.left[0]) + ' (' + sales.left[1] + ' szt.) i BSR ' + formatNumber.format(sales.right[0]) + ' (' + sales.right[1] + ' szt.).';
       if (!persisted) explanation.textContent += ' Ta przeglądarka nie pozwoliła zapisać danych na później.';
