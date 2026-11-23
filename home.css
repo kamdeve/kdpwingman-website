@@ -1115,6 +1115,12 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
 }
 .join-thresholds .edition-goals ul { margin-bottom:0; }
 
+@media (max-width:650px) {
+  .mast nav:has(a[href="narzedzia/index.html"]) {display:flex; margin-left:auto}
+  .mast nav:has(a[href="narzedzia/index.html"]) a:not([href="narzedzia/index.html"]) {display:none}
+  .mast nav a[href="narzedzia/index.html"] {font-size:.85rem; line-height:1.15}
+}
+
 @media (max-width:850px) {
   .join-grid { row-gap:16px; }
   .join-intro .edition-live { margin:12px 0 0; }

@@ -1,6 +1,9 @@
 const pages = require('./pages.cjs');
+const {files:toolFiles,serveTools} = require('./tool-assets.cjs');
 // Only the explicitly listed enrollment routes can reach the private DEV service.
 async function respond(request, assets) {
+  const toolResponse = await serveTools(request, toolFiles, toolRevision);
+  if (toolResponse) return toolResponse;
   const pathname = decodeURIComponent(new URL(request.url).pathname);
   const routes = {
     '/api/forgot-password':['POST','/api/forgot-password'], '/api/reset-password':['POST','/api/reset-password'],
@@ -88,8 +91,11 @@ async function respond(request, assets) {
     'Content-Security-Policy':['/dashboard.html','/reset.html'].includes(pathname) ? "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js https://cdn.quilljs.com/1.3.6/quill.js; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'" : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; media-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'"
   }});
 }
+const toolRevision = null;
 if (process.argv.includes('--railway')) {
-  process.stdout.write('const assets = '+JSON.stringify(pages)+';\n'+respond.toString()+
+  const revision = require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{cwd:__dirname,encoding:'utf8'}).trim();
+  const toolManifest=Object.fromEntries(Object.keys(toolFiles).map(name=>[name,true]));
+  process.stdout.write('const toolFiles = '+JSON.stringify(toolManifest)+';\nconst toolRevision = '+JSON.stringify(revision)+';\n'+serveTools.toString()+'\nconst assets = '+JSON.stringify(pages)+';\n'+respond.toString()+
     '\nBun.serve({hostname:"0.0.0.0",port:Number(process.env.PORT || 8080),fetch:req=>respond(req,assets)});');
 } else {
   require('node:http').createServer(async(req,res)=>{
