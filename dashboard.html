@@ -273,42 +273,15 @@
 }
 
 
-/* --- KARNET LOJALNOŚCIOWY KEBAB --- */
-        .kebab-card {
-            background: #ffffff;
-            border: 1px solid var(--glass-border);
-            border-top: 4px solid var(--cherry);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-        }
-        .stamp-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .stamp-slot {
-            aspect-ratio: 1;
-            background: #f1f5f9;
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; color: #e2e8f0;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;
-        }
-        .stamp-slot.active {
-            background: var(--cherry); border: 2px solid #8a0f3e; color: white;
-            transform: scale(1.05) rotate(5deg); box-shadow: 0 0 15px rgba(160, 19, 74, 0.3);
-        }
-        .stamp-slot.bonus {
-            border: 2px dashed var(--cherry); color: var(--cherry); background: var(--cherry-light);
-        }
-        .stamp-slot.bonus.active {
-            background: var(--cherry); border-color: #8a0f3e; color: white;
-        }
-
+.participation-map { border-top:4px solid var(--cherry); }
+        .participation-map h3 { color:var(--cherry); }
+        .participation-map p { color:var(--text-muted); margin:8px 0 16px; }
+        .participation-year { margin-top:14px; }
+        .participation-year h4 { margin:0 0 7px; }
+        .participation-year ul { display:grid; grid-template-columns:repeat(auto-fill,minmax(48px,1fr)); gap:6px; padding:0; margin:0; list-style:none; }
+        .participation-year li { display:grid; place-items:center; max-width:64px; aspect-ratio:1; font-size:.85rem; border-radius:8px; border:1px dashed #aeb6bf; color:#465364; }
+        .participation-year .joined { background:#a0134a; border:1px solid #a0134a; color:white; font-weight:700; }
+        
 /* TABS */
         .tabs-container { display: flex; gap: 10px; margin-bottom: 25px; background: var(--bg-white); padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-light); }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 1rem; }
@@ -628,22 +601,11 @@
 </div>
 
 
-<div class="kebab-card">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div>
-                            <h3 style="color: var(--text-main); margin: 0;"><i class="fas fa-ticket-alt" style="color: #fbbf24;"></i> Twój Karnet Lojalnościowy</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 5px 0 0 0;">
-                                Zbierz pieczątki i odbierz <strong>bonusy edukacyjne i narzędzia KDP!</strong> 🎁
-                            </p>
-                        </div>
-                        <div id="stamps-counter" style="background: var(--cherry-light); color: var(--cherry); padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.9rem;">
-                            0 / 6
-                        </div>
-                    </div>
-
-                    <div class="stamp-grid" id="kebab-stamps">
-                        </div>
-                </div>
+<section class="card participation-map" aria-labelledby="participation-heading">
+                    <h3 id="participation-heading">Twoja mapa udziału</h3>
+                    <p id="participation-summary" aria-live="polite">Ładowanie historii edycji…</p>
+                    <div id="participation-years"></div>
+                </section>
 
                 <div class="card">
                     <h3 style="color: var(--cherry);"><i class="fas fa-history"></i> Historia Zrzutek</h3>
@@ -1457,38 +1419,8 @@ if (data.has_free_ticket) {
                 }
             }, 100);
 
-            // --- WIZUALIZACJA PIECZĄTEK (SYSTEM KEBAB) ---
-            const stamps = data.loyalty_stamps || 0;
-            const stampsContainer = document.getElementById('kebab-stamps');
-            const stampsCounter = document.getElementById('stamps-counter');
-            
-            if (stampsContainer) {
-                let stampsHtml = '';
-                for (let i = 1; i <= 7; i++) {
-                    let className = "stamp-slot";
-                    let icon = '<i class="fas fa-stamp"></i>';
-                    
-                    if (i === 7) {
-                        className += " bonus";
-                        icon = '<i class="fas fa-gift"></i>';
-                    }
-                    
-                    if (i <= stamps) {
-                        className += " active";
-                        icon = '<i class="fas fa-check-circle"></i>';
-                    }
-                    
-                    stampsHtml += `<div class="${className}">${icon}</div>`;
-                }
-                stampsContainer.innerHTML = stampsHtml;
-                if (stampsCounter) {
-                    stampsCounter.innerText = `${stamps} / 6`;
-                    if (stamps >= 6) {
-                        stampsCounter.style.background = "#10b981";
-                        stampsCounter.innerText = "GOTOWE! 🎉";
-                    }
-                }
-            }
+            participationEdition = data.month;
+            renderParticipationMap();
 
         }
 
@@ -1518,6 +1450,51 @@ if (data.has_free_ticket) {
 
 
 
+        let participationHistory;
+        let participationEdition;
+
+        function renderParticipationMap() {
+            if (!participationHistory) return;
+            const summary = document.getElementById('participation-summary');
+            const years = document.getElementById('participation-years');
+            const validMonth = value => typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+            const months = new Set(participationHistory.map(row => row.month_target).filter(validMonth).sort());
+            years.replaceChildren();
+            if (!months.size) {
+                summary.textContent = 'Po pierwszym udziale zobaczysz tu miesiąc swojej zrzutki.';
+                return;
+            }
+            const sorted = [...months];
+            const first = sorted[0];
+            const last = sorted[sorted.length - 1];
+            const end = validMonth(participationEdition) && participationEdition > last ? participationEdition : last;
+            const names = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
+            let run = 0, longest = 0;
+            for (let year = Number(first.slice(0, 4)); year <= Number(end.slice(0, 4)); year++) {
+                const section = document.createElement('div');
+                section.className = 'participation-year';
+                const title = document.createElement('h4');
+                title.textContent = year;
+                const grid = document.createElement('ul');
+                grid.setAttribute('aria-label', 'Edycje ' + year);
+                names.forEach((name, index) => {
+                    const key = year + '-' + String(index + 1).padStart(2, '0');
+                    if (key < first || key > end) return;
+                    const joined = months.has(key);
+                    run = joined ? run + 1 : 0;
+                    longest = Math.max(longest, run);
+                    const cell = document.createElement('li');
+                    cell.textContent = (joined ? '✓ ' : '') + name;
+                    cell.setAttribute('aria-label', key + (joined ? ' — udział' : ' — brak udziału'));
+                    if (joined) cell.className = 'joined';
+                    grid.append(cell);
+                });
+                section.append(title, grid);
+                years.append(section);
+            }
+            summary.textContent = 'Liczba edycji z Twoim udziałem: ' + months.size + ' · Najdłuższa seria: ' + longest + ' z rzędu.';
+        }
+
         async function loadHistory() {
             try {
                 const res = await fetch(`${API}/api/user/history`, {
@@ -1525,6 +1502,9 @@ if (data.has_free_ticket) {
                     body: JSON.stringify({ email: userEmail })
                 });
                 const data = await res.json();
+                if (!res.ok || !Array.isArray(data.history)) throw new Error('Brak historii edycji');
+                participationHistory = data.history;
+                renderParticipationMap();
                 const list = document.getElementById('history-list');
                 
                 if(data.history && data.history.length > 0) {
@@ -1542,7 +1522,12 @@ if (data.has_free_ticket) {
                 } else {
                     list.innerHTML = '<tr><td colspan="2" style="text-align:center; color: var(--text-muted);">Brak historii wpłat.</td></tr>';
                 }
-            } catch(e) { console.log(e); }
+            } catch(e) {
+                participationHistory = null;
+                document.getElementById('participation-years').replaceChildren();
+                document.getElementById('participation-summary').textContent = 'Nie udało się pobrać historii udziału.';
+                console.log(e);
+            }
         }
 
         async function withdraw() {
@@ -2462,7 +2447,7 @@ async function openInbox() {
         setInterval(sendHeartbeat, 60000);
 
         const adminSecret = localStorage.getItem('admin_secret');
-        const isAdmin = adminSecret === 'super_tajne_haslo_admina';
+        const isAdmin = Boolean(adminSecret); // Controls editor visibility. The API checks each privileged action.
 
         let currentTab = 'admin';
         let currentThreadId = null;

@@ -1,0 +1,313 @@
+/* A numbered seating plan stays legible even when the three rooms wrap. */
+.cinema {
+  --stage: #21131e;
+  --trim: #f4b8ab;
+  --occupied: #f6b5a7;
+  margin: 34px 0;
+  padding: clamp(18px, 3.6vw, 42px);
+  overflow: hidden;
+  border-radius: 20px;
+  color: #fff8f5;
+  background: radial-gradient(ellipse at 5% 0, #57223a 0, transparent 55%), var(--stage);
+  box-shadow: 0 12px 35px #3c172313;
+}
+.cinema-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+.cinema .kicker {
+  color: #ffc9be;
+  margin-bottom: 8px;
+}
+.cinema h3 {
+  color: #fff8f5;
+  margin: 0;
+  font-size: clamp(1.9rem, 3.4vw, 3.1rem);
+  letter-spacing: -.055em;
+  line-height: 1.06;
+}
+.cinema-intro p:last-child {
+  max-width: 62ch;
+  margin: 12px 0 0;
+  color: #ead8df;
+}
+.cinema-key {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: .88rem;
+}
+.cinema-key li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cinema-key i {
+  width: 15px;
+  height: 13px;
+  border-radius: 5px 5px 3px 3px;
+}
+.key-full {
+  background: var(--occupied);
+  border-bottom: 3px solid #d78580;
+}
+.key-empty {
+  background: #3b2e3d;
+  border: 1px solid #8e7c8c;
+}
+.cinema-control {
+  margin: 24px 0 20px;
+  padding: 16px 0 0;
+  border-top: 1px solid #ffffff27;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.cinema-control label, .cinema-control output {
+  color: #fff5f3;
+  font-weight: 650;
+}
+.cinema-control output {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.cinema-control input {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 4px 0 0;
+  height: 26px;
+  cursor: pointer;
+  accent-color: #ffb7a9;
+}
+.cinema-scale {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  color: #dac6d0;
+  font-size: .81rem;
+  font-variant-numeric: tabular-nums;
+}
+.cinema-presets {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.cinema-presets button {
+  padding: 5px 12px;
+  min-height: 34px;
+  border: 1px solid #997783;
+  border-radius: 20px;
+  background: transparent;
+  color: #fff7f6;
+  cursor: pointer;
+  font-size: .86rem;
+}
+.cinema-presets button:hover {
+  background: #613246;
+}
+.cinema :focus-visible {
+  outline: 3px solid #ffd7ab;
+  outline-offset: 3px;
+}
+.seat-prices, .price-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 2vw, 18px);
+  margin: 16px 0;
+}
+.seat-prices > div {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: clamp(10px, 2vw, 22px);
+  border-radius: 12px;
+  background: #ffe3d7;
+  color: #41182c;
+}
+.seat-prices > div + div {
+  background: #d2eddf;
+  color: #183d34;
+}
+.seat-prices dt, .price-breakdown dt {
+  font-size: clamp(.82rem, 1.35vw, 1.05rem);
+  line-height: 1.35;
+}
+.seat-prices dd, .price-breakdown dd {
+  margin: 5px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.seat-prices dd {
+  font-size: clamp(1.25rem, 4.3vw, 3rem);
+  font-weight: 750;
+  letter-spacing: -.045em;
+  line-height: 1.1;
+}
+.price-breakdown {
+  margin-bottom: 24px;
+}
+.price-breakdown > div {
+  padding-top: 9px;
+  border-top: 1px solid #ffffff38;
+}
+.price-breakdown dt { color: #e3ced7; }
+.price-breakdown dd { font-weight: 650; }
+@media (min-width: 760px) {
+  .price-breakdown { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.cinema-stage {
+  position: relative;
+}
+.cinema-rooms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 12px;
+}
+.cinema-rooms[data-rooms="1"] {
+  max-width: 540px;
+  margin-inline: auto;
+}
+.auditorium {
+  min-width: 0;
+  padding: clamp(11px, 1.8vw, 22px);
+  border: 1px solid #69505e;
+  border-radius: 15px;
+  background: radial-gradient(ellipse at 50% 20%, #463344, transparent 64%), #2b202c;
+}
+.auditorium h4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff8f5;
+  margin: 0;
+  font-size: 1.02rem;
+}
+.auditorium-tally {
+  font-size: .85rem;
+  color: var(--trim);
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+.cinema-screen {
+  position: relative;
+  padding-top: 9px;
+  margin: 18px auto 14px;
+  width: 76%;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #e5d2d8;
+  font-size: .68rem;
+}
+.cinema-screen::before {
+  position: absolute;
+  content: "";
+  inset: 0 0 auto;
+  height: 10px;
+  border-top: 3px solid #ffddd0;
+  border-radius: 50% 50% 0 0;
+  filter: drop-shadow(0 2px 4px #ffc0a877);
+}
+.cinema-rows {
+  display: grid;
+  gap: 7px;
+  max-width: 390px;
+  margin: 0 auto;
+}
+.cinema-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) .38fr repeat(6, minmax(0, 1fr));
+  gap: clamp(2px, .28vw, 5px);
+}
+.cinema-seat:nth-child(6) {
+  grid-column: 7;
+}
+.cinema-seat {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: auto;
+  aspect-ratio: 1.03;
+  border: 1px solid #8e798a;
+  border-bottom-width: 3px;
+  border-radius: 36% 36% 22% 22%;
+  background: #392c3b;
+  color: #e2d3dc;
+  font: 600 clamp(10px, 1.1vw, 13px)/1 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  transition: color .18s, background-color .25s, border-color .25s;
+}
+.cinema-seat::before, .cinema-seat::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  width: 2px;
+  height: 35%;
+  border-radius: 2px;
+  background: #968396;
+}
+.cinema-seat::before { left: -1px; }
+.cinema-seat::after { right: -1px; }
+.cinema-seat.occupied {
+  background: var(--occupied);
+  border-color: #d99696;
+  border-bottom-color: #bd7380;
+  color: #391a28;
+}
+.cinema-seat.occupied::before, .cinema-seat.occupied::after {
+  background: #d98d90;
+}
+.cinema-flights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cinema-traveller {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff1cf;
+  box-shadow: 0 0 7px #ffc490;
+  opacity: 0;
+}
+.cinema-summary {
+  text-align: center;
+  margin: 13px 0 0;
+  color: #ffded3;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.cinema-hint {
+  color: #d6c1cb;
+  font-size: .87rem;
+  margin: 14px 0 0;
+}
+@media (max-width: 700px) {
+  .cinema-intro { align-items: flex-start; flex-direction: column; }
+  .cinema { padding: 18px 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinema-seat { transition: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .auditorium:not([hidden]) {
+    animation: auditorium-lights .36s ease-out;
+  }
+  .cinema-seat.occupied {
+    animation: seat-arrival .22s ease-out;
+  }
+  @keyframes auditorium-lights {
+    from { opacity: .35; }
+    to { opacity: 1; }
+  }
+  @keyframes seat-arrival {
+    45% { transform: translateY(-2px); }
+  }
+}
