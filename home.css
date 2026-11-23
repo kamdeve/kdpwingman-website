@@ -1115,11 +1115,7 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
 }
 .join-thresholds .edition-goals ul { margin-bottom:0; }
 
-@media (max-width:650px) {
-  .mast nav:has(a[href="narzedzia/index.html"]) {display:flex; margin-left:auto}
-  .mast nav:has(a[href="narzedzia/index.html"]) a:not([href="narzedzia/index.html"]) {display:none}
-  .mast nav a[href="narzedzia/index.html"] {font-size:.85rem; line-height:1.15}
-}
+
 
 @media (max-width:850px) {
   .join-grid { row-gap:16px; }
@@ -1131,3 +1127,33 @@ body {background:linear-gradient(145deg,#fff4f5,transparent 610px),#fff;}
   .join-thresholds .edition-goals { margin-top:0; }
 }
 
+.mast .member-tools-link {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  color:#a0134a;
+  font-weight:700;
+  white-space:nowrap;
+}
+@media (min-width:561px) and (max-width:850px) {
+  .mast .member-tools-link { margin-left:auto; }
+  .mast-tools { margin-left:0; }
+}
+@media (max-width:560px) {
+  .mast-inner {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:0 6px;
+    padding-block:6px;
+  }
+  .mast .wordmark { grid-area:1 / 1; justify-self:start; }
+  .mast .mast-tools, .mast-inner > .login-link { grid-area:1 / 2; justify-self:end; }
+  .mast .member-tools-link {
+    grid-column:1 / -1;
+    grid-row:2;
+    margin-top:4px;
+    border-radius:8px;
+    background:#f7ebf0;
+  }
+}
