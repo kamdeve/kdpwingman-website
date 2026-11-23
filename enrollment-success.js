@@ -20,15 +20,13 @@
       const res = await fetch(api+'enrollment/receipt',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({session_id:session})});
       const data = await res.json();
       if (!res.ok || !data.success || !data.joined) throw new Error(data.error || 'Nie udało się jeszcze potwierdzić rezerwacji.');
-      const card = document.getElementById('success-card');
-      card.querySelector('h1+p').textContent = 'Twój depozyt został zaksięgowany. Masz miejsce w edycji ' + data.edition + '.';
+      const month = new Intl.DateTimeFormat('pl-PL', {month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(data.edition+'-01T12:00:00Z'));
+      document.getElementById('receipt-edition').textContent = 'Twój depozyt został zaksięgowany. Twoja edycja to ' + month + '.';
       document.getElementById('user-num').textContent = data.position ? '#' + data.position : '✓';
-      card.querySelector('.card:nth-child(2) p').textContent = 'Szacowany koszt Helium na osobę';
       document.getElementById('new-price-usd').textContent = '—';
       document.getElementById('new-price-pln').textContent = '';
-      card.querySelector('button').onclick = () => location.assign(panel);
       document.documentElement.dataset.enrollment = 'confirmed';
-      card.querySelector(':scope > .mt-6').textContent = 'Za 12 sekund otworzy się Mój Panel.';
+      document.getElementById('receipt-next').textContent = 'Za 12 sekund otworzy się Mój Panel.';
       setTimeout(() => location.replace(panel),12000);
       const stats = await fetch(api+'group-buy/status').then(r=>r.ok ? r.json() : null).catch(()=>null);
       if (stats?.targetMonth !== data.edition || !(stats.priceUSD > 0)) return;

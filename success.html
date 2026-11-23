@@ -3,18 +3,13 @@
 <head>
     <meta name="referrer" content="no-referrer">
     <script>if (new URLSearchParams(location.search).has('enrollment_session')) document.documentElement.dataset.enrollment = 'pending';</script>
-    <link rel="stylesheet" href="/enrollment-success.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sukces! - Wingman</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
-    <style>
-        body { font-family: 'Poppins', sans-serif; background: #0f172a; color: white; }
-        .gradient-text { background: linear-gradient(90deg, #a0134a 0%, #d63384 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .card { background: #1f2937; border: 1px solid #374151; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-    </style>
+    <title>Potwierdzenie miejsca · Wingman</title>
+    <link rel="icon" href="/images/wingman-wing.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&amp;family=Geist:wght@400;500;600;700&amp;display=swap">
+    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="/enrollment-success.css">
 
 <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Mi Ri init Vi Gi Rr Wi Ji Bi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync un identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Xi createPersonProfile setInternalOrTestUser sn Hi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ki debug Lr rn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
@@ -26,69 +21,40 @@
 </script>
 
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-
-    <main id="receipt-state" aria-live="polite"><h1>Sprawdzamy Twoją wpłatę…</h1><p id="receipt-detail">Za chwilę zobaczysz status miejsca w tej edycji.</p><a href="/#dolacz">Wróć do zapisów</a> <button id="receipt-retry" hidden>Sprawdź ponownie</button></main>
-    <div id="success-card" class="max-w-4xl w-full text-center">
-        
-        <h1 class="text-4xl md:text-5xl font-bold mb-2">Gratulacje! <span class="gradient-text">Jesteś na liście!</span> 🚀</h1>
-        <p class="text-gray-400 mb-10 text-lg">Twój depozyt został zaksięgowany. Sprawdź, jak wpłynąłeś na cenę!</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            
-            <div class="card rounded-2xl p-8 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-                <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Twój numer na liście</p>
-                <div id="user-num" class="text-7xl font-bold text-white mb-2">...</div>
-                <p class="text-xs text-gray-500">Coraz bliżej celu!</p>
-            </div>
-
-            <div class="card rounded-2xl p-8 relative overflow-hidden border-2 border-pink-900">
-                <div class="absolute top-0 right-0 bg-pink-700 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">TERAZ</div>
-                <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">Dzięki Tobie cena spadła do:</p>
-                <div id="new-price-usd" class="text-6xl font-bold text-white mb-1">...</div>
-                <div id="new-price-pln" class="text-xl font-medium text-green-400">...</div>
-                
-                <div class="mt-4 p-2 bg-gray-900/50 rounded border border-gray-700 text-left">
-                    <p class="text-xs text-gray-400">
-                        <i class="fas fa-chart-line text-yellow-400"></i> 
-                        Historycznie cena spada poniżej <strong>40 PLN</strong>. Czekamy na resztę!
-                    </p>
+<body class="receipt-page">
+    <header class="mast"><div class="shell mast-inner">
+        <a class="wordmark" href="/" aria-label="Wingman — strona główna"><img src="/images/wingman-wing.png" alt="">Wingman</a>
+    </div></header>
+    <main class="receipt-shell">
+        <section id="receipt-state" aria-live="polite">
+            <h1>Sprawdzamy Twoją wpłatę…</h1>
+            <p id="receipt-detail">Za chwilę zobaczysz status miejsca w tej edycji.</p>
+            <a href="/#dolacz">Wróć do zapisów</a>
+            <button id="receipt-retry" type="button" hidden>Sprawdź ponownie</button>
+        </section>
+        <section id="success-card" aria-labelledby="receipt-title">
+            <h1 id="receipt-title">Gratulacje! <span class="gradient-text">Jesteś na liście!</span></h1>
+            <p id="receipt-edition">Twój depozyt został zaksięgowany.</p>
+            <dl class="receipt-metrics">
+                <div class="receipt-metric">
+                    <dt>Twój numer na liście</dt>
+                    <dd id="user-num">—</dd>
                 </div>
-            </div>
-
-        </div>
-
-        <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl mb-8 text-left max-w-2xl mx-auto shadow-lg">
-            <h3 class="text-green-400 font-bold mb-2 flex items-center gap-2">
-                <i class="fas fa-coins"></i> Co z resztą pieniędzy?
-            </h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-                Spokojnie! Wpłaciłeś bezpieczny depozyt (75 zł). Gdy zamkniemy listę i poznamy finalną cenę, 
-                <strong>różnica automatycznie wróci na Twój wirtualny portfel w Panelu Klienta</strong>. 
-                <br><br>
-                Będziesz mógł ją wykorzystać w przyszłym miesiącu lub wypłacić na konto jednym kliknięciem.
-            </p>
-        </div>
-
-        <button onclick="window.location.href='dashboard.html?tab=panel'" 
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg transform transition hover:-translate-y-1 text-lg w-full md:w-auto">
-            Przejdź do Mojego Panelu →
-        </button>
-
-        <p class="mt-6 text-gray-500 text-sm">Login i hasło otrzymasz na e-mail 5-go dnia miesiąca.</p>
-
-<div class="mt-8 pt-6 border-t border-gray-700">
-            <p class="text-gray-400 text-sm mb-3">Nie chcesz klikać co miesiąc?</p>
-            
-            <button onclick="window.location.href='dashboard.html?tab=panel'" 
-                class="group relative w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-gray-800 border border-pink-600 text-pink-500 font-bold rounded-lg hover:bg-pink-900/20 transition-all">
-                <span>✈️ Włącz Autopilota (Subskrypcja)</span>
-                <span class="text-xs font-normal text-gray-400 group-hover:text-gray-300">| w Panelu</span>
-            </button>
-        </div>
-
-    </div>
+                <div class="receipt-metric receipt-price">
+                    <dt>Dzięki Tobie cena spadła do</dt>
+                    <dd id="new-price-usd">—</dd>
+                    <dd id="new-price-pln"></dd>
+                </div>
+            </dl>
+            <section class="receipt-wallet">
+                <h2>Co z resztą depozytu?</h2>
+                <p>Po rozliczeniu edycji nadwyżka z 75 zł wróci do Twojego portfela w Wingmanie. Możesz ją wykorzystać na kolejną edycję lub wypłacić na konto.</p>
+            </section>
+            <a class="receipt-primary" href="/dashboard.html?tab=panel">Przejdź do Mojego Panelu <span aria-hidden="true">→</span></a>
+            <p id="receipt-next">Dane dostępu otrzymasz e-mailem piątego dnia miesiąca edycji.</p>
+            <div class="receipt-autopilot"><a href="/dashboard.html?tab=panel">Włącz Autopilota w panelu</a></div>
+        </section>
+    </main>
 
     <script>
         const API_URL = "https://kdpwingmanv2backend-production.up.railway.app";
