@@ -5,7 +5,7 @@ async function respond(request, assets) {
   const routes = {
     '/api/register':['POST','/api/register'], '/api/login':['POST','/api/login'],
     '/api/group-buy/status':['GET','/api/enrollment/status'], '/public-data/group-buy/status':['GET','/api/enrollment/status'],
-    '/api/enrollment/me':['GET','/api/enrollment/me'], '/api/enrollment/continue':['POST','/api/enrollment/continue'],
+    '/api/enrollment/panel':['GET','/api/enrollment/panel'], '/api/enrollment/me':['GET','/api/enrollment/me'], '/api/enrollment/continue':['POST','/api/enrollment/continue'],
     '/api/enrollment/receipt':['POST','/api/enrollment/receipt'], '/api/enrollment/webhook':['POST','/api/enrollment/webhook']
   };
   const route = Object.hasOwn(routes,pathname) && routes[pathname];
@@ -28,7 +28,7 @@ async function respond(request, assets) {
       return new Response(response.body,{status:response.status,headers:{'Content-Type':response.headers.get('content-type')||'application/json','Cache-Control':'no-store'}});
     } catch { return Response.json({error:'Backend testowy jest chwilowo niedostępny.'},{status:502}); }
   }
-  if (pathname === '/dashboard') return Response.redirect(new URL('/dashboard.html',request.url),302);
+  if (pathname === '/dashboard') return Response.redirect(new URL('/dashboard.html'+new URL(request.url).search,request.url),302);
   if (!['GET','HEAD'].includes(request.method)) return new Response(null,{status:405});
   if (pathname === '/public-data/nbp-usd') {
     try {

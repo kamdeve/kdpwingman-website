@@ -9,7 +9,8 @@
   const sessionKey = 'wingman_join_token';
   const attempt = crypto.randomUUID();
   let edition, member, mode = 'register', busy = false, retryLoad = false;
-  let receipt;
+  const panelPath = '/dashboard.html?tab=panel';
+  const confirmation = $('joined-status');
   const money = n => new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(n / 100);
   const month = (ym, day) => new Intl.DateTimeFormat('pl-PL', day ? {day:'numeric', month:'long',year:'numeric',timeZone:'UTC'} : {month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(ym + (day ? '-05' : '-01') + 'T12:00:00Z'));
 
@@ -46,14 +47,17 @@
     start.hidden = !form.hidden;
     start.disabled = busy;
     submit.disabled = busy;
-    $('join-panel').hidden = !receipt?.success;
+    confirmation.hidden = !member?.joined;
+    $('join-note').hidden = Boolean(member?.joined);
     $('edition-next-wrap').hidden = Boolean(member?.joined || member?.free || edition?.isLocked);
     $('edition-fee-line').hidden = $('edition-next-wrap').hidden;
     if (retryLoad) { form.hidden = true; start.hidden = false; start.textContent = 'Spróbuj ponownie'; return; }
     if (!edition) { start.disabled = true; return; }
-    if (member?.joined || receipt?.joined) {
-      start.hidden = true; form.hidden = true; $('join-panel').hidden = false;
-      message.textContent = 'Masz miejsce w tej edycji. Dostęp otrzymasz e-mailem ' + month(receipt?.edition || edition.targetMonth,true) + '.';
+    if (member?.joined) {
+      start.hidden = true; form.hidden = true;
+      $('joined-access').textContent = 'Dostęp otrzymasz e-mailem ' + month(edition.targetMonth,true) + '.';
+      const mainAction = document.querySelector('a.primary[href="#dolacz"]');
+      if (mainAction) { mainAction.href = panelPath; mainAction.textContent = 'Masz miejsce · Mój Panel'; }
     } else if (edition.isLocked) {
       start.disabled = true; form.hidden = true; start.hidden = false;
       start.textContent = 'Zapisy są teraz zamknięte';
@@ -241,15 +245,14 @@
   };
   async function initialize() {
     try {
-      await load();
       const params = new URLSearchParams(location.search);
-      const session = params.get('enrollment_session');
-      if (session) {
-        receipt = await api('enrollment/receipt',{session_id:session});
-        await load(); history.replaceState(null,'',location.pathname+'#dolacz');
-        if (!receipt?.joined && !member?.joined) { $('join-panel').hidden = false; message.textContent = 'Wpłata zaksięgowana. Sprawdź saldo i status miejsca w panelu.'; }
-      } else if (params.has('cancelled')) message.textContent = 'Płatność anulowana. Możesz wrócić do zapisu.';
-      if (!member && !receipt?.joined && !edition.isLocked) {
+      if (params.has('enrollment_session')) {
+        location.replace('/success.html?enrollment_session=' + encodeURIComponent(params.get('enrollment_session')));
+        return;
+      }
+      await load();
+      if (params.has('cancelled')) message.textContent = 'Płatność anulowana. Możesz wrócić do zapisu.';
+      if (!member && !edition.isLocked) {
         setMode(localStorage.getItem('wingman_user') ? 'login' : 'register');
         form.hidden = false;
       }

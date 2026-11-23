@@ -1,0 +1,21 @@
+#receipt-state{display:none}
+html[data-enrollment] body{margin:0;min-height:100vh;display:grid;align-content:center;justify-items:center;background:#0f172a;color:#f8fafc;font-family:Poppins,system-ui,sans-serif;padding:clamp(18px,4vw,52px);box-sizing:border-box}
+html[data-enrollment] #success-card{display:none}
+html[data-enrollment=pending] #receipt-state{display:block;text-align:center;max-width:40rem}
+#receipt-state a,#receipt-state button{color:#b3d3ff}
+#receipt-state button{background:#263751;padding:.7rem;border:0;border-radius:.5rem;cursor:pointer}
+html[data-enrollment=confirmed] #success-card{display:block;width:min(100%,850px);text-align:center}
+html[data-enrollment] #success-card h1{font-size:clamp(2rem,5vw,3rem);line-height:1.1;margin:0 0 .6rem}
+html[data-enrollment] .gradient-text{color:#ff78b3;background:none;-webkit-text-fill-color:currentColor}
+html[data-enrollment] #success-card>.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:16px;margin:2rem 0}
+html[data-enrollment] #success-card .card,html[data-enrollment] #success-card>.text-left{position:relative;border:1px solid #39475b;background:#1e293b;border-radius:16px;padding:1.35rem;overflow:hidden}
+html[data-enrollment] #success-card .card p{margin:.55rem 0}
+html[data-enrollment] #user-num,html[data-enrollment] #new-price-usd{font-size:clamp(2.1rem,5vw,3.25rem);font-weight:750}
+html[data-enrollment] #new-price-pln{color:#79e5a8}
+html[data-enrollment] #success-card>.text-left{max-width:630px;margin:0 auto 1.5rem;text-align:left}
+html[data-enrollment] #success-card>.text-left h3{color:#79e5a8}
+html[data-enrollment] #success-card>.text-left p{line-height:1.55}
+html[data-enrollment] #success-card .card .absolute,html[data-enrollment] #success-card .card .mt-4,html[data-enrollment] #success-card>.mt-8{display:none}
+html[data-enrollment] #success-card>button{background:#a0134a;color:white;padding:.95rem 1.8rem;border:0;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
+html[data-enrollment] #success-card>.mt-6{color:#c2ccda}
+#receipt-state button[hidden]{display:none}
